@@ -1,0 +1,22 @@
+{
+  "name": "mia",
+  "version": "0.1.0",
+  "description": "Machine Intelligence Architecture - Personal AI Engineering OS",
+  "main": "src/cli/index.ts",
+  "scripts": {
+    "dev:cli": "bun run src/cli/index.ts",
+    "dev:daemon": "bun run src/daemon/server.ts",
+    "build:cli": "bun build --compile src/cli/index.ts --outfile bin/mia",
+    "build:daemon": "bun build --compile src/daemon/server.ts --outfile bin/miad",
+    "build": "bun run build:cli && bun run build:daemon",
+    "start": "bun run bin/mia",
+    "daemon": "bun run bin/miad",
+    "test": "echo 'Tests coming soon'",
+    "postinstall": "bun run build"
+  },
+  "keywords": ["ai", "agent", "workflow", "automation", "mia"],
+  "author": "Soham Datta",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

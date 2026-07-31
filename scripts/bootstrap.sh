@@ -32,7 +32,8 @@ mkdir -p "${MIA_DIR}"
 # Copy the repository to the MIA directory (if not already there)
 if [ "${REPO_DIR}" != "${MIA_DIR}" ]; then
     echo "Copying MIA source to ${MIA_DIR}..."
-    rsync -av --exclude='.git' --exclude='node_modules' --exclude='.DS_Store' "${REPO_DIR}/" "${MIA_DIR}/"
+    # Portable copy: use tar to preserve structure and exclude unwanted dirs
+    (cd "${REPO_DIR}" && tar --exclude='.git' --exclude='node_modules' --exclude='.DS_Store' -cf - .) | (cd "${MIA_DIR}" && tar -xf -)
 else
     echo "Already in the target directory. Skipping copy."
 fi
