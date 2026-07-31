@@ -1,0 +1,10 @@
+{
+  "name": "health",
+  "version": "1.0.0",
+  "description": "Code quality scorekeeper - verification baked into process",
+  "preambleTier": 1,
+  "allowedTools": ["Bash", "Read", "Write"],
+  "triggers": ["health", "quality", "score"],
+  "whenToInvoke": "Before ship. Gates on quality score (≥ 7). Verification is not an afterthought.",
+  "workflow": "1. Run project quality tools (tsc, biome, knip, tests)\n2. Compute composite score (0-10)\n3. Track trend over time\n4. Block ship if score < 7\n5. Suggest improvements when score drops"
+}

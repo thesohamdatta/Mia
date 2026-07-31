@@ -1,0 +1,10 @@
+{
+  "name": "aura",
+  "version": "1.0.0",
+  "description": "AURA project scaffolding and agent management",
+  "preambleTier": 1,
+  "allowedTools": ["Bash", "Read", "Write"],
+  "triggers": ["aura", "aura init", "aura agent"],
+  "whenToInvoke": "When working on AURA - your most important project.",
+  "workflow": "1. mia aura init → scaffold AURA monorepo\n2. mia aura agent <name> → create agent template\n3. mia aura eval → run eval suite\n4. mia aura deploy → deploy to staging"
+}

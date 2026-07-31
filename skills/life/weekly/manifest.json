@@ -1,0 +1,10 @@
+{
+  "name": "weekly",
+  "version": "1.0.0",
+  "description": "Weekly retrospective - trends, patterns, strategy",
+  "preambleTier": 1,
+  "allowedTools": ["Bash", "Read", "Write"],
+  "triggers": ["weekly", "weekly retro", "sprint retro"],
+  "whenToInvoke": "End of each week. Deep retrospective with trend analysis.",
+  "workflow": "1. Aggregate daily reflections\n2. Analyze learnings trends\n3. Review health metrics\n4. Identify patterns (good/bad)\n5. Set next week's focus\n6. Update long-term memory"
+}
