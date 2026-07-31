@@ -12,6 +12,7 @@
     "start": "bun run bin/mia",
     "daemon": "bun run bin/miad",
     "test": "echo 'Tests coming soon'",
+    "gen:skill-docs": "bun run scripts/gen-skill-docs.ts",
     "postinstall": "bun run build"
   },
   "keywords": ["ai", "agent", "workflow", "automation", "mia"],
