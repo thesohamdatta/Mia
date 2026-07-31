@@ -68,7 +68,7 @@ async function sendCommand(skill: string, args: string[] = []): Promise<void> {
 
 function showHelp() {
   console.log(`MIA (Machine Intelligence Architecture) CLI
-Version: 0.1.0
+Version: 0.2.0
 
 Usage: mia <skill> [args...]
 
@@ -97,7 +97,7 @@ Run 'mia <skill> --help' for skill-specific usage.
 }
 
 function showVersion() {
-  console.log("MIA v0.1.0 (Machine Intelligence Architecture)");
+  console.log("MIA v0.2.0 (Machine Intelligence Architecture)");
   console.log("Built on gstack principles. ~ maximum value per line ~");
 }
 

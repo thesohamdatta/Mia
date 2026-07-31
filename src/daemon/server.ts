@@ -68,7 +68,7 @@ async function initializeSkills() {
 // Pick a port and start
 const port = randomPort();
 const token = generateToken();
-const version = "0.1.0";
+const version = "0.2.0";
 
 saveState(port, token, version);
 await initializeSkills();
