@@ -6,6 +6,12 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import { STATE_FILE, DEFAULT_PORT_RANGE } from "../shared/types";
+import {
+  appendLearning, readLearnings, appendTimeline, readTimeline,
+  saveCheckpoint, listCheckpoints, getSlug, ensureProject,
+  readMemory, appendMemory, ensureMemory,
+  type Learning, type TimelineEvent, type Checkpoint
+} from "./learning";
 
 const HOME = homedir();
 const MIA_DIR = join(HOME, ".mia");
@@ -62,6 +68,9 @@ function registerBuiltinSkills() {
   skills.set("ship", { name: "ship", description: "Test → review → push → PR", triggers: ["ship"] });
   skills.set("review", { name: "review", description: "Pre-landing PR review", triggers: ["review"] });
   skills.set("retro", { name: "retro", description: "Weekly retrospective", triggers: ["retro"] });
+  skills.set("learn", { name: "learn", description: "Manage project learnings", triggers: ["learn"] });
+  skills.set("memory", { name: "memory", description: "Read/write long-term memory", triggers: ["memory"] });
+  skills.set("checkpoint", { name: "checkpoint", description: "Save/resume working state", triggers: ["checkpoint"] });
 }
 
 function handleCommand(skillName: string, args: string[], token: string): { ok: boolean; output?: string; error?: string } {
@@ -92,6 +101,100 @@ function handleCommand(skillName: string, args: string[], token: string): { ok: 
 
     case "plan":
       return { ok: true, output: "📋 PLAN MODE\n\nGrill-to-Ship pipeline:\nbrainstorm → grill → plan → PRD → issues → TDD → execute → review → commit\n\nWrite a verifiable plan with success criteria before implementing.\nRun 'mia spec' to turn intent into a PRD first. please" };
+
+    case "learn": {
+      const slug = getSlug();
+      const subcmd = args[0] || "list";
+      if (subcmd === "list") {
+        const learnings = readLearnings(slug, 20);
+        if (learnings.length === 0) return { ok: true, output: "No learnings yet. Run skills and MIA will learn from sessions. please" };
+        const lines = [`📚 Learnings for ${slug} (${learnings.length} shown):`, ""];
+        for (const l of learnings) {
+          lines.push(`  [${l.type}] ${l.key} (conf: ${l.confidence}) — ${l.insight}`);
+        }
+        return { ok: true, output: lines.join("\n") };
+      }
+      if (subcmd === "add") {
+        const slug2 = getSlug();
+        const learning: Learning = {
+          ts: new Date().toISOString(),
+          skill: args[1] || "manual",
+          type: (args[2] as Learning["type"]) || "preference",
+          key: args[3] || "untitled",
+          insight: args.slice(4).join(" ") || "No insight recorded",
+          confidence: 7,
+          source: "user-stated",
+        };
+        appendLearning(slug2, learning);
+        return { ok: true, output: `✓ Learning saved: ${learning.key}\n  ${learning.insight}` };
+      }
+      return { ok: true, output: "Usage: mia learn [list|add <skill> <type> <key> <insight>]" };
+    }
+
+    case "retro": {
+      const slug = getSlug();
+      const timeline = readTimeline(slug, 20);
+      const learnings = readLearnings(slug, 10);
+      const lines = [`📊 Retrospective for ${slug}`, ""];
+      if (timeline.length > 0) {
+        lines.push("## Recent Activity");
+        for (const t of timeline) {
+          lines.push(`  ${t.ts} | ${t.skill} | ${t.event}${t.outcome ? " | " + t.outcome : ""}`);
+        }
+      } else {
+        lines.push("## Recent Activity", "  (no timeline events yet)");
+      }
+      lines.push("");
+      if (learnings.length > 0) {
+        lines.push("## Key Learnings");
+        for (const l of learnings) {
+          lines.push(`  [${l.type}] ${l.key} — ${l.insight}`);
+        }
+      } else {
+        lines.push("## Key Learnings", "  (no learnings yet)");
+      }
+      lines.push("", "## What went well", "  (reflect and add)", "## What to improve", "  (reflect and add)", "## Next steps", "  (plan for next session)", "", "~ observe → learn → distill → apply → verify → evolve ~");
+      return { ok: true, output: lines.join("\n") };
+    }
+
+    case "memory": {
+      ensureMemory();
+      const subcmd = args[0] || "read";
+      if (subcmd === "read") {
+        const mem = readMemory();
+        return { ok: true, output: mem };
+      }
+      if (subcmd === "add") {
+        const text = args.slice(1).join(" ");
+        if (!text) return { ok: false, error: "Usage: mia memory add <text to remember>" };
+        appendMemory(text);
+        return { ok: true, output: `✓ Memory updated. ~/​.mia/memory.md` };
+      }
+      return { ok: true, output: "Usage: mia memory [read|add <text>]" };
+    }
+
+    case "checkpoint": {
+      const slug = getSlug();
+      const subcmd = args[0] || "list";
+      if (subcmd === "list") {
+        const cps = listCheckpoints(slug);
+        if (cps.length === 0) return { ok: true, output: "No checkpoints. Run 'mia checkpoint save' to create one. please" };
+        return { ok: true, output: `💾 Checkpoints for ${slug}:\n${cps.map(c => "  " + c).join("\n")}` };
+      }
+      if (subcmd === "save") {
+        const cp: Checkpoint = {
+          ts: new Date().toISOString(),
+          branch: args[1] || "unknown",
+          phase: args[2] || "working",
+          summary: args.slice(3).join(" ") || "Manual checkpoint",
+          remaining: [],
+          files: [],
+        };
+        saveCheckpoint(slug, cp);
+        return { ok: true, output: `✓ Checkpoint saved at ${cp.ts}` };
+      }
+      return { ok: true, output: "Usage: mia checkpoint [list|save <branch> <phase> <summary>]" };
+    }
 
     default:
       return { ok: true, output: `[${skillName}] Skill stub - not yet implemented. Coming soon! please` };
@@ -135,6 +238,68 @@ const server = serve({
     if (url.pathname === "/skills" && req.method === "GET") {
       const list = Array.from(skills.values()).map(s => ({ name: s.name, description: s.description, triggers: s.triggers }));
       return Response.json({ ok: true, skills: list });
+    }
+
+    // Learning API: POST /learn → append learning
+    if (url.pathname === "/learn" && req.method === "POST") {
+      if (currentToken && !verifyToken(req, currentToken)) {
+        return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      }
+      return req.json().then((body: Learning) => {
+        const slug = getSlug();
+        appendLearning(slug, body);
+        return Response.json({ ok: true, message: "Learning saved" });
+      }).catch(() => Response.json({ ok: false, error: "Invalid JSON" }, { status: 400 }));
+    }
+
+    // Learning API: GET /learn?limit=20 → list learnings
+    if (url.pathname === "/learn" && req.method === "GET") {
+      const slug = getSlug();
+      const limit = parseInt(url.searchParams.get("limit") || "20");
+      const learnings = readLearnings(slug, limit);
+      return Response.json({ ok: true, learnings });
+    }
+
+    // Timeline API: POST /timeline → append event
+    if (url.pathname === "/timeline" && req.method === "POST") {
+      if (currentToken && !verifyToken(req, currentToken)) {
+        return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      }
+      return req.json().then((body: TimelineEvent) => {
+        const slug = getSlug();
+        appendTimeline(slug, body);
+        return Response.json({ ok: true, message: "Timeline event saved" });
+      }).catch(() => Response.json({ ok: false, error: "Invalid JSON" }, { status: 400 }));
+    }
+
+    // Timeline API: GET /timeline?limit=30 → list events
+    if (url.pathname === "/timeline" && req.method === "GET") {
+      const slug = getSlug();
+      const limit = parseInt(url.searchParams.get("limit") || "30");
+      const events = readTimeline(slug, limit);
+      return Response.json({ ok: true, events });
+    }
+
+    // Memory API: GET /memory → read, POST /memory → append
+    if (url.pathname === "/memory" && req.method === "GET") {
+      const mem = readMemory();
+      return Response.json({ ok: true, memory: mem });
+    }
+    if (url.pathname === "/memory" && req.method === "POST") {
+      if (currentToken && !verifyToken(req, currentToken)) {
+        return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      }
+      return req.json().then((body: { text: string }) => {
+        appendMemory(body.text);
+        return Response.json({ ok: true, message: "Memory updated" });
+      }).catch(() => Response.json({ ok: false, error: "Invalid JSON" }, { status: 400 }));
+    }
+
+    // Checkpoint API: GET /checkpoints → list
+    if (url.pathname === "/checkpoints" && req.method === "GET") {
+      const slug = getSlug();
+      const cps = listCheckpoints(slug);
+      return Response.json({ ok: true, checkpoints: cps });
     }
 
     return Response.json({ ok: false, error: "Not found" }, { status: 404 });

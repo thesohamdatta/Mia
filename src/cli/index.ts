@@ -72,7 +72,7 @@ Version: 0.1.0
 
 Usage: mia <skill> [args...]
 
-Available skills:
+Core skills:
   help        Show this help message
   version     Show MIA version
   grill       Start a clarification interview (golden rule enforcement)
@@ -80,7 +80,12 @@ Available skills:
   spec        Turn intent into PRD → issues
   ship        Test → review → push → PR
   review      Pre-landing PR review
-  retro       Weekly retrospective
+
+Learning skills:
+  learn       Manage project learnings (list, add)
+  retro       Weekly retrospective with timeline + learnings
+  memory      Read/write long-term memory (~/.mia/memory.md)
+  checkpoint  Save/resume working state
 
 Daemon:
   miad                Start the MIA daemon (runs in foreground)
