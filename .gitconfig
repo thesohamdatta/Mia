@@ -1,0 +1,115 @@
+# MIA Project Git Configuration
+# Include this in your local git config:
+# git config --local include.path ../.gitconfig
+
+[alias]
+  # Status shortcuts
+  st = status -sb
+  ss = status --short
+  
+  # Log shortcuts
+  lg = log --oneline --graph --decorate --all -20
+  lga = log --oneline --graph --decorate --all
+  lp = log --oneline --graph --decorate --all -p
+  ls = log --oneline --stat --decorate -20
+  
+  # Branch shortcuts
+  br = branch -v
+  bra = branch -av
+  co = checkout
+  cob = checkout -b
+  
+  # Diff shortcuts
+  df = diff
+  dfs = diff --staged
+  dfw = diff --word-diff
+  
+  # Commit shortcuts
+  cm = commit -m
+  ca = commit --amend --no-edit
+  fixup = commit --fixup
+  squash = commit --squash
+  
+  # Push/Pull shortcuts
+  ps = push
+  psf = push --force-with-lease
+  pl = pull --rebase
+  plr = pull --rebase --autostash
+  
+  # Stash shortcuts
+  sta = stash push -m
+  stal = stash list
+  stap = stash pop
+  
+  # Reset shortcuts
+  unstage = reset HEAD --
+  uncommit = reset --soft HEAD~1
+  unmodify = checkout --
+  
+  # Useful
+  amend = commit --amend --no-edit
+  last = log -1 HEAD
+  root = rev-parse --show-toplevel
+
+[core]
+  # Line endings - LF in repo, convert on checkout
+  autocrlf = input
+  # Case sensitivity
+  ignorecase = false
+  # Editor
+  editor = code --wait
+
+[pull]
+  # Default to rebase for cleaner history
+  rebase = true
+  ff = only
+
+[push]
+  # Push current branch to matching upstream
+  default = current
+  # Push tags with --follow-tags
+  followTags = true
+
+[merge]
+  # Don't commit on merge, let me review
+  ff = only
+  # Conflict style
+  conflictstyle = diff3
+
+[rebase]
+  # Auto-stash before rebase
+  autostash = true
+  # Update refs
+  updateRefs = true
+
+[init]
+  # Default branch name
+  defaultBranch = main
+
+[commit]
+  # Sign commits by default (if GPG configured)
+  gpgsign = false
+  # Verbose commit messages
+  verbose = true
+
+[log]
+  # Decorate by default
+  decorate = short
+
+[diff]
+  # Algorithm
+  algorithm = histogram
+  # Color
+  colorMoved = zebra
+
+[fetch]
+  # Prune by default
+  prune = true
+
+[branch]
+  # Sort by commit date
+  sort = -committerdate
+
+[tag]
+  # Sort tags by version
+  sort = version:refname

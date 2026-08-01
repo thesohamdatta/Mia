@@ -1,1 +1,80 @@
-bin/*.exe
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+bin/
+dist/
+build/
+*.exe
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Bun
+.bun/
+
+# MIA state (local per-machine)
+.mia/
+!.mia/skills/  # Keep built-in skills
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Editor directories and files
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - IntelliJ
+.idea/
+*.iml
+*.iws
+
+# VS Code (keep settings that should be shared)
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+
+# Misc
+*.pid
+.seed

@@ -55,15 +55,15 @@ fi
 
 ## When to invoke this skill
 
-After grill, before implementation. Grill-to-Ship: brainstorm → grill → plan → spec → TDD → execute → review → commit
+After grill, before any implementation. Verifiable plan with success criteria before implementing.
 
 ## Workflow
 
-1. Define objective and success criteria
-2. Break into verifiable steps
+1. Define success criteria (measurable)
+2. Break into atomic steps
 3. Identify dependencies and risks
-4. Write ADR for architectural decisions
-5. Get approval before execute
+4. Estimate effort per step
+5. Human approves plan before execution
 
 ---
 

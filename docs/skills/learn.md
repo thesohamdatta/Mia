@@ -58,7 +58,7 @@ When asked about past patterns, or proactively after completing a session. Every
 
 1. Run 'mia learn list' to see existing
 2. Add new: 'mia learn add <skill> <type> <key> <insight>'
-3. Types: pattern, pitfall, preference, architecture, tool
+3. Types: pattern, pitfall, preference, architecture, tool, constitutional-principle, character-trait, psychological-insight
 4. Confidence auto-decays 1pt per 30 days
 
 ---

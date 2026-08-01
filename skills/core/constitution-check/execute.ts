@@ -1,29 +1,36 @@
 // Constitution Check Skill - Audits all skills against constitutional hierarchy
 // Runs: mia constitution-check
 
-import { type SkillManifest } from "../../skill-loader";
+import type { SkillManifest } from '../../skill-loader';
 
 export const manifest: SkillManifest = {
-  name: "constitution-check",
-  version: "1.0.0",
-  description: "Audit all skills against constitutional hierarchy",
+  name: 'constitution-check',
+  version: '1.0.0',
+  description: 'Audit all skills against constitutional hierarchy',
   preambleTier: 1,
-  allowedTools: ["Bash", "Read", "Write"],
-  triggers: ["constitution-check", "constitutional-audit"],
-  whenToInvoke: "Monthly constitutional audit. Before major releases. When value drift suspected.",
-  workflow: "1. Load all skill manifests\n2. Check each has constitutionalAlignment\n3. Verify primaryValue follows hierarchy (safe > ethical > compliant > helpful)\n4. Check hardConstraints are declared\n5. Report violations and drift\n6. Suggest amendments if needed",
+  allowedTools: ['Bash', 'Read', 'Write'],
+  triggers: ['constitution-check', 'constitutional-audit'],
+  whenToInvoke: 'Monthly constitutional audit. Before major releases. When value drift suspected.',
+  workflow:
+    '1. Load all skill manifests\n2. Check each has constitutionalAlignment\n3. Verify primaryValue follows hierarchy (safe > ethical > compliant > helpful)\n4. Check hardConstraints are declared\n5. Report violations and drift\n6. Suggest amendments if needed',
   constitutionalAlignment: {
-    "primaryValue": "compliant",
-    "hardConstraints": ["constitutional-audit", "drift-detection"],
-    "reasoning": "Meta-skill that enforces constitutional compliance across all skills. Implements the amendment protocol's drift detection. Primary value: Compliant."
-  }
+    primaryValue: 'compliant',
+    hardConstraints: ['constitutional-audit', 'drift-detection'],
+    reasoning:
+      "Meta-skill that enforces constitutional compliance across all skills. Implements the amendment protocol's drift detection. Primary value: Compliant.",
+  },
 };
 
-export async function execute(args: string[], token: string): Promise<{ ok: boolean; output?: string; error?: string }> {
-  const subcmd = args[0] || "audit";
-  
-  if (subcmd === "audit") {
-    return { ok: true, output: `📋 CONSTITUTIONAL AUDIT
+export async function execute(
+  args: string[],
+  _token: string
+): Promise<{ ok: boolean; output?: string; error?: string }> {
+  const subcmd = args[0] || 'audit';
+
+  if (subcmd === 'audit') {
+    return {
+      ok: true,
+      output: `📋 CONSTITUTIONAL AUDIT
 
 ═══════════════════════════════════
 VALUE HIERARCHY (priority order):
@@ -51,11 +58,14 @@ AUDIT CHECKLIST:
 Run 'mia constitution-check details' for full skill-by-skill report.
 Run 'mia constitution-check drift' for value drift analysis.
 
-~ constitutional authority: CLAUDE.md > PRINCIPLES.md > WORKFLOW.md > skills ~` };
+~ constitutional authority: CLAUDE.md > PRINCIPLES.md > WORKFLOW.md > skills ~`,
+    };
   }
-  
-  if (subcmd === "details") {
-    return { ok: true, output: `📊 SKILL-BY-SKILL CONSTITUTIONAL ALIGNMENT
+
+  if (subcmd === 'details') {
+    return {
+      ok: true,
+      output: `📊 SKILL-BY-SKILL CONSTITUTIONAL ALIGNMENT
 
 CORE SKILLS:
 ┌──────────┬────────────┬────────────────────────────────┐
@@ -105,11 +115,14 @@ HARD CONSTRAINT COVERAGE:
 ✅ agent-architecture-principles: aura
 ✅ evals-first: aura
 
-~ maximum value per line ~` };
+~ maximum value per line ~`,
+    };
   }
-  
-  if (subcmd === "drift") {
-    return { ok: true, output: `📈 VALUE DRIFT ANALYSIS
+
+  if (subcmd === 'drift') {
+    return {
+      ok: true,
+      output: `📈 VALUE DRIFT ANALYSIS
 
 Drift detection compares recent decisions (timeline) against constitutional hierarchy.
 
@@ -139,8 +152,9 @@ RECOMMENDATIONS:
 2. Consider adding 'constitutional-principle' learning type captures
 3. Monthly constitution-check audit scheduled
 
-~ observe → learn → distill → apply → verify → evolve ~` };
+~ observe → learn → distill → apply → verify → evolve ~`,
+    };
   }
-  
-  return { ok: true, output: `Usage: mia constitution-check [audit|details|drift]` };
+
+  return { ok: true, output: 'Usage: mia constitution-check [audit|details|drift]' };
 }

@@ -2,7 +2,7 @@
 
 > A personal AI engineering OS — compiled, local-first, self-improving.
 
-## What is MIA?
+## What is MIA
 
 MIA is a **personal AI chief of staff** for software engineers. It runs as a compiled Bun binary with a persistent daemon, giving you:
 

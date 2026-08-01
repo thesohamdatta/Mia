@@ -1,0 +1,25 @@
+# MIA Research Sources Registry
+# Every source used in research must be registered here with metadata
+# Format: YAML list of source objects
+
+# Example entries:
+# - id: gstack-repo
+#   type: primary:source-code
+#   url: https://github.com/user/gstack
+#   commit: abc123
+#   accessed: 2026-08-01
+#   relevance: core-foundation
+#   confidence: high
+#   tags: [bun, daemon, sqlite, skills, host-adapters]
+
+# - id: ousterhout-book
+#   type: primary:book
+#   title: "A Philosophy of Software Design"
+#   author: John Ousterhout
+#   edition: 2nd
+#   year: 2021
+#   chapters-studied: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+#   relevance: software-craft
+#   confidence: high
+
+# Add sources as research progresses

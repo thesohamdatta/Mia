@@ -1,0 +1,50 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Commit-msg hook - validates Conventional Commits format
+# Runs on every commit message
+
+commit_msg_file="$1"
+commit_msg=$(cat "$commit_msg_file")
+
+# Conventional Commits regex
+# Format: <type>[optional scope]: <description>
+# Types: feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert
+
+conventional_regex='^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\([^)]+\))?: .{1,100}$'
+
+if ! echo "$commit_msg" | grep -qE "$conventional_regex"; then
+    echo "❌ Invalid commit message format!"
+    echo ""
+    echo "Expected format: <type>[optional scope]: <description>"
+    echo ""
+    echo "Valid types:"
+    echo "  feat     - A new feature"
+    echo "  fix      - A bug fix"
+    echo "  docs     - Documentation only changes"
+    echo "  style    - Changes that don't affect code meaning (whitespace, formatting)"
+    echo "  refactor - Code change that neither fixes a bug nor adds a feature"
+    echo "  perf     - Performance improvement"
+    echo "  test     - Adding missing tests or correcting existing tests"
+    echo "  chore    - Changes to build process or auxiliary tools"
+    echo "  build    - Changes that affect the build system or external dependencies"
+    echo "  ci       - Changes to CI configuration files and scripts"
+    echo "  revert   - Reverts a previous commit"
+    echo ""
+    echo "Examples:"
+    echo "  feat(cli): add new --verbose flag"
+    echo "  fix(daemon): handle connection timeout"
+    echo "  docs: update README with install instructions"
+    echo "  refactor(skills): simplify skill loading logic"
+    echo "  test: add unit tests for config parser"
+    echo ""
+    echo "Your message: $commit_msg"
+    exit 1
+fi
+
+# Check for breaking changes
+if echo "$commit_msg" | grep -qE '^.*(!:|\(.+\)!):'; then
+    echo "⚠️  Breaking change detected - ensure CHANGELOG is updated"
+fi
+
+echo "✅ Commit message format valid"

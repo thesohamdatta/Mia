@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-commit hook - runs on every commit
+# Runs fast checks: linting, formatting, type checking
+
+echo "🔍 Running pre-commit checks..."
+
+# Run biome lint and format check
+echo "📝 Checking code style with Biome..."
+bunx biome check --write --unsafe .
+
+# Run TypeScript type checking
+echo "🔍 Running TypeScript type check..."
+bunx tsc --noEmit
+
+# Run knip to check for unused dependencies/exports
+echo "🔍 Checking for unused code with Knip..."
+bunx knip
+
+echo "✅ Pre-commit checks passed!"

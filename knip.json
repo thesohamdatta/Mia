@@ -1,0 +1,29 @@
+{
+  "$schema": "https://knip.dev/schema.json",
+  "entry": ["src/cli/index.ts", "src/daemon/server.ts"],
+  "project": ["src/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"],
+  "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky"],
+  "ignoreDependencies": [
+    "typescript",
+    "@biomejs/biome",
+    "vitest",
+    "husky",
+    "markdownlint-cli2",
+    "gray-matter",
+    "zod",
+    "lychee",
+    "typos-cli",
+    "knip"
+  ],
+  "rules": {
+    "dependencies": "error",
+    "devDependencies": "error",
+    "exports": "error",
+    "files": "error",
+    "nsExports": "error",
+    "nsTypes": "error",
+    "types": "error",
+    "unlisted": "warn",
+    "unresolved": "error"
+  }
+}
