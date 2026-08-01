@@ -37,30 +37,12 @@ export class ConfigLoader {
   }
 
   private merge(base: Config, override: Partial<Config>): Config {
-    const result: Config = {
-      daemon: { ...base.daemon },
-      paths: { ...base.paths },
-      skills: { ...base.skills },
-      features: { ...base.features },
-    } as Config;
+    const result: Config = { ...base } as Config;
 
     for (const key of Object.keys(override) as Array<keyof Config>) {
       const overrideValue = override[key];
       if (overrideValue !== undefined) {
-        if (
-          typeof overrideValue === 'object' &&
-          overrideValue !== null &&
-          !Array.isArray(overrideValue)
-        ) {
-          const baseValue = base[key];
-          if (typeof baseValue === 'object' && baseValue !== null && !Array.isArray(baseValue)) {
-            result[key] = { ...baseValue, ...overrideValue } as Config[keyof Config];
-          } else {
-            result[key] = overrideValue as Config[keyof Config];
-          }
-        } else {
-          result[key] = overrideValue as Config[keyof Config];
-        }
+        result[key] = overrideValue as never;
       }
     }
     return result;

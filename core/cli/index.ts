@@ -52,7 +52,7 @@ async function sendCommand(skill: string, args: string[] = []): Promise<void> {
     body: JSON.stringify({ skill, args }),
   });
 
-  const result: { ok: boolean; error?: string; output?: string } = await res.json();
+  const result = (await res.json()) as { ok: boolean; error?: string; output?: string };
 
   if (!result.ok) {
     console.error(`❌ ${result.error ?? 'Unknown error'}`);

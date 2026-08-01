@@ -11,7 +11,7 @@ export async function memoryRoute(req: Request, token: string): Promise<Response
     }
 
     try {
-      const body: { text?: string } = await req.json();
+      const body = (await req.json()) as { text?: string };
       if (!body.text) {
         return Response.json({ ok: false, error: 'Text field required' }, { status: 400 });
       }

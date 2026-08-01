@@ -27,18 +27,20 @@ async function loadExecutor(skillDir: string, manifest: SkillManifest): Promise<
 
   if (existsSync(execPath)) {
     const mod = await import(execPath);
-    return mod.execute;
+    return { execute: mod.execute };
   }
   if (existsSync(execJsPath)) {
     const mod = await import(execJsPath);
-    return mod.execute || mod.default;
+    return { execute: mod.execute || mod.default };
   }
 
   // Fallback stub
-  return async (_args: string[], _context: ExecutionContext) => ({
-    ok: true,
-    output: `[${manifest.name}] Not yet implemented. Coming soon!`,
-  });
+  return {
+    execute: async (_args: string[], _context: ExecutionContext) => ({
+      ok: true,
+      output: `[${manifest.name}] Not yet implemented. Coming soon!`,
+    }),
+  };
 }
 
 async function loadSkillFromDir(skillDir: string): Promise<Skill | null> {
@@ -73,15 +75,17 @@ function scanSkillsDir(skillsDir: string): Map<string, Skill> {
       const manifest = readManifest(manifestPath);
 
       if (manifest) {
-        // Store skill with lazy executor loading - executor must be a function
+        // Store skill with lazy executor loading - executor must be an object with execute method
         const skill: Skill = {
           manifest,
-          executor: async (args, context) => {
-            const loaded = await loadSkillFromDir(skillPath);
-            if (!loaded) {
-              return { ok: false, error: `Skill ${manifest.name} not found` };
-            }
-            return loaded.executor(args, context);
+          executor: {
+            execute: async (args, context) => {
+              const loaded = await loadSkillFromDir(skillPath);
+              if (!loaded) {
+                return { ok: false, error: `Skill ${manifest.name} not found` };
+              }
+              return loaded.executor.execute(args, context);
+            },
           },
         };
 

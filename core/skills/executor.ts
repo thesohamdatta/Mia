@@ -10,7 +10,7 @@ export async function executeSkill(
   const _startTime = Date.now();
 
   try {
-    const result = await executor(args, context);
+    const result = await executor.execute(args, context);
 
     // Log completion
     await logSkillComplete(context.slug, skillName, result);
@@ -31,5 +31,5 @@ export async function executeSkill(
 export function createExecutor(
   fn: (args: string[], context: ExecutionContext) => Promise<SkillResult>
 ): SkillExecutor {
-  return fn;
+  return { execute: fn };
 }

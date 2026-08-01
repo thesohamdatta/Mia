@@ -108,8 +108,7 @@ const server = serve({
         );
       }
 
-      return req
-        .json()
+      return (req.json() as Promise<{ skill: string; args?: string[] }>)
         .then(async (body: { skill: string; args?: string[] }) => {
           const { skill, args = [] } = body;
           const skillObj = skills.get(skill);
@@ -153,8 +152,7 @@ const server = serve({
       if (currentToken && !verifyToken(req, currentToken)) {
         return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
       }
-      return req
-        .json()
+      return (req.json() as Promise<Learning>)
         .then((body: Learning) => {
           const slug = getSlug();
           appendLearning(slug, body);
@@ -176,8 +174,7 @@ const server = serve({
       if (currentToken && !verifyToken(req, currentToken)) {
         return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
       }
-      return req
-        .json()
+      return (req.json() as Promise<TimelineEvent>)
         .then((body: TimelineEvent) => {
           const slug = getSlug();
           appendTimeline(slug, body);
@@ -203,8 +200,7 @@ const server = serve({
       if (currentToken && !verifyToken(req, currentToken)) {
         return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
       }
-      return req
-        .json()
+      return (req.json() as Promise<{ text: string }>)
         .then((body: { text: string }) => {
           appendMemory(body.text);
           return Response.json({ ok: true, message: 'Memory updated' });

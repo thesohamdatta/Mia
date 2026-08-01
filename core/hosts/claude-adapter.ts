@@ -17,20 +17,20 @@ export class ClaudeAdapter extends BaseHostAdapter {
   private createClient(config: HostConfig) {
     return {
       baseUrl: config.baseUrl || 'https://api.anthropic.com',
-      apiKey: config.apiKey,
-      anthropicVersion: config.anthropicVersion || '2023-06-01',
+      apiKey: config.apiKey || '',
+      anthropicVersion: (config.extra?.anthropicVersion as string) || '2023-06-01',
       timeout: config.timeout || 60000,
     };
   }
 
-  protected async onInitialize(): Promise<void> {
+  protected override async onInitialize(): Promise<void> {
     if (!this.config.apiKey) {
       throw new Error('Claude adapter requires apiKey in config');
     }
     this.client = this.createClient(this.config);
   }
 
-  protected async executeImpl(
+  protected override async executeImpl(
     skill: SkillManifest,
     _context: ExecutionContext,
     input: string
@@ -53,7 +53,7 @@ export class ClaudeAdapter extends BaseHostAdapter {
     }
   }
 
-  async *executeStreaming(
+  protected override async *executeStreaming(
     skill: SkillManifest,
     _context: ExecutionContext,
     input: string

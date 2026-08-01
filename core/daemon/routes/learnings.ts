@@ -15,7 +15,7 @@ export async function learningsRoute(req: Request, token: string): Promise<Respo
     }
 
     try {
-      const learning: Learning = await req.json();
+      const learning = (await req.json()) as Learning;
       await stateService.learnings.append(slug, learning);
       return Response.json({ ok: true, message: 'Learning saved' });
     } catch {
