@@ -1,0 +1,15 @@
+{
+  "name": "constitution-check",
+  "version": "1.0.0",
+  "description": "Audit all skills against constitutional hierarchy",
+  "preambleTier": 1,
+  "allowedTools": ["Bash", "Read", "Write"],
+  "triggers": ["constitution-check", "constitutional-audit"],
+  "whenToInvoke": "Monthly constitutional audit. Before major releases. When value drift suspected.",
+  "workflow": "1. Load all skill manifests\n2. Check each has constitutionalAlignment\n3. Verify primaryValue follows hierarchy (safe > ethical > compliant > helpful)\n4. Check hardConstraints are declared\n5. Report violations and drift\n6. Suggest amendments if needed",
+  "constitutionalAlignment": {
+    "primaryValue": "compliant",
+    "hardConstraints": ["constitutional-audit", "drift-detection"],
+    "reasoning": "Meta-skill that enforces constitutional compliance across all skills. Implements the amendment protocol's drift detection. Primary value: Compliant."
+  }
+}

@@ -5,6 +5,11 @@
   "preambleTier": 1,
   "allowedTools": ["Bash", "Read", "Write"],
   "triggers": ["aura", "aura init", "aura agent"],
-  "whenToInvoke": "When working on AURA - your most important project.",
-  "workflow": "1. mia aura init → scaffold AURA monorepo\n2. mia aura agent <name> → create agent template\n3. mia aura eval → run eval suite\n4. mia aura deploy → deploy to staging"
+  "whenToInvoke": "Starting new AURA project or creating agent definitions. AURA is the north star: agentic software development.",
+  "workflow": "1. Scaffold AURA monorepo structure\n2. Create agent definitions (planner, executor, reviewer, researcher)\n3. Set up evals/ harness/ memory/ skills/ config/\n4. Initialize learning layer for AURA project\n5. Run 'mia aura init' in target directory",
+  "constitutionalAlignment": {
+    "primaryValue": "helpful",
+    "hardConstraints": ["agent-architecture-principles", "evals-first"],
+    "reasoning": "AURA is the north star project. Agent architecture follows constitutional principles: single responsibility, clear triggers, composable workflows, progressive disclosure, portable content. Primary value: Helpful (enables agentic software development)."
+  }
 }

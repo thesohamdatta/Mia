@@ -6,5 +6,10 @@
   "allowedTools": ["Bash", "Read", "Write"],
   "triggers": ["evening", "end day", "daily end"],
   "whenToInvoke": "End of each work day. Captures learnings, prevents cognitive debt, prepares tomorrow.",
-  "workflow": "1. What did I ship today?\n2. What did I learn? (add to learnings)\n3. What's blocked?\n4. What are tomorrow's 3 priorities?\n5. Fold into long-term memory"
+  "workflow": "1. What did I ship today?\n2. What did I learn? (add to learnings)\n3. What's blocked?\n4. What are tomorrow's 3 priorities?\n5. Fold into long-term memory\n\n## Constitutional Reflection\n- Did I prioritize safety > ethics > guidelines > helpfulness?\n- Where did I skip grill? What was the cost?\n- Character moment: when was I genuinely warm/curious/direct?\n- Learning to capture: [constitutional-principle|character-trait|psychological-insight]",
+  "constitutionalAlignment": {
+    "primaryValue": "ethical",
+    "hardConstraints": ["daily-reflection", "learning-capture"],
+    "reasoning": "Evening reflection implements 'reflective equilibrium' daily. Captures learnings for psychological security. Primary value: Ethical (honest self-assessment)."
+  }
 }

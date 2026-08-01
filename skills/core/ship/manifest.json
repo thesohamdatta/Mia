@@ -5,6 +5,11 @@
   "preambleTier": 1,
   "allowedTools": ["Bash", "Read", "Write"],
   "triggers": ["ship", "deploy", "push"],
-  "whenToInvoke": "After review passes. Final step in grill-to-ship.",
-  "workflow": "1. Run all tests\n2. Run health check (score ≥ 7)\n3. Create PR with changelog\n4. Push and create PR\n5. Verify CI passes"
+  "whenToInvoke": "After review passes. Test → health (≥7) → review → push → PR. Gate on health score.",
+  "workflow": "1. Tests: run full test suite\n2. Health: mia health (score ≥ 7)\n3. Review: mia review (if not done)\n4. Changelog: auto-generate\n5. Push: git push origin <branch>\n6. PR: gh pr create --fill",
+  "constitutionalAlignment": {
+    "primaryValue": "helpful",
+    "hardConstraints": ["health-gate-7", "review-before-ship", "grill-before-code"],
+    "reasoning": "Ship delivers value to user. Health gate ensures safety/ethical compliance first. Primary value: Helpful (genuinely useful delivery)."
+  }
 }

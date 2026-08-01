@@ -6,5 +6,10 @@
   "allowedTools": ["Bash", "Read", "Write"],
   "triggers": ["review", "code review", "pr review"],
   "whenToInvoke": "Before ship. Adversarial review of changes.",
-  "workflow": "1. Fetch diff\n2. Run adversarial checks (security, perf, maintainability)\n3. Run specialist checks if needed\n4. Output findings with confidence scores\n5. Block if critical issues"
+  "workflow": "1. Fetch diff\n2. Run adversarial checks (security, perf, maintainability)\n3. Run specialist checks if needed\n4. Output findings with confidence scores\n5. Block if critical issues",
+  "constitutionalAlignment": {
+    "primaryValue": "safe",
+    "hardConstraints": ["adversarial-review", "confidence-scores"],
+    "reasoning": "Adversarial review catches issues before they reach users. Implements 'verification over confidence'. Primary value: Safe (prevents harm)."
+  }
 }

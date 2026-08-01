@@ -5,6 +5,11 @@
   "preambleTier": 1,
   "allowedTools": ["Bash", "Read", "Write", "AskUserQuestion"],
   "triggers": ["plan", "create plan", "planning"],
-  "whenToInvoke": "After grill, before implementation. Grill-to-Ship: brainstorm → grill → plan → spec → TDD → execute → review → commit",
-  "workflow": "1. Define objective and success criteria\n2. Break into verifiable steps\n3. Identify dependencies and risks\n4. Write ADR for architectural decisions\n5. Get approval before execute"
+  "whenToInvoke": "After grill, before any implementation. Verifiable plan with success criteria before implementing.",
+  "workflow": "1. Define success criteria (measurable)\n2. Break into atomic steps\n3. Identify dependencies and risks\n4. Estimate effort per step\n5. Human approves plan before execution",
+  "constitutionalAlignment": {
+    "primaryValue": "ethical",
+    "hardConstraints": ["grill-before-plan"],
+    "reasoning": "Planning embodies good judgment over rigid rules. Requires grill first (Safe). Primary value: Ethical (thoughtful, honest planning)."
+  }
 }

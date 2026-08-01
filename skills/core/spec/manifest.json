@@ -5,6 +5,11 @@
   "preambleTier": 1,
   "allowedTools": ["Bash", "Read", "Write", "AskUserQuestion"],
   "triggers": ["spec", "prd", "specification"],
-  "whenToInvoke": "After plan, before TDD. Creates a Product Requirements Document from intent.",
-  "workflow": "1. Clarify intent with user\n2. Write PRD with user stories\n3. Break into issues with acceptance criteria\n4. Prioritize and estimate\n4. Get approval"
+  "whenToInvoke": "After plan, before TDD. Convert intent to formal PRD with acceptance criteria.",
+  "workflow": "1. Problem statement\n2. User stories with acceptance criteria\n3. Technical approach\n4. Risks and mitigations\n5. Break into atomic, independently-shippable issues",
+  "constitutionalAlignment": {
+    "primaryValue": "compliant",
+    "hardConstraints": ["grill-before-spec", "plan-before-spec"],
+    "reasoning": "PRD formalizes the plan into executable specifications. Follows grill+plan (Safe+Ethical). Primary value: Compliant (adheres to constitutional workflow)."
+  }
 }

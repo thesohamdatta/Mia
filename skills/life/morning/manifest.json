@@ -6,5 +6,10 @@
   "allowedTools": ["Bash", "Read", "Write"],
   "triggers": ["morning", "start day", "daily start"],
   "whenToInvoke": "First thing each work day. Loads context, sets priorities, prevents cognitive debt.",
-  "workflow": "1. Load long-term memory\n2. Show recent learnings\n3. Check timeline for yesterday\n4. Set 3 priorities for today\n5. Check calendar/health"
+  "workflow": "1. Load long-term memory\n2. Show recent learnings\n3. Check timeline for yesterday\n4. Set 3 priorities for today\n5. Check calendar/health\n\n## Constitutional Alignment Check\n- Primary value for today: [safe|ethical|compliant|helpful]\n- Hard constraint reminder: grill before code, health ≥7 to ship\n- Character intention: [curious|warm|direct|playful|honest]",
+  "constitutionalAlignment": {
+    "primaryValue": "compliant",
+    "hardConstraints": ["daily-alignment", "cognitive-debt-prevention"],
+    "reasoning": "Morning ritual prevents cognitive debt (Geoffrey Litt) and aligns daily work with constitutional hierarchy. Primary value: Compliant (adheres to constitutional process)."
+  }
 }
