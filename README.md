@@ -2,8 +2,10 @@
   <img src="./docs/assets/mia-ascii.png" alt="MIA ASCII (#B61C1C)" width="540" />
 </p>
 
+<h1 align="center">MIA (Machine Intelligence Architecture)</h1>
+
 <p align="center">
-  <b>Personal AI Engineering OS</b> &bull; Compiled &bull; Local-First &bull; Self-Improving
+  <em>A personal AI engineering OS — compiled, local-first, self-improving.</em>
 </p>
 
 <p align="center">
