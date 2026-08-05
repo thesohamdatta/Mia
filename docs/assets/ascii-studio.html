@@ -4,19 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MIA // ASCII Studio & Video Matrix Engine (#B61C1C)</title>
+  
+  <!-- Typography: Orbitron & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg-dark: #0A0A0D;
-      --panel-bg: rgba(18, 14, 16, 0.85);
+      --bg-dark: #07070A;
+      --bg-card: rgba(15, 10, 12, 0.75);
+      --bg-card-hover: rgba(26, 14, 18, 0.85);
       --crimson-primary: #B61C1C;
       --crimson-bright: #FF3E3E;
-      --crimson-dark: #4A0A0A;
-      --border-glow: rgba(182, 28, 28, 0.4);
-      --text-main: #F0F0F5;
-      --text-dim: #A0A0B0;
+      --crimson-subtle: rgba(182, 28, 28, 0.25);
+      --crimson-glow: rgba(255, 62, 62, 0.4);
+      --border-color: rgba(182, 28, 28, 0.35);
+      --text-main: #F4F4F8;
+      --text-dim: #9494A8;
+      --font-display: 'Orbitron', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -28,259 +39,508 @@
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-mono);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
       background-image: 
-        radial-gradient(circle at 50% 20%, rgba(182, 28, 28, 0.15) 0%, transparent 60%),
-        radial-gradient(circle at 80% 80%, rgba(74, 10, 10, 0.2) 0%, transparent 50%);
+        radial-gradient(circle at 50% 0%, rgba(182, 28, 28, 0.2) 0%, transparent 65%),
+        radial-gradient(circle at 100% 100%, rgba(74, 10, 10, 0.25) 0%, transparent 50%),
+        linear-gradient(to bottom, rgba(7, 7, 10, 0.8), #07070A);
+      background-attachment: fixed;
     }
 
+    /* HEADER HUD */
     header {
       width: 100%;
-      max-width: 1100px;
-      padding: 24px 32px;
+      max-width: 1240px;
+      padding: 20px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-glow);
-      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand {
+    .brand-container {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .brand-icon {
-      width: 20px;
-      height: 20px;
-      background: var(--crimson-primary);
-      border-radius: 4px;
-      box-shadow: 0 0 12px var(--crimson-bright);
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--crimson-bright), var(--crimson-primary));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px var(--crimson-glow);
+    }
+
+    .brand-logo svg {
+      width: 18px;
+      height: 18px;
+      fill: #FFF;
     }
 
     .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
       font-weight: 800;
-      font-size: 1.25rem;
       letter-spacing: 2px;
-      color: var(--text-main);
+      text-transform: uppercase;
     }
 
     .brand-title span {
       color: var(--crimson-bright);
     }
 
-    .tag {
-      font-family: 'Fira Code', monospace;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      background: rgba(182, 28, 28, 0.2);
-      border: 1px solid var(--crimson-primary);
-      border-radius: 20px;
-      color: var(--crimson-bright);
+    .status-hud {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
+    .hud-pill {
+      font-size: 0.75rem;
+      padding: 6px 14px;
+      background: var(--crimson-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      color: var(--crimson-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--crimson-bright);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--crimson-bright);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* MAIN CONTENT */
     main {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1240px;
       padding: 32px;
       display: flex;
       flex-direction: column;
       gap: 24px;
-      align-items: center;
     }
 
-    .canvas-container {
+    /* TAB NAVIGATION */
+    .mode-tabs {
+      display: flex;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .tab-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--crimson-subtle);
+      border-color: var(--border-color);
+      color: var(--crimson-bright);
+      box-shadow: 0 0 15px rgba(182, 28, 28, 0.2);
+    }
+
+    /* CANVAS STUDIO DISPLAY */
+    .studio-viewport {
       position: relative;
       width: 100%;
-      background: rgba(5, 5, 8, 0.95);
-      border: 1.5px solid var(--border-glow);
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(182, 28, 28, 0.25);
+      background: rgba(3, 3, 5, 0.95);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(182, 28, 28, 0.15);
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 400px;
+      min-height: 420px;
     }
 
     canvas {
       display: block;
       width: 100%;
       height: auto;
+      max-height: 520px;
     }
 
-    .controls-panel {
-      width: 100%;
-      background: var(--panel-bg);
-      border: 1px solid var(--border-glow);
-      border-radius: 16px;
-      padding: 24px 32px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
+    /* DROPZONE OVERLAY */
+    .dropzone-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 7, 10, 0.88);
       backdrop-filter: blur(10px);
-    }
-
-    .control-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+      z-index: 10;
     }
 
-    .control-group label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-dim);
+    .dropzone-overlay.drag-over {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .dropzone-icon svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--crimson-bright);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    /* CONTROLS DECK */
+    .controls-deck {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      backdrop-filter: blur(20px);
+    }
+
+    .control-item {
       display: flex;
-      justify-size: space-between;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .control-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
     }
 
-    .control-group label span {
+    .control-value {
       color: var(--crimson-bright);
-      font-family: 'Fira Code', monospace;
+      font-family: var(--font-mono);
+      background: rgba(182, 28, 28, 0.15);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
     }
 
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
       height: 6px;
-      background: #251015;
+      background: rgba(255, 255, 255, 0.08);
       border-radius: 3px;
       outline: none;
+      transition: var(--transition-smooth);
     }
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: var(--crimson-bright);
       cursor: pointer;
-      box-shadow: 0 0 10px var(--crimson-bright);
-      transition: transform 0.1s ease;
+      box-shadow: 0 0 12px var(--crimson-bright);
+      transition: transform 0.15s ease;
     }
 
     input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
+      transform: scale(1.25);
+    }
+
+    select {
+      background: rgba(15, 10, 12, 0.9);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus {
+      border-color: var(--crimson-bright);
+      box-shadow: 0 0 10px var(--crimson-subtle);
+    }
+
+    /* ACTIONS FOOTER DECK */
+    .actions-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
     .btn-group {
-      grid-column: 1 / -1;
       display: flex;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
-      justify-content: flex-end;
-      margin-top: 8px;
     }
 
-    button {
+    .action-btn {
       background: var(--crimson-primary);
       color: #FFF;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.9rem;
+      border: 1px solid var(--crimson-bright);
+      padding: 11px 22px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(182, 28, 28, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 18px rgba(182, 28, 28, 0.35);
     }
 
-    button:hover {
+    .action-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .action-btn:hover {
       background: var(--crimson-bright);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 62, 62, 0.6);
+      box-shadow: 0 6px 24px rgba(255, 62, 62, 0.5);
     }
 
-    button.secondary {
+    .action-btn.outline {
       background: transparent;
-      border: 1px solid var(--border-glow);
+      border-color: var(--border-color);
       color: var(--text-main);
       box-shadow: none;
     }
 
-    button.secondary:hover {
-      background: rgba(182, 28, 28, 0.15);
+    .action-btn.outline:hover {
+      background: var(--crimson-subtle);
       border-color: var(--crimson-bright);
+      color: var(--crimson-bright);
     }
 
     footer {
+      width: 100%;
+      max-width: 1240px;
+      padding: 24px 32px;
       margin-top: auto;
-      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       color: var(--text-dim);
-      font-size: 0.85rem;
-      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* HIDDEN VIDEO FOR FILE CONVERT */
+    #sourceVideo {
+      display: none;
     }
   </style>
 </head>
 <body>
+
+  <!-- HEADER HUD -->
   <header>
-    <div class="brand">
-      <div class="brand-icon"></div>
+    <div class="brand-container">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
       <div class="brand-title">MIA <span>ASCII STUDIO</span></div>
     </div>
-    <div class="tag">COLOR: #B61C1C // CRIMSON</div>
+    <div class="status-hud">
+      <div class="hud-pill"><div class="pulse-dot"></div> ENGINE ACTIVE</div>
+      <div class="hud-pill">COLOR: #B61C1C</div>
+    </div>
   </header>
 
+  <!-- MAIN STUDIO WORKSPACE -->
   <main>
-    <div class="canvas-container">
-      <canvas id="asciiCanvas" width="900" height="380"></canvas>
+
+    <!-- MODE SWITCH TABS -->
+    <div class="mode-tabs">
+      <button class="tab-btn active" id="tabMiaMode">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/></svg>
+        MIA 3D Matrix Engine
+      </button>
+      <button class="tab-btn" id="tabVideoMode">
+        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        Upload Video / Image
+      </button>
+      <button class="tab-btn" id="tabWebcamMode">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Webcam ASCII Live Feed
+      </button>
     </div>
 
-    <div class="controls-panel">
-      <div class="control-group">
-        <label for="speedRange">Animation Speed: <span id="speedVal">1.0x</span></label>
-        <input type="range" id="speedRange" min="0.2" max="3.0" step="0.1" value="1.0">
-      </div>
-
-      <div class="control-group">
-        <label for="matrixRange">Video Wave Flow: <span id="matrixVal">High</span></label>
-        <input type="range" id="matrixRange" min="1" max="10" step="1" value="7">
-      </div>
-
-      <div class="control-group">
-        <label for="glitchRange">Glitch Intensity: <span id="glitchVal">2.0</span></label>
-        <input type="range" id="glitchRange" min="0" max="10" step="0.5" value="2.0">
-      </div>
-
-      <div class="control-group">
-        <label for="glowRange">Glow Amplitude: <span id="glowVal">15px</span></label>
-        <input type="range" id="glowRange" min="0" max="30" step="1" value="15">
-      </div>
-
-      <div class="btn-group">
-        <button id="copyTxtBtn" class="secondary">Copy RAW ASCII</button>
-        <button id="downloadSvgBtn" class="secondary">Export SVG</button>
-        <button id="downloadPngBtn">Export PNG Frame</button>
+    <!-- CANVAS VIEWPORT -->
+    <div class="studio-viewport" id="viewport">
+      <canvas id="asciiCanvas" width="1000" height="420"></canvas>
+      
+      <!-- DROPZONE FOR FILES -->
+      <div class="dropzone-overlay" id="dropzone">
+        <div class="dropzone-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p>Drop Video (.mp4) or Image (.png, .jpg) to Convert to ASCII</p>
       </div>
     </div>
+
+    <!-- CONTROLS DECK -->
+    <div class="controls-deck">
+      <div class="control-item">
+        <div class="control-label">Animation Speed <span class="control-value" id="valSpeed">1.0x</span></div>
+        <input type="range" id="sliderSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-item">
+        <div class="control-label">Matrix Wave Density <span class="control-value" id="valDensity">High</span></div>
+        <input type="range" id="sliderDensity" min="1" max="10" step="1" value="7">
+      </div>
+
+      <div class="control-item">
+        <div class="control-label">Glitch Factor <span class="control-value" id="valGlitch">2.0</span></div>
+        <input type="range" id="sliderGlitch" min="0" max="10" step="0.5" value="2.0">
+      </div>
+
+      <div class="control-item">
+        <div class="control-label">Crimson Glow Intensity <span class="control-value" id="valGlow">16px</span></div>
+        <input type="range" id="sliderGlow" min="0" max="35" step="1" value="16">
+      </div>
+
+      <div class="control-item">
+        <div class="control-label">Color Palette Theme</div>
+        <select id="selectTheme">
+          <option value="crimson" selected>Deep Crimson (#B61C1C)</option>
+          <option value="cyber">Cyberpunk Red / Neon</option>
+          <option value="matrix">Classic Matrix Green</option>
+          <option value="monochrome">Obsidian Monochrome</option>
+        </select>
+      </div>
+
+      <!-- ACTIONS BAR -->
+      <div class="actions-bar">
+        <div class="btn-group">
+          <button class="action-btn outline" id="btnCopyTxt">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy RAW ASCII
+          </button>
+          <button class="action-btn outline" id="btnExportSvg">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Animated SVG
+          </button>
+        </div>
+
+        <button class="action-btn" id="btnDownloadPng">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Export PNG Frame
+        </button>
+      </div>
+
+    </div>
+
   </main>
 
+  <video id="sourceVideo" loop muted playsinline></video>
+  <input type="file" id="fileInput" accept="video/*,image/*" style="display:none">
+
+  <!-- FOOTER -->
   <footer>
-    Machine Intelligence Architecture &bull; Crimson Red (#B61C1C) Matrix Renderer
+    <div>Machine Intelligence Architecture &bull; UI/UX Pro Max Edition</div>
+    <div>Strict Palette: #B61C1C Crimson</div>
   </footer>
 
   <script>
     const canvas = document.getElementById('asciiCanvas');
     const ctx = canvas.getContext('2d');
+    const sourceVideo = document.getElementById('sourceVideo');
+    const fileInput = document.getElementById('fileInput');
 
-    const speedRange = document.getElementById('speedRange');
-    const speedVal = document.getElementById('speedVal');
-    const matrixRange = document.getElementById('matrixRange');
-    const matrixVal = document.getElementById('matrixVal');
-    const glitchRange = document.getElementById('glitchRange');
-    const glitchVal = document.getElementById('glitchVal');
-    const glowRange = document.getElementById('glowRange');
-    const glowVal = document.getElementById('glowVal');
+    // Controls
+    const sliderSpeed = document.getElementById('sliderSpeed');
+    const valSpeed = document.getElementById('valSpeed');
+    const sliderDensity = document.getElementById('sliderDensity');
+    const valDensity = document.getElementById('valDensity');
+    const sliderGlitch = document.getElementById('sliderGlitch');
+    const valGlitch = document.getElementById('valGlitch');
+    const sliderGlow = document.getElementById('sliderGlow');
+    const valGlow = document.getElementById('valGlow');
+    const selectTheme = document.getElementById('selectTheme');
+
+    // Tabs
+    const tabMiaMode = document.getElementById('tabMiaMode');
+    const tabVideoMode = document.getElementById('tabVideoMode');
+    const tabWebcamMode = document.getElementById('tabWebcamMode');
+    const dropzone = document.getElementById('dropzone');
+
+    let currentMode = 'mia'; // 'mia', 'video', 'webcam'
+    let time = 0;
 
     const miaArt = [
       "  ███╗   ███╗██╗ █████╗ ",
@@ -291,88 +551,179 @@
       "  ╚═╝     ╚═╝╚═╝╚═╝  ╚═╝"
     ];
 
-    let time = 0;
+    // Theme definitions
+    const themes = {
+      crimson: { primary: '#B61C1C', highlight: '#FF3E3E', glow: '#FF3E3E' },
+      cyber: { primary: '#FF0055', highlight: '#00F0FF', glow: '#FF0055' },
+      matrix: { primary: '#00FF66', highlight: '#66FF99', glow: '#00FF66' },
+      monochrome: { primary: '#E0E0E0', highlight: '#FFFFFF', glow: '#FFFFFF' }
+    };
 
-    function draw() {
-      const speed = parseFloat(speedRange.value);
-      const waveFlow = parseInt(matrixRange.value);
-      const glitch = parseFloat(glitchRange.value);
-      const glow = parseInt(glowRange.value);
+    function render() {
+      const speed = parseFloat(sliderSpeed.value);
+      const density = parseInt(sliderDensity.value);
+      const glitch = parseFloat(sliderGlitch.value);
+      const glow = parseInt(sliderGlow.value);
+      const activeTheme = themes[selectTheme.value] || themes.crimson;
 
-      speedVal.textContent = speed.toFixed(1) + 'x';
-      matrixVal.textContent = waveFlow > 7 ? 'Ultra' : (waveFlow > 4 ? 'High' : 'Normal');
-      glitchVal.textContent = glitch.toFixed(1);
-      glowVal.textContent = glow + 'px';
+      valSpeed.textContent = speed.toFixed(1) + 'x';
+      valDensity.textContent = density > 7 ? 'Ultra' : (density > 4 ? 'High' : 'Normal');
+      valGlitch.textContent = glitch.toFixed(1);
+      valGlow.textContent = glow + 'px';
 
       time += 0.03 * speed;
 
-      // Clear background
-      ctx.fillStyle = '#0A0A0D';
+      // Dark background
+      ctx.fillStyle = '#07070A';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw background ASCII matrix rain
-      ctx.font = '12px "Fira Code", monospace';
-      const matrixChars = '@#$%*+=:. ';
-      const rows = 18;
-      const cols = 45;
+      if (currentMode === 'mia') {
+        // Draw Matrix Rain Background
+        ctx.font = '12px "JetBrains Mono", monospace';
+        const chars = '@#$%*+=:. ';
+        const rows = 20;
+        const cols = 50;
 
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const wave = Math.sin(time * waveFlow * 0.5 + c * 0.3 + r * 0.4);
-          const opacity = Math.max(0.05, Math.min(0.25, (wave + 1) * 0.15));
-          ctx.fillStyle = `rgba(182, 28, 28, ${opacity})`;
-          const char = matrixChars[Math.floor(Math.abs(wave) * matrixChars.length) % matrixChars.length];
-          ctx.fillText(char, 20 + c * 20, 25 + r * 20);
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const wave = Math.sin(time * density * 0.4 + c * 0.3 + r * 0.35);
+            const opacity = Math.max(0.04, Math.min(0.25, (wave + 1) * 0.15));
+            ctx.fillStyle = activeTheme.primary;
+            ctx.globalAlpha = opacity;
+            const char = chars[Math.floor(Math.abs(wave) * chars.length) % chars.length];
+            ctx.fillText(char, 20 + c * 20, 24 + r * 20);
+          }
         }
+        ctx.globalAlpha = 1.0;
+
+        // Draw MIA ASCII Hero Text
+        ctx.font = '900 30px Consolas, "JetBrains Mono", monospace';
+        ctx.shadowBlur = glow;
+        ctx.shadowColor = activeTheme.glow;
+
+        const startX = 180;
+        const startY = 130;
+        const lineHeight = 36;
+
+        miaArt.forEach((line, index) => {
+          let xShift = 0;
+          if (glitch > 0 && Math.random() < (glitch * 0.04)) {
+            xShift = (Math.random() - 0.5) * glitch * 8;
+          }
+
+          const pulse = (Math.sin(time * 2.5 + index * 0.6) + 1) / 2;
+          ctx.fillStyle = pulse > 0.5 ? activeTheme.highlight : activeTheme.primary;
+          ctx.fillText(line, startX + xShift, startY + index * lineHeight);
+        });
+
+        ctx.shadowBlur = 0;
+
+        // Subtitle Badge
+        ctx.fillStyle = activeTheme.highlight;
+        ctx.font = '700 13px "Orbitron", sans-serif';
+        ctx.fillText('// MACHINE INTELLIGENCE ARCHITECTURE // COLOR #B61C1C', 230, 375);
+      } else if (currentMode === 'video' && sourceVideo.readyState >= 2) {
+        // Convert video frame to ASCII
+        renderVideoToAscii(activeTheme);
       }
 
-      // Draw Hero MIA ASCII Text
-      ctx.font = '900 28px Consolas, "Fira Code", monospace';
-      ctx.shadowBlur = glow;
-      ctx.shadowColor = '#FF3E3E';
-
-      const startX = 140;
-      const startY = 120;
-      const lineHeight = 34;
-
-      miaArt.forEach((line, index) => {
-        let xShift = 0;
-        if (glitch > 0 && Math.random() < (glitch * 0.04)) {
-          xShift = (Math.random() - 0.5) * glitch * 6;
-        }
-
-        const pulse = (Math.sin(time * 2 + index * 0.5) + 1) / 2;
-        const color = pulse > 0.5 ? '#FF3E3E' : '#B61C1C';
-
-        ctx.fillStyle = color;
-        ctx.fillText(line, startX + xShift, startY + index * lineHeight);
-      });
-
-      // Reset shadow
-      ctx.shadowBlur = 0;
-
-      // Subtitle
-      ctx.fillStyle = 'rgba(255, 62, 62, 0.8)';
-      ctx.font = '600 13px "Fira Code", monospace';
-      ctx.fillText('// MACHINE INTELLIGENCE ARCHITECTURE // COLOR #B61C1C', 220, 340);
-
-      requestAnimationFrame(draw);
+      requestAnimationFrame(render);
     }
 
-    draw();
+    function renderVideoToAscii(theme) {
+      const vWidth = 80;
+      const vHeight = 40;
 
-    // Export Handlers
-    document.getElementById('downloadPngBtn').addEventListener('click', () => {
+      // Offscreen canvas for sampling
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = vWidth;
+      offCanvas.height = vHeight;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(sourceVideo, 0, 0, vWidth, vHeight);
+
+      const imgData = offCtx.getImageData(0, 0, vWidth, vHeight).data;
+      const asciiChars = '@#$S%*+;:-. ';
+
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = theme.primary;
+
+      for (let y = 0; y < vHeight; y++) {
+        for (let x = 0; x < vWidth; x++) {
+          const idx = (y * vWidth + x) * 4;
+          const r = imgData[idx];
+          const g = imgData[idx + 1];
+          const b = imgData[idx + 2];
+          const brightness = (r + g + b) / 3;
+
+          const charIdx = Math.floor((brightness / 255) * (asciiChars.length - 1));
+          const char = asciiChars[charIdx];
+
+          ctx.fillStyle = brightness > 160 ? theme.highlight : theme.primary;
+          ctx.fillText(char, 30 + x * 11, 20 + y * 10);
+        }
+      }
+    }
+
+    // Tab Switches
+    tabMiaMode.addEventListener('click', () => {
+      currentMode = 'mia';
+      tabMiaMode.classList.add('active');
+      tabVideoMode.classList.remove('active');
+      tabWebcamMode.classList.remove('active');
+      dropzone.classList.remove('drag-over');
+    });
+
+    tabVideoMode.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    tabWebcamMode.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        sourceVideo.srcObject = stream;
+        sourceVideo.play();
+        currentMode = 'video';
+        tabWebcamMode.classList.add('active');
+        tabMiaMode.classList.remove('active');
+        tabVideoMode.classList.remove('active');
+      } catch (err) {
+        alert('Webcam access failed: ' + err.message);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        sourceVideo.src = URL.createObjectURL(file);
+        sourceVideo.play();
+        currentMode = 'video';
+        tabVideoMode.classList.add('active');
+        tabMiaMode.classList.remove('active');
+        tabWebcamMode.classList.remove('active');
+      }
+    });
+
+    // Handlers
+    document.getElementById('btnDownloadPng').addEventListener('click', () => {
       const link = document.createElement('a');
-      link.download = 'mia-ascii-frame.png';
+      link.download = 'mia-ascii-pro-frame.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
     });
 
-    document.getElementById('copyTxtBtn').addEventListener('click', () => {
+    document.getElementById('btnCopyTxt').addEventListener('click', () => {
       navigator.clipboard.writeText(miaArt.join('\n'));
       alert('MIA RAW ASCII art copied to clipboard!');
     });
+
+    document.getElementById('btnExportSvg').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'mia-ascii-banner.svg';
+      link.href = 'mia-ascii-banner.svg';
+      link.click();
+    });
+
+    render();
   </script>
 </body>
 </html>
