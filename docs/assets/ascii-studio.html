@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIA // ASCII Studio & Video Matrix Engine (#B61C1C)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0A0A0D;
+      --panel-bg: rgba(18, 14, 16, 0.85);
+      --crimson-primary: #B61C1C;
+      --crimson-bright: #FF3E3E;
+      --crimson-dark: #4A0A0A;
+      --border-glow: rgba(182, 28, 28, 0.4);
+      --text-main: #F0F0F5;
+      --text-dim: #A0A0B0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(182, 28, 28, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(74, 10, 10, 0.2) 0%, transparent 50%);
+    }
+
+    header {
+      width: 100%;
+      max-width: 1100px;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-glow);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 20px;
+      height: 20px;
+      background: var(--crimson-primary);
+      border-radius: 4px;
+      box-shadow: 0 0 12px var(--crimson-bright);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+      color: var(--text-main);
+    }
+
+    .brand-title span {
+      color: var(--crimson-bright);
+    }
+
+    .tag {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      background: rgba(182, 28, 28, 0.2);
+      border: 1px solid var(--crimson-primary);
+      border-radius: 20px;
+      color: var(--crimson-bright);
+    }
+
+    main {
+      width: 100%;
+      max-width: 1100px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      background: rgba(5, 5, 8, 0.95);
+      border: 1.5px solid var(--border-glow);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(182, 28, 28, 0.25);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .controls-panel {
+      width: 100%;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 24px 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      display: flex;
+      justify-size: space-between;
+      align-items: center;
+    }
+
+    .control-group label span {
+      color: var(--crimson-bright);
+      font-family: 'Fira Code', monospace;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #251015;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--crimson-bright);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--crimson-bright);
+      transition: transform 0.1s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .btn-group {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    button {
+      background: var(--crimson-primary);
+      color: #FFF;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(182, 28, 28, 0.4);
+    }
+
+    button:hover {
+      background: var(--crimson-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 62, 62, 0.6);
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border-glow);
+      color: var(--text-main);
+      box-shadow: none;
+    }
+
+    button.secondary:hover {
+      background: rgba(182, 28, 28, 0.15);
+      border-color: var(--crimson-bright);
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 24px;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      font-family: 'Fira Code', monospace;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon"></div>
+      <div class="brand-title">MIA <span>ASCII STUDIO</span></div>
+    </div>
+    <div class="tag">COLOR: #B61C1C // CRIMSON</div>
+  </header>
+
+  <main>
+    <div class="canvas-container">
+      <canvas id="asciiCanvas" width="900" height="380"></canvas>
+    </div>
+
+    <div class="controls-panel">
+      <div class="control-group">
+        <label for="speedRange">Animation Speed: <span id="speedVal">1.0x</span></label>
+        <input type="range" id="speedRange" min="0.2" max="3.0" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label for="matrixRange">Video Wave Flow: <span id="matrixVal">High</span></label>
+        <input type="range" id="matrixRange" min="1" max="10" step="1" value="7">
+      </div>
+
+      <div class="control-group">
+        <label for="glitchRange">Glitch Intensity: <span id="glitchVal">2.0</span></label>
+        <input type="range" id="glitchRange" min="0" max="10" step="0.5" value="2.0">
+      </div>
+
+      <div class="control-group">
+        <label for="glowRange">Glow Amplitude: <span id="glowVal">15px</span></label>
+        <input type="range" id="glowRange" min="0" max="30" step="1" value="15">
+      </div>
+
+      <div class="btn-group">
+        <button id="copyTxtBtn" class="secondary">Copy RAW ASCII</button>
+        <button id="downloadSvgBtn" class="secondary">Export SVG</button>
+        <button id="downloadPngBtn">Export PNG Frame</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Machine Intelligence Architecture &bull; Crimson Red (#B61C1C) Matrix Renderer
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('asciiCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const speedRange = document.getElementById('speedRange');
+    const speedVal = document.getElementById('speedVal');
+    const matrixRange = document.getElementById('matrixRange');
+    const matrixVal = document.getElementById('matrixVal');
+    const glitchRange = document.getElementById('glitchRange');
+    const glitchVal = document.getElementById('glitchVal');
+    const glowRange = document.getElementById('glowRange');
+    const glowVal = document.getElementById('glowVal');
+
+    const miaArt = [
+      "  ███╗   ███╗██╗ █████╗ ",
+      "  ████╗ ████║██║██╔══██╗",
+      "  ██╔████╔██║██║███████║",
+      "  ██║╚██╔╝██║██║██╔══██║",
+      "  ██║ ╚═╝ ██║██║██║  ██║",
+      "  ╚═╝     ╚═╝╚═╝╚═╝  ╚═╝"
+    ];
+
+    let time = 0;
+
+    function draw() {
+      const speed = parseFloat(speedRange.value);
+      const waveFlow = parseInt(matrixRange.value);
+      const glitch = parseFloat(glitchRange.value);
+      const glow = parseInt(glowRange.value);
+
+      speedVal.textContent = speed.toFixed(1) + 'x';
+      matrixVal.textContent = waveFlow > 7 ? 'Ultra' : (waveFlow > 4 ? 'High' : 'Normal');
+      glitchVal.textContent = glitch.toFixed(1);
+      glowVal.textContent = glow + 'px';
+
+      time += 0.03 * speed;
+
+      // Clear background
+      ctx.fillStyle = '#0A0A0D';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background ASCII matrix rain
+      ctx.font = '12px "Fira Code", monospace';
+      const matrixChars = '@#$%*+=:. ';
+      const rows = 18;
+      const cols = 45;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const wave = Math.sin(time * waveFlow * 0.5 + c * 0.3 + r * 0.4);
+          const opacity = Math.max(0.05, Math.min(0.25, (wave + 1) * 0.15));
+          ctx.fillStyle = `rgba(182, 28, 28, ${opacity})`;
+          const char = matrixChars[Math.floor(Math.abs(wave) * matrixChars.length) % matrixChars.length];
+          ctx.fillText(char, 20 + c * 20, 25 + r * 20);
+        }
+      }
+
+      // Draw Hero MIA ASCII Text
+      ctx.font = '900 28px Consolas, "Fira Code", monospace';
+      ctx.shadowBlur = glow;
+      ctx.shadowColor = '#FF3E3E';
+
+      const startX = 140;
+      const startY = 120;
+      const lineHeight = 34;
+
+      miaArt.forEach((line, index) => {
+        let xShift = 0;
+        if (glitch > 0 && Math.random() < (glitch * 0.04)) {
+          xShift = (Math.random() - 0.5) * glitch * 6;
+        }
+
+        const pulse = (Math.sin(time * 2 + index * 0.5) + 1) / 2;
+        const color = pulse > 0.5 ? '#FF3E3E' : '#B61C1C';
+
+        ctx.fillStyle = color;
+        ctx.fillText(line, startX + xShift, startY + index * lineHeight);
+      });
+
+      // Reset shadow
+      ctx.shadowBlur = 0;
+
+      // Subtitle
+      ctx.fillStyle = 'rgba(255, 62, 62, 0.8)';
+      ctx.font = '600 13px "Fira Code", monospace';
+      ctx.fillText('// MACHINE INTELLIGENCE ARCHITECTURE // COLOR #B61C1C', 220, 340);
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    // Export Handlers
+    document.getElementById('downloadPngBtn').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'mia-ascii-frame.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    document.getElementById('copyTxtBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(miaArt.join('\n'));
+      alert('MIA RAW ASCII art copied to clipboard!');
+    });
+  </script>
+</body>
+</html>

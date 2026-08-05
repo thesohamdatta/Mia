@@ -1,6 +1,19 @@
+<p align="center">
+  <a href="./docs/assets/ascii-studio.html">
+    <img src="./docs/assets/mia-ascii-banner.svg" alt="MIA ASCII Hero Banner (#B61C1C)" width="100%" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="./docs/assets/ascii-studio.html"><b> Interactive ASCII Studio</b></a> &bull;
+  <a href="./docs/assets/mia-ascii.svg"><b> Crisp SVG Asset</b></a> &bull;
+  <a href="./docs/assets/mia-ascii.txt"><b> RAW ASCII</b></a>
+</p>
+
 # MIA (Machine Intelligence Architecture)
 
 > A personal AI engineering OS — compiled, local-first, self-improving.
+
 
 ## What is MIA
 
