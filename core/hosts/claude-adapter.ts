@@ -18,8 +18,7 @@ export class ClaudeAdapter extends BaseHostAdapter {
     return {
       baseUrl: config.baseUrl || 'https://api.anthropic.com',
       apiKey: config.apiKey || '',
-      anthropicVersion:
-        (config.extra?.['anthropicVersion'] as string) || '2023-06-01',
+      anthropicVersion: (config.extra?.anthropicVersion as string) || '2023-06-01',
       timeout: config.timeout || 60000,
     };
   }

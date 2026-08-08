@@ -1,20 +1,31 @@
 // Bun globals are available without import
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
+import { initializeConfig } from '@core/config/index.js';
 import { initializeSkills } from '@core/skills/registry.js';
-import { verifyToken } from './middleware.js';
-import { checkpointsRoute } from './routes/checkpoints.js';
-import { commandRoute } from './routes/command.js';
-import { healthRoute } from './routes/health.js';
-import { learningsRoute } from './routes/learnings.js';
-import { memoryRoute } from './routes/memory.js';
-import { skillsRoute } from './routes/skills.js';
-import { timelineRoute } from './routes/timeline.js';
+import { createStateService } from '@core/state/service.js';
+import { createRouter } from './router.js';
+import type { StateService } from './router.js';
+import {
+  checkpointsHandler,
+  commandHandler,
+  healthHandler,
+  learningsHandler,
+  memoryHandler,
+  skillsHandler,
+  timelineHandler,
+} from './routes/index.js';
+
+interface DaemonDeps {
+  stateService: StateService;
+  port: number;
+  token: string;
+  version: string;
+}
 
 function getStateFilePath(): string {
-  // Lazy access to config
   const { getStateFile } = require('@core/config/paths.js');
   return getStateFile();
 }
@@ -24,7 +35,6 @@ function generateToken(): string {
 }
 
 function randomPort(): number {
-  // Lazy config access - called after initializeConfig
   const { getConfig } = require('@core/config/index.js');
   const config = getConfig();
   return (
@@ -44,14 +54,15 @@ function saveState(port: number, token: string, version: string) {
   writeFileSync(getStateFilePath(), JSON.stringify(state, null, 2), { mode: 0o600 });
 }
 
-async function initialize(): Promise<{ port: number; token: string; version: string }> {
+async function initializeDaemon(builtinSkillsPath: string): Promise<{
+  port: number;
+  token: string;
+  version: string;
+}> {
   // Initialize config
-  const { initializeConfig } = await import('@core/config/index.js');
-  const { getConfig } = await import('@core/config/index.js');
-
-  const builtinSkillsPath = join(__dirname, '..', '..', '..', 'skills');
   initializeConfig(builtinSkillsPath);
 
+  const { getConfig } = await import('@core/config/index.js');
   const config = getConfig();
 
   // Ensure state directory exists
@@ -77,103 +88,65 @@ async function initialize(): Promise<{ port: number; token: string; version: str
   return { port, token, version };
 }
 
-async function handleRequest(req: Request): Promise<Response> {
-  const url = new URL(req.url);
-  const state = loadState();
-  const currentToken = state?.token;
-
-  try {
-    // Health check - no auth required
-    if (url.pathname === '/health') {
-      return healthRoute(req);
-    }
-
-    // Skills list - no auth required (read-only)
-    if (url.pathname === '/skills' && req.method === 'GET') {
-      return skillsRoute(req);
-    }
-
-    // RPC endpoint for CLI commands
-    if (url.pathname === '/command' && req.method === 'POST') {
-      if (currentToken && !verifyToken(req, currentToken)) {
-        return Response.json(
-          { ok: false, error: 'Unauthorized: invalid or missing Bearer token' },
-          { status: 401 }
-        );
-      }
-      return commandRoute(req, currentToken || '');
-    }
-
-    // Learning API
-    if (url.pathname === '/learn') {
-      if (currentToken && !verifyToken(req, currentToken)) {
-        return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-      }
-      return learningsRoute(req, currentToken || '');
-    }
-
-    // Timeline API
-    if (url.pathname === '/timeline') {
-      if (currentToken && !verifyToken(req, currentToken)) {
-        return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-      }
-      return timelineRoute(req, currentToken || '');
-    }
-
-    // Memory API
-    if (url.pathname === '/memory') {
-      return memoryRoute(req, currentToken || '');
-    }
-
-    // Checkpoints API
-    if (url.pathname === '/checkpoints') {
-      if (currentToken && !verifyToken(req, currentToken)) {
-        return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-      }
-      return checkpointsRoute(req, currentToken || '');
-    }
-
-    return Response.json({ ok: false, error: 'Not found' }, { status: 404 });
-  } catch (error) {
-    console.error('Request error:', error);
-    return Response.json({ ok: false, error: 'Internal server error' }, { status: 500 });
-  }
+function createRouteTable(_token: string) {
+  return [
+    { path: '/health', method: 'GET', handler: healthHandler, authRequired: false },
+    { path: '/skills', method: 'GET', handler: skillsHandler, authRequired: false },
+    { path: '/command', method: 'POST', handler: commandHandler, authRequired: true },
+    { path: '/learn', method: 'GET', handler: learningsHandler, authRequired: true },
+    { path: '/learn', method: 'POST', handler: learningsHandler, authRequired: true },
+    { path: '/timeline', method: 'GET', handler: timelineHandler, authRequired: true },
+    { path: '/memory', method: 'GET', handler: memoryHandler, authRequired: false },
+    { path: '/memory', method: 'POST', handler: memoryHandler, authRequired: true },
+    { path: '/checkpoints', method: 'GET', handler: checkpointsHandler, authRequired: true },
+  ];
 }
 
-function loadState(): { port: number; token: string } | null {
-  try {
-    if (existsSync(getStateFilePath())) {
-      const data = JSON.parse(readFileSync(getStateFilePath(), 'utf-8'));
-      return { port: data.port, token: data.token };
-    }
-  } catch {}
-  return null;
+export async function start(deps: DaemonDeps): Promise<Bun.Server<unknown>> {
+  const { stateService, port, token, version } = deps;
+
+  const routeTable = createRouteTable(token);
+  const handleRequest = createRouter(routeTable, token, stateService);
+
+  const server = Bun.serve({
+    port,
+    fetch: handleRequest,
+  });
+
+  console.log(`   Server listening on http://127.0.0.1:${port}`);
+  console.log(`   Version: ${version}`);
+
+  // Graceful shutdown
+  process.on('SIGINT', () => {
+    console.log('\n👋 Shutting down miad gracefully...');
+    server.stop();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', () => {
+    server.stop();
+    process.exit(0);
+  });
+
+  // Keep alive
+  setInterval(() => {}, 1000 * 60 * 60);
+
+  return server;
 }
 
-// Initialize and start server
-const init = await initialize();
-const port = init.port;
-const _token = init.token;
-const _version = init.version;
+// CLI entry point - only runs when executed directly
+if (import.meta.main) {
+  const builtinSkillsPath = join(__dirname, '..', '..', '..', 'skills');
+  const init = await initializeDaemon(builtinSkillsPath);
 
-const server = Bun.serve({
-  port,
-  fetch: handleRequest,
-});
+  const stateService = createStateService();
 
-console.log(`   Server listening on http://127.0.0.1:${port}`);
+  await start({
+    stateService,
+    port: init.port,
+    token: init.token,
+    version: init.version,
+  });
+}
 
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n👋 Shutting down miad gracefully...');
-  server.stop();
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  server.stop();
-  process.exit(0);
-});
-
-// Keep alive
-setInterval(() => {}, 1000 * 60 * 60);
+export { getStateFilePath, generateToken, randomPort, saveState, initializeDaemon };

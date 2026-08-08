@@ -2,7 +2,7 @@
   "name": "mia",
   "version": "0.2.1",
   "description": "Machine Intelligence Architecture - Personal AI Engineering OS",
-  "main": "src/cli/index.ts",
+  "main": "core/cli/index.ts",
   "scripts": {
     "dev:cli": "bun run core/cli/index.ts",
     "dev:daemon": "bun run core/daemon/server.ts",

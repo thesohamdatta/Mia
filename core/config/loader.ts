@@ -50,29 +50,41 @@ export class ConfigLoader {
 
   private applyEnv(config: Config): Config {
     const result = { ...config };
-    const env = process.env;
+    const env = process.env as {
+      MIA_DAEMON_PORT?: string;
+      MIA_IDLE_TIMEOUT_MS?: string;
+      MIA_TOKEN_LENGTH?: string;
+      MIA_DIR?: string;
+      MIA_SKILLS_DIR?: string;
+      MIA_PROJECTS_DIR?: string;
+      MIA_STATE_FILE?: string;
+      MIA_MEMORY_FILE?: string;
+      MIA_TELEMETRY?: string;
+      MIA_AUTO_RESTART?: string;
+      MIA_HOT_RELOAD?: string;
+    };
 
     // Daemon settings from env
-    const daemonPort = env['MIA_DAEMON_PORT'];
+    const daemonPort = env.MIA_DAEMON_PORT;
     if (daemonPort) {
       result.daemon = { ...result.daemon };
       result.daemon.portRange = { ...result.daemon.portRange };
       result.daemon.portRange.min = Number.parseInt(daemonPort, 10);
       result.daemon.portRange.max = result.daemon.portRange.min;
     }
-    const idleTimeout = env['MIA_IDLE_TIMEOUT_MS'];
+    const idleTimeout = env.MIA_IDLE_TIMEOUT_MS;
     if (idleTimeout) {
       result.daemon = { ...result.daemon };
       result.daemon.idleTimeoutMs = Number.parseInt(idleTimeout, 10);
     }
-    const tokenLength = env['MIA_TOKEN_LENGTH'];
+    const tokenLength = env.MIA_TOKEN_LENGTH;
     if (tokenLength) {
       result.daemon = { ...result.daemon };
       result.daemon.tokenLength = Number.parseInt(tokenLength, 10);
     }
 
     // Paths from env
-    const miaDirEnv = env['MIA_DIR'];
+    const miaDirEnv = env.MIA_DIR;
     if (miaDirEnv) {
       const miaDir = miaDirEnv;
       result.paths = { ...result.paths };
@@ -83,37 +95,37 @@ export class ConfigLoader {
       result.paths.memoryFile = join(miaDir, 'memory.md');
       result.paths.sessionsDir = join(miaDir, 'sessions');
     }
-    const skillsDir = env['MIA_SKILLS_DIR'];
+    const skillsDir = env.MIA_SKILLS_DIR;
     if (skillsDir) {
       result.paths = { ...result.paths };
       result.paths.skillsDir = skillsDir;
     }
-    const projectsDir = env['MIA_PROJECTS_DIR'];
+    const projectsDir = env.MIA_PROJECTS_DIR;
     if (projectsDir) {
       result.paths = { ...result.paths };
       result.paths.projectsDir = projectsDir;
     }
-    const stateFile = env['MIA_STATE_FILE'];
+    const stateFile = env.MIA_STATE_FILE;
     if (stateFile) {
       result.paths = { ...result.paths };
       result.paths.stateFile = stateFile;
     }
-    const memoryFile = env['MIA_MEMORY_FILE'];
+    const memoryFile = env.MIA_MEMORY_FILE;
     if (memoryFile) {
       result.paths = { ...result.paths };
       result.paths.memoryFile = memoryFile;
     }
 
     // Feature flags
-    if (env['MIA_TELEMETRY'] === 'true') {
+    if (env.MIA_TELEMETRY === 'true') {
       result.features = { ...result.features };
       result.features.telemetry = true;
     }
-    if (env['MIA_AUTO_RESTART'] === 'false') {
+    if (env.MIA_AUTO_RESTART === 'false') {
       result.features = { ...result.features };
       result.features.autoRestart = false;
     }
-    if (env['MIA_HOT_RELOAD'] === 'true') {
+    if (env.MIA_HOT_RELOAD === 'true') {
       result.features = { ...result.features };
       result.features.hotReload = true;
     }
