@@ -2,7 +2,7 @@
   "$schema": "https://knip.dev/schema.json",
   "entry": ["src/cli/index.ts", "src/daemon/server.ts"],
   "project": ["src/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"],
-  "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky"],
+  "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky", ".claude"],
   "ignoreDependencies": [
     "typescript",
     "@biomejs/biome",

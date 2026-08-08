@@ -394,14 +394,14 @@ Update continuously — see RESEARCH_PLAN_v2.md section 4.3 for template.
 
 | Criterion | Target | Verification |
 |-----------|--------|--------------|
-| Research files created | ≥50 markdown files | `find research -name "*.md" | wc -l` |
+| Research files created | ≥50 markdown files | `find research -name "*.md" \| wc -l` |
 | Primary source citations | >60% | Script: count source types in all .md |
-| ADRs completed | 10 | `ls research/09-synthesis/adrs/ | wc -l` |
-| Spike specs written | 5 | `ls research/09-synthesis/spike-specs/ | wc -l` |
+| ADRs completed | 10 | `ls research/09-synthesis/adrs/ \| wc -l` |
+| Spike specs written | 5 | `ls research/09-synthesis/spike-specs/ \| wc -l` |
 | Open questions tracked | ≥20 | `grep -c "## OQ-" research/09-synthesis/open-questions.md` |
-| Cross-references | ≥100 links | `grep -r "\[.*\](.*\.md)" research/ | wc -l` |
+| Cross-references | ≥100 links | `grep -r "\[.*\](.*\.md)" research/ \| wc -l` |
 | Research log entries | ≥200 | `wc -l research/_meta/research-log.jsonl` |
-| Contradictions documented | ≥10 | `grep -r "CONTRADICTION\|contradict" research/ | wc -l` |
+| Contradictions documented | ≥10 | `grep -r "CONTRADICTION\|contradict" research/ \| wc -l` |
 
 ---
 

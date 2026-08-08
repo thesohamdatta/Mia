@@ -17,7 +17,7 @@
 
 ---
 
-### What is MIA?
+### What is MIA
 
 **MIA** (Machine Intelligence Architecture) is a compiled, local-first AI engineering harness that runs on your machine. It turns raw intent into verified code while compounding learnings across sessions.
 

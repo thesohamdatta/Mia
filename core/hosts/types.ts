@@ -13,7 +13,7 @@ export interface HostAdapter {
     skill: SkillManifest,
     context: ExecutionContext,
     input: string
-  ): Promise<AsyncIterable<string>>;
+  ): AsyncIterable<string>;
   healthCheck(): Promise<{ ok: boolean; details?: string }>;
   shutdown(): Promise<void>;
 }
@@ -25,6 +25,8 @@ export interface HostConfig {
   timeout?: number;
   maxTokens?: number;
   temperature?: number;
+  organizationId?: string;
+  authToken?: string;
   extra?: Record<string, unknown>;
 }
 

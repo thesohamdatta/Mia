@@ -41,6 +41,6 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky"]
+    "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky", ".claude"]
   }
 }

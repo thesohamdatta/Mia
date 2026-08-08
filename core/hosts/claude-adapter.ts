@@ -10,7 +10,7 @@ export class ClaudeAdapter extends BaseHostAdapter {
   readonly name = 'claude';
   readonly version = '1.0.0';
   readonly description = 'Anthropic Claude API adapter (Messages API)';
-  readonly supportsStreaming = true;
+  override readonly supportsStreaming = true;
 
   private client: ReturnType<typeof this.createClient> | null = null;
 
@@ -18,7 +18,8 @@ export class ClaudeAdapter extends BaseHostAdapter {
     return {
       baseUrl: config.baseUrl || 'https://api.anthropic.com',
       apiKey: config.apiKey || '',
-      anthropicVersion: (config.extra?.anthropicVersion as string) || '2023-06-01',
+      anthropicVersion:
+        (config.extra?.['anthropicVersion'] as string) || '2023-06-01',
       timeout: config.timeout || 60000,
     };
   }
@@ -53,7 +54,7 @@ export class ClaudeAdapter extends BaseHostAdapter {
     }
   }
 
-  protected override async *executeStreaming(
+  override async *executeStreaming(
     skill: SkillManifest,
     _context: ExecutionContext,
     input: string
@@ -101,7 +102,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': this.client.apiKey!,
+        'x-api-key': this.client.apiKey || '',
         'anthropic-version': this.client.anthropicVersion,
       },
       body: JSON.stringify({
@@ -120,7 +121,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
     }
 
     if (stream) {
-      return response.body; // Handled by streaming method
+      throw new Error('Use executeStreaming for streaming requests');
     }
 
     const data = (await response.json()) as { content: Array<{ text: string }> };
@@ -136,7 +137,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': this.client.apiKey!,
+        'x-api-key': this.client.apiKey || '',
         'anthropic-version': this.client.anthropicVersion,
       },
       body: JSON.stringify({
@@ -185,7 +186,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
     }
   }
 
-  protected async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
+  protected override async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
     if (!this.client) {
       return { ok: false, details: 'Not initialized' };
     }
@@ -195,7 +196,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': this.client.apiKey!,
+          'x-api-key': this.client.apiKey || '',
           'anthropic-version': this.client.anthropicVersion,
         },
         body: JSON.stringify({

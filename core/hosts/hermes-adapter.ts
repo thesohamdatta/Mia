@@ -10,7 +10,7 @@ export class HermesAdapter extends BaseHostAdapter {
   readonly name = 'hermes';
   readonly version = '1.0.0';
   readonly description = 'Hermes Agent local adapter (HTTP API)';
-  readonly supportsStreaming = false;
+  override readonly supportsStreaming = false;
 
   private client: ReturnType<typeof this.createClient> | null = null;
 
@@ -22,14 +22,14 @@ export class HermesAdapter extends BaseHostAdapter {
     };
   }
 
-  protected async onInitialize(): Promise<void> {
+  protected override async onInitialize(): Promise<void> {
     if (!this.config.baseUrl) {
       throw new Error('Hermes adapter requires baseUrl in config');
     }
     this.client = this.createClient(this.config);
   }
 
-  protected async executeImpl(
+  protected override async executeImpl(
     skill: SkillManifest,
     context: ExecutionContext,
     input: string
@@ -88,7 +88,7 @@ Allowed tools: ${skill.allowedTools.join(', ')}
 Execute this skill faithfully according to its workflow. Return only the skill's output.`;
   }
 
-  protected async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
+  protected override async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
     if (!this.client) {
       return { ok: false, details: 'Not initialized' };
     }

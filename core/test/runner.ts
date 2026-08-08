@@ -1,7 +1,8 @@
 import { executeSkill } from '../skills/executor.js';
 import { runPreamble } from '../skills/preamble.js';
 import { getSkillRegistry } from '../skills/registry.js';
-import type { ExecutionContext, TestAssertion, TestCase, TestResult } from './types.js';
+import type { ExecutionContext } from '../skills/types.js';
+import type { TestAssertion, TestCase, TestResult } from './types.js';
 
 export class TestRunnerImpl {
   private registry = getSkillRegistry();
@@ -31,14 +32,14 @@ export class TestRunnerImpl {
 
       if (testCase.expectedError) {
         assertions.push({
-          passed: !result.ok && result.error?.includes(testCase.expectedError),
+          passed: !result.ok && Boolean(result.error?.includes(testCase.expectedError)),
           message: `Expected error containing "${testCase.expectedError}"`,
           expected: testCase.expectedError,
           actual: result.error,
         });
       } else if (testCase.expectedOutput) {
         assertions.push({
-          passed: result.output?.includes(testCase.expectedOutput) ?? false,
+          passed: Boolean(result.output?.includes(testCase.expectedOutput)),
           message: `Expected output containing "${testCase.expectedOutput}"`,
           expected: testCase.expectedOutput,
           actual: result.output,

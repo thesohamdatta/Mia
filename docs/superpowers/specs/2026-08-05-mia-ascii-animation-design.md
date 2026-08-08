@@ -17,7 +17,7 @@ Create an ASCII animation featuring the name **MIA** with video-like dynamic mat
   - Highlighting / Peak: `#FF3E3E`
   - Ambient Glow / Shading: `#5C0E0E`, `#2B0707`
   - Background: Obsidian Dark (`#0A0A0D`) with transparent fallback for GitHub Dark mode.
-- **Typography & Glyphs:** Monospace ASCII character set (`@`, `#`, `$`, `%`, `*`, `+`, `=`, `:`, `.`, ` `).
+- **Typography & Glyphs:** Monospace ASCII character set (`@`, `#`, `$`, `%`, `*`, `+`, `=`, `:`, `.`, `space`).
 - **Animation Motion:** 
   - 3D ASCII "MIA" typography floating/pulsing.
   - Video matrix rain / fluid dynamic wave passing through letters.
