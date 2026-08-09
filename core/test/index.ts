@@ -1,3 +1,2 @@
-export * from './types.js';
-export * from './analyzer.js';
-export * from './judge.js';
+// Test utilities index - currently no exports needed
+// Integration test imports directly from vitest and core modules

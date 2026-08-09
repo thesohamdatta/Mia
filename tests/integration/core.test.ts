@@ -2,10 +2,10 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { createExecutionContext } from '../context.js';
-import { getSkillExecutor, listSkills } from '../skills/index.js';
-import { executeWithMiddlewares } from '../skills/preamble.js';
-import { createUnifiedStore } from '../state/unified-store.js';
+import { createExecutionContext } from '../../core/context.js';
+import { getSkillExecutor, listSkills } from '../../core/skills/index.js';
+import { executeWithMiddlewares } from '../../core/skills/preamble.js';
+import { createUnifiedStore } from '../../core/state/unified-store.js';
 
 describe('Integration: CLI -> Skill -> Store', () => {
   let testDir: string;
@@ -86,14 +86,18 @@ describe('Integration: CLI -> Skill -> Store', () => {
     // Query learnings
     const learnings = await store.listLearnings(projectsDir, slug, 10);
     expect(learnings.length).toBe(1);
-    const learning = learnings[0]!;
+    const learning = learnings[0];
+    expect(learning).toBeDefined();
+    if (!learning) throw new Error('No learning found');
     expect(learning.data).toEqual({ insight: 'Test learning', key: 'test-key' });
     expect(learning.type).toBe('learning');
 
     // Query timeline
     const timeline = await store.listTimeline(projectsDir, slug, 10);
     expect(timeline.length).toBe(1);
-    const tlEvent = timeline[0]!;
+    const tlEvent = timeline[0];
+    expect(tlEvent).toBeDefined();
+    if (!tlEvent) throw new Error('No timeline event found');
     expect(tlEvent.data).toEqual({ skill: 'test', event: 'started' });
     expect(tlEvent.type).toBe('timeline');
 
