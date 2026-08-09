@@ -15,7 +15,7 @@ export class LLMJudgeImpl implements LLMJudge {
     criteria?: JudgeCriteria
   ): Promise<JudgeResult> {
     const activeCriteria = { ...this.defaultCriteria, ...criteria };
-    const scores: Record<string, number> = {};
+    const scores: Partial<Record<'accuracy' | 'completeness' | 'clarity' | 'style', number>> = {};
     let totalScore = 0;
     let count = 0;
 

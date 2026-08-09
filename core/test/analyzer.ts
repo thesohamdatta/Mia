@@ -7,7 +7,7 @@ export class StaticAnalyzerImpl implements StaticAnalyzer {
     const lines = code.split('\n').length;
 
     // Basic complexity analysis
-    const cyclomaticMatches = code.match(/\b(if|else|for|while|switch|case|catch|&&|\|\||?\.)/g);
+    const cyclomaticMatches = code.match(/\b(if|else|for|while|switch|case|catch|&&|\|\|)\b/g);
     complexity = (cyclomaticMatches?.length || 0) + 1;
 
     // Check for common issues
@@ -70,7 +70,7 @@ export class StaticAnalyzerImpl implements StaticAnalyzer {
   private findLine(code: string, search: string): number {
     const lines = code.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes(search)) {
+      if (lines[i]?.includes(search)) {
         return i + 1;
       }
     }

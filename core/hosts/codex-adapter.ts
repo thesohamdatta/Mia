@@ -10,7 +10,7 @@ export class CodexAdapter extends BaseHostAdapter {
   readonly name = 'codex';
   readonly version = '1.0.0';
   readonly description = 'OpenAI Codex API adapter (Chat Completions)';
-  readonly supportsStreaming = true;
+  override readonly supportsStreaming = true;
 
   private client: ReturnType<typeof this.createClient> | null = null;
 
@@ -23,14 +23,14 @@ export class CodexAdapter extends BaseHostAdapter {
     };
   }
 
-  protected async onInitialize(): Promise<void> {
+  protected override async onInitialize(): Promise<void> {
     if (!this.config.apiKey) {
       throw new Error('Codex adapter requires apiKey in config');
     }
     this.client = this.createClient(this.config);
   }
 
-  protected async executeImpl(
+  protected override async executeImpl(
     skill: SkillManifest,
     _context: ExecutionContext,
     input: string
@@ -53,7 +53,7 @@ export class CodexAdapter extends BaseHostAdapter {
     }
   }
 
-  async *executeStreaming(
+  override async *executeStreaming(
     skill: SkillManifest,
     _context: ExecutionContext,
     input: string
@@ -86,7 +86,7 @@ When to invoke:
 ${skill.whenToInvoke}
 
 Preamble tier: ${skill.preambleTier}
-Allowed tools: ${skill.allowedTools.join(', ')}
+Allowed tools: ${(skill.allowedTools || []).join(', ')}
 
 Execute this skill faithfully according to its workflow. Return only the skill's output.`;
   }
@@ -122,7 +122,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
     }
 
     if (stream) {
-      return response.body;
+      throw new Error('Use executeStreaming for streaming requests');
     }
 
     const data = (await response.json()) as { choices: Array<{ message: { content: string } }> };
@@ -190,7 +190,7 @@ Execute this skill faithfully according to its workflow. Return only the skill's
     }
   }
 
-  protected async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
+  protected override async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
     if (!this.client) {
       return { ok: false, details: 'Not initialized' };
     }

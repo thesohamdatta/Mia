@@ -19,7 +19,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "@types/bun"],
     "baseUrl": ".",
     "paths": {
       "@core/*": ["core/*"]

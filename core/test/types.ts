@@ -48,7 +48,7 @@ export interface TestSuiteResult {
 }
 
 export interface StaticAnalyzer {
-  analyze(code: string): StaticAnalysisResult;
+  analyze(code: string): Promise<StaticAnalysisResult>;
 }
 
 export interface StaticAnalysisResult {

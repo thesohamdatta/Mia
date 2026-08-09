@@ -10,7 +10,7 @@ export class OpenClawAdapter extends BaseHostAdapter {
   readonly name = 'opencode';
   readonly version = '1.0.0';
   readonly description = 'OpenCode CLI adapter (local process execution)';
-  readonly supportsStreaming = false;
+  override readonly supportsStreaming = false;
 
   private client: ReturnType<typeof this.createClient> | null = null;
 
@@ -22,14 +22,14 @@ export class OpenClawAdapter extends BaseHostAdapter {
     };
   }
 
-  protected async onInitialize(): Promise<void> {
+  protected override async onInitialize(): Promise<void> {
     if (!this.config.baseUrl) {
       throw new Error('OpenClaw adapter requires baseUrl in config');
     }
     this.client = this.createClient(this.config);
   }
 
-  protected async executeImpl(
+  protected override async executeImpl(
     skill: SkillManifest,
     context: ExecutionContext,
     input: string
@@ -78,12 +78,12 @@ When to invoke:
 ${skill.whenToInvoke}
 
 Preamble tier: ${skill.preambleTier}
-Allowed tools: ${skill.allowedTools.join(', ')}
+Allowed tools: ${(skill.allowedTools || []).join(', ')}
 
 Execute this skill faithfully according to its workflow. Return only the skill's output.`;
   }
 
-  protected async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
+  protected override async healthCheckImpl(): Promise<{ ok: boolean; details?: string }> {
     if (!this.client) {
       return { ok: false, details: 'Not initialized' };
     }
