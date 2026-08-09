@@ -23,7 +23,7 @@
 
 - **Grill-to-Ship Pipeline** &mdash; Never write code without explicit clarification & verifiable plans.
 - **Self-Improving Memory** &mdash; Every session logs learnings (`.jsonl`) with confidence decay and global wisdom.
-- **Zero External Dependencies** &mdash; Compiled Bun single-file binary with sub-millisecond execution.
+- **Zero External Dependencies** &mdash; Single compiled Bun binary with sub-millisecond execution.
 
 ---
 
@@ -34,9 +34,10 @@
 curl -fsSL https://raw.githubusercontent.com/thesohamdatta/Mia/main/scripts/bootstrap.sh | bash
 
 # Daily engineering workflow
-mia morning     # Start your day: context, priorities & health
 mia grill       # Clarification interview before non-trivial tasks
-mia ship        # Test -> health check -> review -> PR
+mia plan        # Create a verifiable plan with success criteria
+mia spec        # Turn intent into PRD & atomic issue tickets
+mia ship        # Test → health check → review → PR
 ```
 
 ---
@@ -46,11 +47,14 @@ mia ship        # Test -> health check -> review -> PR
 | Skill | Command | Purpose |
 | :--- | :--- | :--- |
 | **Grill** | `mia grill` | Clarification interview (never code without intent alignment) |
-| **Plan** | `mia plan create` | Verifiable task plan with explicit success criteria |
-| **Spec** | `mia spec start` | Turn intent into PRD & atomic issue tickets |
+| **Plan** | `mia plan` | Verifiable task plan with explicit success criteria |
+| **Spec** | `mia spec` | Turn intent into PRD & atomic issue tickets |
 | **Health** | `mia health` | Code quality scorekeeper with baked-in verification |
-| **Ship** | `mia ship` | Test verification &rarr; pre-landing review &rarr; git PR |
+| **Ship** | `mia ship` | Test verification → pre-landing review → git PR |
 | **Learn** | `mia learn` | Capture typed learnings, confidence scores & decay |
+| **Retro** | `mia retro` | Weekly retrospective with timeline + learnings |
+| **Memory** | `mia memory` | Read/write long-term memory (~/.mia/memory.md) |
+| **Checkpoint** | `mia checkpoint` | Save/resume working state |
 
 ---
 
@@ -58,15 +62,14 @@ mia ship        # Test -> health check -> review -> PR
 
 ```
 ~/.mia/
-├── state.json          # Daemon runtime state (port, token, version)
-├── memory.md           # Global curated long-term wisdom
+├── memory.md              # Global curated long-term wisdom
 ├── bin/
-│   ├── mia             # Compiled CLI binary (~94MB)
-│   └── miad            # Compiled persistent daemon (~94MB)
-└── projects/{slug}/    # Per-repository learning store
-    ├── learnings.jsonl # Typed, decay-scored learnings
-    └── timeline.jsonl  # Skill execution history
+│   └── mia                # Single compiled binary (~50MB)
+└── projects/{slug}/       # Per-repository learning store
+    └── events.jsonl       # Unified event log (learnings, timeline, checkpoints)
 ```
+
+**No daemon. No HTTP. No auth tokens. Just direct execution.**
 
 ---
 

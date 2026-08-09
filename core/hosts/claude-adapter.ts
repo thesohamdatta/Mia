@@ -18,7 +18,7 @@ export class ClaudeAdapter extends BaseHostAdapter {
     return {
       baseUrl: config.baseUrl || 'https://api.anthropic.com',
       apiKey: config.apiKey || '',
-      anthropicVersion: (config.extra?.anthropicVersion as string) || '2023-06-01',
+      anthropicVersion: (config.extra?.['anthropicVersion'] as string) || '2023-06-01',
       timeout: config.timeout || 60000,
     };
   }
@@ -86,7 +86,7 @@ When to invoke:
 ${skill.whenToInvoke}
 
 Preamble tier: ${skill.preambleTier}
-Allowed tools: ${skill.allowedTools.join(', ')}
+Allowed tools: ${(skill.allowedTools || []).join(', ')}
 
 Execute this skill faithfully according to its workflow. Return only the skill's output.`;
   }

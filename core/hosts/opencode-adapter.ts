@@ -78,7 +78,7 @@ When to invoke:
 ${skill.whenToInvoke}
 
 Preamble tier: ${skill.preambleTier}
-Allowed tools: ${skill.allowedTools.join(', ')}
+Allowed tools: ${(skill.allowedTools || []).join(', ')}
 
 Execute this skill faithfully according to its workflow. Return only the skill's output.`;
   }
