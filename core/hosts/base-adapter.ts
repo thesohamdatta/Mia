@@ -30,7 +30,7 @@ export abstract class BaseHostAdapter implements HostAdapter {
     input: string
   ): Promise<SkillResult>;
 
-  async executeStreaming?(
+  executeStreaming?(
     skill: SkillManifest,
     context: ExecutionContext,
     input: string

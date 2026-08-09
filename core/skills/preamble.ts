@@ -1,55 +1,73 @@
-import { createStateService } from '../state/service.js';
-import type { ExecutionContext, SkillResult } from './types.js';
+import type { ExecutionContext, SkillExecutor, SkillResult } from './types.js';
 
-const stateService = createStateService();
+export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
-export interface SkillPreamble {
-  checkUpdates(): Promise<string | null>;
-  trackSession(sessionId: string): Promise<void>;
-  loadLearnings(slug: string): Promise<void>;
-  formatOutput(output: string): string;
-}
-
-export async function runPreamble(tier: 1 | 2 | 3, context: ExecutionContext): Promise<void> {
-  if (tier >= 1) {
-    // Tier 1: Always run - update check, session tracking
-    await stateService.sessions.touch(context.token);
+export const requireProject: Middleware = async (ctx, next) => {
+  if (ctx.slug === 'default') {
+    console.warn('⚠️  Not in a git repository. Using default project.');
   }
+  await next();
+};
 
-  if (tier >= 2) {
-    // Tier 2: Load learnings for the project
-    await stateService.learnings.list(context.slug, 5);
+export const loadRecentLearnings: Middleware = async (ctx, next) => {
+  try {
+    const projectsDir = ctx.config.projectsDir;
+    const learnings = await ctx.unifiedStore.listLearnings(projectsDir, ctx.slug, 5);
+    if (learnings.length > 0) {
+      console.log('📚 Recent learnings:');
+      for (const l of learnings) {
+        const data = l.data as { insight?: string; key?: string };
+        console.log(`  • ${data.insight || data.key}`);
+      }
+    }
+  } catch {
+    // Ignore
   }
+  await next();
+};
 
-  // Auto-log timeline event
-  await stateService.timeline.append(context.slug, {
-    ts: new Date().toISOString(),
-    skill: 'unknown', // Will be overridden by caller
+export const logTimelineStart: Middleware = async (ctx, next) => {
+  const skillName = (ctx as any)._skillName || 'unknown';
+  const projectsDir = ctx.config.projectsDir;
+  await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
+    skill: skillName,
     event: 'started',
   });
-}
+  await next();
+};
 
-export async function logSkillComplete(
-  slug: string,
-  skillName: string,
-  result: SkillResult
-): Promise<void> {
-  await stateService.timeline.append(slug, {
-    ts: new Date().toISOString(),
+export const logTimelineComplete: Middleware = async (ctx, next) => {
+  const skillName = (ctx as any)._skillName || 'unknown';
+  const result = (ctx as any)._skillResult as SkillResult;
+  const projectsDir = ctx.config.projectsDir;
+  await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
     event: 'completed',
     outcome: result.ok ? 'success' : 'failed',
   });
-}
+  await next();
+};
 
-export async function logLearning(
-  slug: string,
-  learning: Omit<import('../state/types.js').Learning, 'ts'>
+export const defaultMiddlewares: Middleware[] = [
+  requireProject,
+  loadRecentLearnings,
+  logTimelineStart,
+];
+
+export async function runMiddlewares(
+  middlewares: Middleware[],
+  ctx: ExecutionContext
 ): Promise<void> {
-  await stateService.learnings.append(slug, {
-    ...learning,
-    ts: new Date().toISOString(),
-  });
+  let index = 0;
+  const next = async (): Promise<void> => {
+    if (index < middlewares.length) {
+      const mw = middlewares[index++];
+      if (mw) {
+        await mw(ctx, next);
+      }
+    }
+  };
+  await next();
 }
 
 export function formatSkillOutput(result: SkillResult): string {
@@ -57,4 +75,23 @@ export function formatSkillOutput(result: SkillResult): string {
     return `❌ ${result.error}`;
   }
   return result.output || '✅ Done';
+}
+
+export async function executeWithMiddlewares(
+  executor: SkillExecutor,
+  args: string[],
+  ctx: ExecutionContext,
+  skillName: string,
+  middlewares: Middleware[] = defaultMiddlewares
+): Promise<SkillResult> {
+  (ctx as any)._skillName = skillName;
+
+  await runMiddlewares(middlewares, ctx);
+
+  const result = await executor.execute(args, ctx);
+
+  (ctx as any)._skillResult = result;
+  await logTimelineComplete(ctx, async () => {});
+
+  return result;
 }

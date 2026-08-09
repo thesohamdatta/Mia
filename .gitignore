@@ -45,6 +45,7 @@ coverage/
 # MIA state (local per-machine)
 .mia/
 !.mia/skills/  # Keep built-in skills
+.claude/
 
 # Temporary files
 *.tmp
