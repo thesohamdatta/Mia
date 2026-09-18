@@ -1,171 +1,188 @@
 # MIA Architecture
 
-> Simple, deep, evolvable. The harness is more important than the model.
+> **Simple. Deep. Evolvable.** The harness is more important than the model.
 
----
+## System overview
 
-## System Overview
+MIA is a compiled Bun CLI with direct skill execution.
 
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                            MIA                               │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  CLI → ExecutionContext → Middleware → Skill Executor        │
+│                         │                     │              │
+│                         │                     ├→ local files │
+│                         │                     ├→ UnifiedStore│
+│                         │                     └→ host adapter│
+│                         │                                    │
+│                         └→ Config                             │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        MIA OS                               │
-├─────────────────────────────────────────────────────────────┤
-│  CLI (bin/mia)  ◄──►  Daemon (bin/miad)  ◄──►  State        │
-│  (compiled Bun)     (persistent HTTP)    (~/.mia/)          │
-│                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌────────────────────┐  │
-│  │  Skills     │  │  Learning   │  │  Projects          │  │
-│  │  (core,     │  │  (learnings,│  │  (per-repo,        │  │
-│  │   learning, │  │   timeline, │  │   per-domain)      │  │
-│  │   life)     │  │   memory)   │  │                    │  │
-│  └─────────────┘  └─────────────┘  └────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+
+There is no current daemon in this architecture. The old CLI → HTTP → daemon path was removed as an accepted architectural change and is retained only in the decision record for historical context.
+
+## Core components
+
+| Component | Current implementation | Purpose |
+| :--- | :--- | :--- |
+| **CLI** | `core/cli/index.ts` | Parses `mia <skill> [args...]` and dispatches directly |
+| **Context** | `core/context.ts` | Carries cwd, project slug, config, and shared store |
+| **Skills** | `core/skills/` | Small executable use-case modules |
+| **Middleware** | `core/skills/preamble.ts` | Project checks, recent learnings, timeline logging |
+| **State** | `core/state/` | JSONL storage interfaces and `UnifiedStore` |
+| **Config** | `core/config/` | Local defaults, config-file loading, environment overrides |
+| **Hosts** | `core/hosts/` | Optional integrations with external or local AI hosts |
+| **Docs generator** | `core/generator/` | Skill documentation generation utility |
+| **Tests** | `core/test/` | Current regression and integration-oriented coverage |
+
+## Execution flow
+
+```text
+user
+ ↓
+mia <skill> [args]
+ ↓
+core/cli/index.ts
+ ↓
+createExecutionContext()
+ ↓
+executeWithMiddlewares()
+ ↓
+skill executor
+ ↓
+SkillResult
+ ↓
+timeline / learning / checkpoint persistence
 ```
 
----
+The normal command path is in-process. There is no HTTP hop and no second MIA process to start.
 
-## Core Components
+## Project state
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **CLI** | Bun (compiled) | Single binary, sub-ms startup, zero deps |
-| **Daemon** | Bun.serve + SQLite-ish (JSONL) | Persistent state, token auth, skill registry |
-| **Skills** | TypeScript → compiled into daemon | Self-contained workflows (grill, learn, retro, etc.) |
-| **State** | `~/.mia/state.json` | Daemon port, token, version |
-| **Projects** | `~/.mia/projects/{slug}/` | Per-repo learnings, timeline, checkpoints |
-| **Memory** | `~/.mia/memory.md` | Global curated wisdom (OpenClaw-style) |
+By default:
 
----
-
-## Project Hierarchy (Superstructure)
-
-```
+```text
 ~/.mia/
-├── state.json              # daemon state
-├── memory.md               # global long-term memory
-└── projects/
-    ├── aura/               # AURA project
-    │   ├── learnings.jsonl
-    │   ├── timeline.jsonl
-    │   └── checkpoints/
-    ├── mia/                # MIA self-development
-    │   ├── learnings.jsonl
-    │   ├── timeline.jsonl
-    │   └── checkpoints/
-    ├── work/               # work projects
-    │   ├── learnings.jsonl
-    │   ├── timeline.jsonl
-    │   └── checkpoints/
-    └── life/               # personal domains (tagged)
-        ├── learnings.jsonl
-        ├── timeline.jsonl
-        └── checkpoints/
+├── memory.md
+├── skills/
+├── projects/
+│   └── <slug>/
+│       └── events.jsonl
+└── sessions/
 ```
 
-**Slug resolution:** Auto-detect from git repo name. If no git, use `default`.
+Project slugs come from the git repository root name. When no git repository is available, MIA uses `default`.
 
-**Domain tags (within learnings):**
-```json
-{ "domain": "engineering|startup|social|film|health|learning" }
+`events.jsonl` stores typed events:
+
+- `learning`
+- `timeline`
+- `checkpoint`
+
+The append/query surface is exposed by `UnifiedStore`.
+
+## Skills
+
+The current executable map in `core/skills/index.ts` contains:
+
+### Workflow
+- `grill`
+- `plan`
+- `spec`
+- `review`
+- `health`
+- `ship`
+
+### Learning and state
+- `learn`
+- `retro`
+- `memory`
+- `checkpoint`
+
+### Version control
+- `vc`
+
+Skills are imported directly into the map. The current runtime does not depend on filesystem scanning to discover the executable command set.
+
+## Middleware
+
+The current middleware chain is intentionally small:
+
+```text
+requireProject
+    ↓
+loadRecentLearnings
+    ↓
+logTimelineStart
+    ↓
+skill executor
+    ↓
+logTimelineComplete
 ```
 
-All domains share one learning store per project. Tag for filtering.
+This keeps cross-cutting behaviour separate from skill logic without recreating a service layer around the CLI.
 
----
+## Host adapters
 
-## Skill Categories
+The host layer defines a stable adapter interface.
 
-| Category | Skills | Purpose |
-|----------|--------|---------|
-| **Core** | grill, plan, spec, ship, review | Engineering workflow |
-| **Learning** | learn, retro, memory, checkpoint | Self-improvement loop |
-| **Life** | morning, evening, weekly, health | Daily rituals (v0.3) |
-| **Agent** | spawn, delegate, eval | Multi-agent (v0.4) |
+Current implementations include:
 
----
+- Claude
+- Codex
+- Hermes
+- OpenCode
 
-## Learning Loop (gstack-inspired)
+These adapters provide integration boundaries for model hosts. They are not required for the core local CLI execution path.
 
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│  OBSERVE    │───►│  LEARN      │───►│  DISTILL    │
-│  (session)  │    │  (auto)     │    │  (retro)    │
-└─────────────┘    └─────────────┘    └─────────────┘
-       ▲                                    │
-       │                                    ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│  EVOLVE     │◄───│  VERIFY     │◄───│  APPLY      │
-│  (patterns) │    │  (tests)    │    │  (next run) │
-└─────────────┘    └─────────────┘    └─────────────┘
-```
+## Configuration
 
-**Storage:**
-- `learnings.jsonl` — typed, confidence (1-10), decay (1pt/30d), source
-- `timeline.jsonl` — auto-logged skill events (start/complete/fail)
-- `checkpoints/` — markdown snapshots for resume
-- `memory.md` — global curated wisdom
+The config layer currently loads in this order:
 
----
+1. built-in defaults
+2. `~/.mia/config.json` when present
+3. environment-variable overrides
 
-## Data Flow
+Relevant environment variables include:
 
-```
-User → mia <skill> → CLI → HTTP POST /command → Daemon
-                                                      │
-                    ◄──── JSON response ────────────┤
-                                                      ▼
-                                            ┌─────────────────┐
-                                            │ handleCommand() │
-                                            │ - exec skill    │
-                                            │ - append learn  │
-                                            │ - append timeline│
-                                            └─────────────────┘
+```text
+MIA_DIR
+MIA_SKILLS_DIR
+MIA_PROJECTS_DIR
+MIA_STATE_FILE
+MIA_MEMORY_FILE
+MIA_TELEMETRY
+MIA_AUTO_RESTART
+MIA_HOT_RELOAD
 ```
 
-**Auto-learning:** Every skill completion appends to timeline. Skills can append learnings.
+The schema still contains a few daemon-related fields from the earlier architecture. Those are compatibility residue, not evidence that the current CLI runs a daemon.
 
----
+## Design rules
 
-## North Star: Agentic Software Development
+### Simple
 
-```
-/autoship (future)
-  describe feature → approve plan → autonomous execution
-    │
-    ├── /office-hours → /autoplan (CEO → design → eng)
-    ├── /checkpoint auto-save before each phase
-    ├── /health quality gate (score ≥ 7)
-    ├── /review (adversarial + specialists)
-    ├── /qa (browser + unit + integration)
-    └── /ship (tests → review → push → PR)
-```
+Use the smallest mechanism that solves the problem.
 
-MIA is the **harness** that makes autonomous agents reliable:
-- Persistent state across compaction/sessions
-- Learnings compound across runs
-- Verification > confidence
+### Deep
 
----
+Keep interfaces small and push complexity behind them.
 
-## Design Principles Applied
+### Evolvable
 
-| Principle | Implementation |
-|-----------|----------------|
-| **Simple** | JSONL files, compiled binaries, no external deps |
-| **Deep** | Simple CLI, rich daemon, typed learning schema |
-| **Evolvable** | Skills as modules, append-only storage, domain tags |
-| **Verifiable** | Deterministic tests, health scores, confidence scores |
+Prefer boundaries that let individual skills, stores, and adapters change independently.
 
----
+### Verifiable
 
-## What's Next (v0.2)
+Treat tests, typechecks, linting, and targeted checks as evidence, not ceremony.
 
-1. **Skill template system** — `SKILL.md.tmpl` + `gen-skill-docs.ts` (gstack pattern)
-2. **Host adapters** — Claude Code, Hermes, OpenClaw native integration
-3. **Daily rituals** — `mia morning`, `mia evening`, `mia weekly`
-4. **Spec/ship/review skills** — full grill-to-ship pipeline
-5. **AURA integration** — first-class project with agent scaffolding
+## Historical note
 
----
+MIA originally used a CLI + daemon architecture with HTTP and a separate `miad` process.
 
-*This architecture is intentionally minimal. Detail lives in skills and code.*
+ADR-0001 records why that was removed. The current code and accepted ADR define the present architecture.
+
+See [`docs/decisions/ADR-0001-eliminate-daemon.md`](../decisions/ADR-0001-eliminate-daemon.md).
