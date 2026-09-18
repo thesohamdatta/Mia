@@ -206,20 +206,13 @@ There is no daemon in the current architecture. No `miad`. No HTTP hop in the no
 
 ## configuration
 
-MIA has a default local configuration and supports a JSON config file plus environment-variable overrides.
-
-The main configuration surface includes:
+The current CLI uses `MIA_DIR` to choose the local state root, defaulting to `~/.mia`. The remaining runtime paths are derived from that root.
 
 ```text
 MIA_DIR
-MIA_SKILLS_DIR
-MIA_PROJECTS_DIR
-MIA_STATE_FILE
-MIA_MEMORY_FILE
-MIA_TELEMETRY
-MIA_AUTO_RESTART
-MIA_HOT_RELOAD
 ```
+
+The repository also contains a broader `core/config/ConfigLoader` with JSON and environment override support, but that loader is not currently wired into `createExecutionContext()`. I treat it as transition/compatibility code rather than advertising it as the current CLI configuration contract.
 
 Some legacy daemon-related settings still exist in the configuration schema for compatibility. They are not part of the normal daemon-free execution path.
 
