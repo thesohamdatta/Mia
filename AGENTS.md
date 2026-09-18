@@ -4,95 +4,245 @@
 
 ---
 
-## Session Startup
+## Canonical context
 
-Use runtime-provided startup context first (CLAUDE.md, AGENTS.md, PRINCIPLES.md, recent daily memory, MEMORY.md).
+`AGENTS.md` is the canonical workspace entry point for MIA. `CLAUDE.md` and `GEMINI.md` are aliases that point here.
 
-Do not manually reread unless:
-1. User explicitly asks
-2. Provided context is missing something you need
-3. You need a deeper follow-up read
+The deeper architecture, workflows, principles, references, and historical decisions live under `docs/`.
+
+Use the runtime-provided startup context first. Read deeper files only when the task needs them or the user explicitly asks.
+
+---
+
+## Session startup
+
+Start with:
+
+1. `AGENTS.md`
+2. `PRINCIPLES.md`
+3. the relevant `docs/` file
+4. recent project memory when it is available
+
+Do not reread the entire documentation tree by default. Context is a resource too.
 
 ---
 
 ## Memory
 
-**Daily notes:** `memory/YYYY-MM-DD.md` — raw logs
-**Long-term:** `MEMORY.md` — curated wisdom (load ONLY in main session, never in group chats)
+MIA keeps long-lived local context under `~/.mia/`.
 
-**Write It Down:**
-- "Mental notes" don't survive restarts; files do
-- Read first, then write concrete updates only
-- "Remember this" → update daily notes or relevant file
-- Learn a lesson → update AGENTS.md, CONTEXT.md, or relevant skill
-- Make a mistake → document it so future-you doesn't repeat it
+- Project events: `~/.mia/projects/<slug>/events.jsonl`
+- Long-term memory: `~/.mia/memory.md`
+- Sessions: `~/.mia/sessions/`
 
----
+Use the current `UnifiedStore` for project learnings, timeline events, and checkpoints.
 
-## Red Lines
-
-- Don't exfiltrate private data. Ever.
-- Don't run destructive commands without asking.
-- Before changing config/schedulers, inspect existing state first and preserve/merge by default.
-- Prefer `trash` over `rm` — recoverable beats gone forever.
-- When in doubt, ask.
+**Write it down:**
+- mental notes do not survive restarts; files do
+- read before writing
+- record useful decisions, failures, and reusable patterns
+- do not duplicate the same truth across documents without a reason
 
 ---
 
-## Existing Solutions Preflight
+## Architecture
 
-Before building custom: check for open-source, maintained libraries, existing skills, or free platforms. Prefer those when adequate. Build custom only when existing options are unsuitable, too expensive, unmaintained, unsafe, non-compliant, or user explicitly asks.
+The current runtime is a **direct CLI execution model**.
 
----
-
-## External vs Internal
-
-**Safe freely:** read files, explore, organize, learn; search web, check calendars; work within workspace.
-
-**Ask first:** sending emails, tweets, public posts; anything that leaves the machine; anything uncertain.
-
----
-
-## Group Chats
-
-You're a participant, not their voice or proxy.
-
-**Respond when:** directly mentioned/asked; add genuine value; correcting misinformation; summarizing when asked.
-
-**Stay silent when:** casual banter; already answered; would just be "yeah"; flows fine without you; would interrupt vibe.
-
-Quality over quantity. One reaction max per message. No triple-tap.
-
----
-
-## Tools
-
-Skills provide tools. Check SKILL.md when needed. Keep local notes (camera names, SSH, TTS voices) in TOOLS.md.
-
-**Voice:** Use TTS for stories, summaries, storytime — more engaging than walls of text.
-
-**Platform formatting:**
-- Discord/WhatsApp: no markdown tables — use bullet lists
-- Discord links: wrap in `<>` to suppress embeds
-- WhatsApp: no headers — use **bold** or CAPS for emphasis
-
----
-
-## Heartbeats — Be Proactive
-
-Don't just reply `HEARTBEAT_OK`. Edit HEARTBEAT.md with a short checklist.
-
-**Check (rotate 2-4x/day):** urgent emails, calendar (24-48h), social mentions, weather.
-
-**Track in `memory/heartbeat-state.json`:**
-```json
-{"lastChecks": {"email": 1703275200, "calendar": 1703260800, "weather": null}}
+```text
+CLI
+ ↓
+ExecutionContext
+ ↓
+Middleware
+ ↓
+Skill Executor
+ ↓
+UnifiedStore / local files / optional host integrations
 ```
 
-**Reach out when:** important email; calendar <2h; found something interesting; >8h silent.
+There is **no current MIA daemon or HTTP control plane** in the normal execution path.
 
-**Stay quiet (`HEARTBEAT_OK`) when:** late night (23-08) unless urgent; human busy; nothing new; checked <30min ago.
+The accepted architectural decision is recorded in [`docs/decisions/ADR-0001-eliminate-daemon.md`](docs/decisions/ADR-0001-eliminate-daemon.md).
 
-**Proactive work (no ask needed):** organize memory; check projects (`git status`); update docs; commit/push own changes; review MEMORY.md.
+---
 
-**Memory maintenance:** Every few days, fold daily notes into MEMORY.md, remove outdated entries.
+## Core rules
+
+### 1. Clarify before coding
+
+For non-trivial work, start with the grill.
+
+Ask:
+- What problem are we solving?
+- What assumptions are we making?
+- What could go wrong?
+- What does done mean?
+- What is explicitly out of scope?
+
+### 2. Human approval stays explicit
+
+Present meaningful choices before consequential execution. Do not silently invent product or architecture decisions.
+
+### 3. Prefer the smallest useful change
+
+Use existing patterns and maintained libraries before introducing new machinery.
+
+Prefer:
+- small diffs
+- deep modules
+- explicit contracts
+- deterministic verification
+- reversible decisions
+
+### 4. Verification beats confidence
+
+Before claiming work is complete, verify the relevant layers:
+
+```text
+typecheck → lint → tests → build → targeted behaviour checks
+```
+
+Use the narrowest set that proves the claim, but do not replace evidence with intuition.
+
+### 5. Preserve local state
+
+Do not overwrite or delete local memory, configuration, credentials, or unrelated project state just because a task is easier that way.
+
+Prefer recoverable changes.
+
+---
+
+## Existing-solutions preflight
+
+Before building something custom, check for a maintained library, existing MIA skill, compatible host adapter, or other established solution.
+
+Build custom only when the existing option is unsuitable, unsafe, unavailable, too expensive, or the task explicitly requires it.
+
+---
+
+## Change boundaries
+
+When changing:
+
+**Code**
+- keep module boundaries intact
+- avoid unrelated refactors
+- update tests for behavioural changes
+
+**Architecture**
+- update or add an ADR
+- update the architecture reference
+- keep README statements consistent with the accepted design
+
+**Skills**
+- update the executable skill and its documentation source
+- keep `docs/skills/` consistent with the current skill surface
+- keep deep material out of the concise entry point
+
+**Documentation**
+- update the narrowest relevant document
+- remove dead paths and stale claims
+- verify internal links
+
+---
+
+## Git and commits
+
+Use Conventional Commits:
+
+```text
+feat(scope): add something
+fix(scope): correct something
+docs(scope): update documentation
+refactor(scope): restructure without changing behaviour
+test(scope): add or repair tests
+chore(scope): maintenance
+```
+
+Use `mia vc` for the project-aware git helpers when appropriate.
+
+Do not rewrite shared history or force-update branches without explicit instruction.
+
+---
+
+## Repository validation
+
+Use the narrowest read-only checks that prove the claim:
+
+```bash
+bun test
+bun run typecheck
+bun run lint:check
+bun run knip
+bun run lint:md
+bun run validate:frontmatter
+bun run build
+```
+
+`bun run gen:skill-docs` regenerates generated skill docs and may write files. Run it intentionally when checking or updating generated documentation.
+
+`bun run validate` is a composite maintenance command that includes the write-enabled `lint` script. Treat it as a formatting/repair command, not a pure verification gate.
+
+If a command is not present in `package.json`, do not document it as a supported command.
+
+---
+
+## Documentation map
+
+| Area | Canonical location |
+| :--- | :--- |
+| Architecture | `docs/core/architecture.md` |
+| Context engineering | `docs/core/context.md` |
+| Engineering principles | `docs/core/principles.md` |
+| Design philosophy | `docs/core/design-philosophy.md` |
+| Skills | `docs/core/skills-index.md` + `docs/skills/` |
+| Development workflow | `docs/workflows/grill-to-ship.md` |
+| Onboarding | `docs/workflows/onboarding.md` |
+| Testing | `docs/reference/testing-strategy.md` |
+| Code review | `docs/reference/review-standards.md` |
+| Voice/style | `docs/reference/voice-guide.md` |
+| Decisions | `docs/decisions/` |
+| Historical material | `docs/archive/` |
+
+---
+
+## Proactive maintenance
+
+Do not pretend MIA has a magical always-on background brain. The current project is a CLI and local state system.
+
+When working proactively:
+- check project git state
+- update documentation when implementation makes it stale
+- fold reusable learnings into the right file
+- avoid destructive cleanup without a clear reason
+
+---
+
+## Failure recovery
+
+If a change fails:
+
+1. reproduce the failure
+2. isolate the root cause
+3. make the smallest corrective change
+4. re-run the relevant verification
+5. document the lesson when it is reusable
+
+After repeated failures, stop broad editing and reassess the design instead of stacking patches on patches.
+
+---
+
+## Agent entry points
+
+The repository supports several agent entry points:
+
+- `AGENTS.md` is canonical.
+- `CLAUDE.md` aliases `AGENTS.md`.
+- `GEMINI.md` aliases `AGENTS.md`.
+
+Do not create a second competing source of truth.
+
+---
+
+*Simple rules. Explicit state. Evidence before claims.*

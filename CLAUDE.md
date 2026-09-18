@@ -1,7 +1,7 @@
 # CLAUDE.md — Agent Entry Point Alias
 
-> **Canonical Source of Truth**: [`AGENTS.md`](file:///D:/PROJECTS/Mia/AGENTS.md)
+> **Canonical source of truth:** [`AGENTS.md`](AGENTS.md)
 
-All session startup rules, hard constraints, verification commands, and documentation router maps for MIA are centrally maintained in [`AGENTS.md`](file:///D:/PROJECTS/Mia/AGENTS.md). 
+Read `AGENTS.md` for MIA's workspace conventions, architecture, verification rules, documentation map, and agent guidance.
 
-Please read [`AGENTS.md`](file:///D:/PROJECTS/Mia/AGENTS.md) for full context.
+Do not maintain a separate set of project rules here.
