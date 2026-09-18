@@ -140,24 +140,12 @@ These adapters provide integration boundaries for model hosts. They are not requ
 
 ## Configuration
 
-The config layer currently loads in this order:
+The active CLI path builds its runtime configuration in `core/context.ts`:
 
-1. built-in defaults
-2. `~/.mia/config.json` when present
-3. environment-variable overrides
+1. `MIA_DIR`, or `~/.mia` when it is not set
+2. derive `skills/`, `projects/`, `memory.md`, and `sessions/` from that root
 
-Relevant environment variables include:
-
-```text
-MIA_DIR
-MIA_SKILLS_DIR
-MIA_PROJECTS_DIR
-MIA_STATE_FILE
-MIA_MEMORY_FILE
-MIA_TELEMETRY
-MIA_AUTO_RESTART
-MIA_HOT_RELOAD
-```
+The repository also contains `core/config/ConfigLoader`, which supports `~/.mia/config.json` and additional `MIA_*` overrides. That loader is not currently used by `createExecutionContext()`, so those broader overrides are not part of the current CLI runtime contract.
 
 The schema still contains a few daemon-related fields from the earlier architecture. Those are compatibility residue, not evidence that the current CLI runs a daemon.
 
