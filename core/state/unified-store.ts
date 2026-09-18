@@ -47,19 +47,28 @@ export class UnifiedStore {
       events.push(...readJsonl<StoredEvent>(path));
     }
 
-    // Fallback/Legacy support: learnings.jsonl and timeline.jsonl
+    // Fallback/Legacy support: learnings.jsonl and timeline.jsonl with deduplication against events.jsonl
+    const existingSignatures = new Set(
+      events.map((e) => `${e.type}:${e.ts}:${JSON.stringify(e.data)}`)
+    );
+
     if (!type || type === 'learning') {
       const legacyLearningsPath = join(dir, 'learnings.jsonl');
       if (existsSync(legacyLearningsPath)) {
         const legacy = readJsonl<Record<string, unknown>>(legacyLearningsPath);
         for (const item of legacy) {
-          const itemTs = item['ts'];
-          events.push({
-            type: 'learning',
-            ts: typeof itemTs === 'string' ? itemTs : new Date(0).toISOString(),
-            slug,
-            data: item,
-          });
+          if (!item || typeof item !== 'object') continue;
+          const itemTs = typeof item['ts'] === 'string' ? item['ts'] : new Date(0).toISOString();
+          const sig = `learning:${itemTs}:${JSON.stringify(item)}`;
+          if (!existingSignatures.has(sig)) {
+            existingSignatures.add(sig);
+            events.push({
+              type: 'learning',
+              ts: itemTs,
+              slug,
+              data: item,
+            });
+          }
         }
       }
     }
@@ -69,13 +78,18 @@ export class UnifiedStore {
       if (existsSync(legacyTimelinePath)) {
         const legacy = readJsonl<Record<string, unknown>>(legacyTimelinePath);
         for (const item of legacy) {
-          const itemTs = item['ts'];
-          events.push({
-            type: 'timeline',
-            ts: typeof itemTs === 'string' ? itemTs : new Date(0).toISOString(),
-            slug,
-            data: item,
-          });
+          if (!item || typeof item !== 'object') continue;
+          const itemTs = typeof item['ts'] === 'string' ? item['ts'] : new Date(0).toISOString();
+          const sig = `timeline:${itemTs}:${JSON.stringify(item)}`;
+          if (!existingSignatures.has(sig)) {
+            existingSignatures.add(sig);
+            events.push({
+              type: 'timeline',
+              ts: itemTs,
+              slug,
+              data: item,
+            });
+          }
         }
       }
     }

@@ -59,6 +59,25 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(result.output).toContain('Commands:');
   });
 
+  it('should safely install executable git hooks with vc hooks', async () => {
+    const { existsSync, statSync } = require('node:fs');
+    const ctx = createExecutionContext();
+    const executor = getSkillExecutor('vc');
+    expect(executor).toBeDefined();
+    if (!executor) throw new Error('vc executor not found');
+
+    const result = await executor.execute(['hooks'], ctx);
+    expect(result.ok).toBe(true);
+
+    const hookPath = join(testDir, '.git', 'hooks', 'commit-msg');
+    expect(existsSync(hookPath)).toBe(true);
+    if (process.platform !== 'win32') {
+      const mode = statSync(hookPath).mode;
+      // Mode should include executable bit (0o755 / 0o111)
+      expect(mode & 0o111).toBeGreaterThan(0);
+    }
+  });
+
   it('should execute grill skill through CLI path', async () => {
     const ctx = createExecutionContext();
     const executor = getSkillExecutor('grill');
