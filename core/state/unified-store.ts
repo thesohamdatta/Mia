@@ -39,10 +39,48 @@ export class UnifiedStore {
     filter?: (event: StoredEvent) => boolean,
     limit = 50
   ): Promise<StoredEvent[]> {
+    const dir = projectDir(projectsDir, slug);
     const path = eventsPath(projectsDir, slug);
-    if (!existsSync(path)) return [];
-    const all = readJsonl<StoredEvent>(path);
-    let filtered = type ? all.filter((e) => e.type === type) : all;
+    const events: StoredEvent[] = [];
+
+    if (existsSync(path)) {
+      events.push(...readJsonl<StoredEvent>(path));
+    }
+
+    // Fallback/Legacy support: learnings.jsonl and timeline.jsonl
+    if (!type || type === 'learning') {
+      const legacyLearningsPath = join(dir, 'learnings.jsonl');
+      if (existsSync(legacyLearningsPath)) {
+        const legacy = readJsonl<Record<string, unknown>>(legacyLearningsPath);
+        for (const item of legacy) {
+          const itemTs = item['ts'];
+          events.push({
+            type: 'learning',
+            ts: typeof itemTs === 'string' ? itemTs : new Date(0).toISOString(),
+            slug,
+            data: item,
+          });
+        }
+      }
+    }
+
+    if (!type || type === 'timeline') {
+      const legacyTimelinePath = join(dir, 'timeline.jsonl');
+      if (existsSync(legacyTimelinePath)) {
+        const legacy = readJsonl<Record<string, unknown>>(legacyTimelinePath);
+        for (const item of legacy) {
+          const itemTs = item['ts'];
+          events.push({
+            type: 'timeline',
+            ts: typeof itemTs === 'string' ? itemTs : new Date(0).toISOString(),
+            slug,
+            data: item,
+          });
+        }
+      }
+    }
+
+    let filtered = type ? events.filter((e) => e.type === type) : events;
     if (filter) filtered = filtered.filter(filter);
     return filtered.slice(-limit).reverse();
   }

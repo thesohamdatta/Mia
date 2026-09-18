@@ -27,10 +27,10 @@ function getConfig(): AppConfig {
   const miaDir = getMiaDir();
   return {
     miaDir,
-    skillsDir: join(miaDir, 'skills'),
-    projectsDir: join(miaDir, 'projects'),
-    memoryFile: join(miaDir, 'memory.md'),
-    sessionsDir: join(miaDir, 'sessions'),
+    skillsDir: process.env['MIA_SKILLS_DIR'] || join(miaDir, 'skills'),
+    projectsDir: process.env['MIA_PROJECTS_DIR'] || join(miaDir, 'projects'),
+    memoryFile: process.env['MIA_MEMORY_FILE'] || join(miaDir, 'memory.md'),
+    sessionsDir: process.env['MIA_SESSIONS_DIR'] || join(miaDir, 'sessions'),
   };
 }
 

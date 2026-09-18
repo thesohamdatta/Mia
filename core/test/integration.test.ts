@@ -109,6 +109,34 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(filtered.length).toBe(1);
   });
 
+  it('should seamlessly read legacy learnings.jsonl and timeline.jsonl files', async () => {
+    const { mkdirSync, writeFileSync } = require('node:fs');
+    const store = createUnifiedStore();
+    const projectsDir = join(testDir, '.mia', 'projects');
+    const slug = 'legacy-project';
+    const projDir = join(projectsDir, slug);
+    mkdirSync(projDir, { recursive: true });
+
+    writeFileSync(
+      join(projDir, 'learnings.jsonl'),
+      `${JSON.stringify({ key: 'legacy-key', insight: 'Legacy learning' })}\n`
+    );
+    writeFileSync(
+      join(projDir, 'timeline.jsonl'),
+      `${JSON.stringify({ skill: 'legacy-skill', event: 'completed' })}\n`
+    );
+
+    const learnings = await store.listLearnings(projectsDir, slug, 10);
+    expect(learnings.length).toBe(1);
+    expect(learnings[0]?.type).toBe('learning');
+    expect((learnings[0]?.data as { key?: string }).key).toBe('legacy-key');
+
+    const timeline = await store.listTimeline(projectsDir, slug, 10);
+    expect(timeline.length).toBe(1);
+    expect(timeline[0]?.type).toBe('timeline');
+    expect((timeline[0]?.data as { skill?: string }).skill).toBe('legacy-skill');
+  });
+
   it('should execute skill and timeline events are recorded', async () => {
     const ctx = createExecutionContext();
     const projectsDir = ctx.config.projectsDir;
