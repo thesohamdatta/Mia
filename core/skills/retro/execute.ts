@@ -10,13 +10,13 @@ export async function execute(_args: string[], ctx: ExecutionContext): Promise<S
 
   let output = '📊 RETROSPECTIVE\n\n## Recent Activity (auto-loaded)\n';
   for (const t of timeline) {
-    const d = t.data as { skill?: string; event?: string; outcome?: string };
+    const d = t.data as any;
     output += `  • ${t.ts} [${d.skill || 'unknown'}]: ${d.event || ''} (${d.outcome || ''})\n`;
   }
 
   output += '\n## Key Learnings (auto-loaded)\n';
   for (const l of learnings) {
-    const d = l.data as { type?: string; key?: string; insight?: string };
+    const d = l.data as any;
     output += `  • [${d.type || 'pattern'}] ${d.key || 'unnamed'}: ${d.insight || ''}\n`;
   }
 

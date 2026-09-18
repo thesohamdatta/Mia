@@ -3,22 +3,15 @@
   "entry": ["core/cli/index.ts", "scripts/sync-docs.ts", "core/generator/gen-skill-docs.ts"],
   "project": ["core/**/*.ts", "scripts/**/*.ts"],
   "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky", ".claude"],
-  "ignoreDependencies": [
-    "typescript",
-    "@biomejs/biome",
-    "husky",
-    "markdownlint-cli2",
-    "knip",
-    "zod"
-  ],
+  "ignoreDependencies": ["typescript", "@biomejs/biome", "husky", "markdownlint-cli2", "knip"],
   "rules": {
     "dependencies": "error",
     "devDependencies": "error",
-    "exports": "off",
-    "files": "off",
-    "nsExports": "off",
-    "nsTypes": "off",
-    "types": "off",
+    "exports": "error",
+    "files": "error",
+    "nsExports": "error",
+    "nsTypes": "error",
+    "types": "error",
     "unlisted": "warn",
     "unresolved": "error"
   }

@@ -39,62 +39,10 @@ export class UnifiedStore {
     filter?: (event: StoredEvent) => boolean,
     limit = 50
   ): Promise<StoredEvent[]> {
-    const dir = projectDir(projectsDir, slug);
     const path = eventsPath(projectsDir, slug);
-    const events: StoredEvent[] = [];
-
-    if (existsSync(path)) {
-      events.push(...readJsonl<StoredEvent>(path));
-    }
-
-    // Fallback/Legacy support: learnings.jsonl and timeline.jsonl with deduplication against events.jsonl
-    const existingSignatures = new Set(
-      events.map((e) => `${e.type}:${e.ts}:${JSON.stringify(e.data)}`)
-    );
-
-    if (!type || type === 'learning') {
-      const legacyLearningsPath = join(dir, 'learnings.jsonl');
-      if (existsSync(legacyLearningsPath)) {
-        const legacy = readJsonl<Record<string, unknown>>(legacyLearningsPath);
-        for (const item of legacy) {
-          if (!item || typeof item !== 'object') continue;
-          const itemTs = typeof item['ts'] === 'string' ? item['ts'] : new Date(0).toISOString();
-          const sig = `learning:${itemTs}:${JSON.stringify(item)}`;
-          if (!existingSignatures.has(sig)) {
-            existingSignatures.add(sig);
-            events.push({
-              type: 'learning',
-              ts: itemTs,
-              slug,
-              data: item,
-            });
-          }
-        }
-      }
-    }
-
-    if (!type || type === 'timeline') {
-      const legacyTimelinePath = join(dir, 'timeline.jsonl');
-      if (existsSync(legacyTimelinePath)) {
-        const legacy = readJsonl<Record<string, unknown>>(legacyTimelinePath);
-        for (const item of legacy) {
-          if (!item || typeof item !== 'object') continue;
-          const itemTs = typeof item['ts'] === 'string' ? item['ts'] : new Date(0).toISOString();
-          const sig = `timeline:${itemTs}:${JSON.stringify(item)}`;
-          if (!existingSignatures.has(sig)) {
-            existingSignatures.add(sig);
-            events.push({
-              type: 'timeline',
-              ts: itemTs,
-              slug,
-              data: item,
-            });
-          }
-        }
-      }
-    }
-
-    let filtered = type ? events.filter((e) => e.type === type) : events;
+    if (!existsSync(path)) return [];
+    const all = readJsonl<StoredEvent>(path);
+    let filtered = type ? all.filter((e) => e.type === type) : all;
     if (filter) filtered = filtered.filter(filter);
     return filtered.slice(-limit).reverse();
   }

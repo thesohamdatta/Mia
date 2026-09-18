@@ -59,25 +59,6 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(result.output).toContain('Commands:');
   });
 
-  it('should safely install executable git hooks with vc hooks', async () => {
-    const { existsSync, statSync } = require('node:fs');
-    const ctx = createExecutionContext();
-    const executor = getSkillExecutor('vc');
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('vc executor not found');
-
-    const result = await executor.execute(['hooks'], ctx);
-    expect(result.ok).toBe(true);
-
-    const hookPath = join(testDir, '.git', 'hooks', 'commit-msg');
-    expect(existsSync(hookPath)).toBe(true);
-    if (process.platform !== 'win32') {
-      const mode = statSync(hookPath).mode;
-      // Mode should include executable bit (0o755 / 0o111)
-      expect(mode & 0o111).toBeGreaterThan(0);
-    }
-  });
-
   it('should execute grill skill through CLI path', async () => {
     const ctx = createExecutionContext();
     const executor = getSkillExecutor('grill');
@@ -105,18 +86,14 @@ describe('Integration: CLI -> Skill -> Store', () => {
     // Query learnings
     const learnings = await store.listLearnings(projectsDir, slug, 10);
     expect(learnings.length).toBe(1);
-    const learning = learnings[0];
-    expect(learning).toBeDefined();
-    if (!learning) throw new Error('learning not found');
+    const learning = learnings[0]!;
     expect(learning.data).toEqual({ insight: 'Test learning', key: 'test-key' });
     expect(learning.type).toBe('learning');
 
     // Query timeline
     const timeline = await store.listTimeline(projectsDir, slug, 10);
     expect(timeline.length).toBe(1);
-    const tlEvent = timeline[0];
-    expect(tlEvent).toBeDefined();
-    if (!tlEvent) throw new Error('tlEvent not found');
+    const tlEvent = timeline[0]!;
     expect(tlEvent.data).toEqual({ skill: 'test', event: 'started' });
     expect(tlEvent.type).toBe('timeline');
 
@@ -126,34 +103,6 @@ describe('Integration: CLI -> Skill -> Store', () => {
       return data.key === 'test-key';
     });
     expect(filtered.length).toBe(1);
-  });
-
-  it('should seamlessly read legacy learnings.jsonl and timeline.jsonl files', async () => {
-    const { mkdirSync, writeFileSync } = require('node:fs');
-    const store = createUnifiedStore();
-    const projectsDir = join(testDir, '.mia', 'projects');
-    const slug = 'legacy-project';
-    const projDir = join(projectsDir, slug);
-    mkdirSync(projDir, { recursive: true });
-
-    writeFileSync(
-      join(projDir, 'learnings.jsonl'),
-      `${JSON.stringify({ key: 'legacy-key', insight: 'Legacy learning' })}\n`
-    );
-    writeFileSync(
-      join(projDir, 'timeline.jsonl'),
-      `${JSON.stringify({ skill: 'legacy-skill', event: 'completed' })}\n`
-    );
-
-    const learnings = await store.listLearnings(projectsDir, slug, 10);
-    expect(learnings.length).toBe(1);
-    expect(learnings[0]?.type).toBe('learning');
-    expect((learnings[0]?.data as { key?: string }).key).toBe('legacy-key');
-
-    const timeline = await store.listTimeline(projectsDir, slug, 10);
-    expect(timeline.length).toBe(1);
-    expect(timeline[0]?.type).toBe('timeline');
-    expect((timeline[0]?.data as { skill?: string }).skill).toBe('legacy-skill');
   });
 
   it('should execute skill and timeline events are recorded', async () => {

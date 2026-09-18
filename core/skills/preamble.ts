@@ -1,10 +1,5 @@
 import type { ExecutionContext, SkillExecutor, SkillResult } from './types.js';
 
-export interface ExtendedContext extends ExecutionContext {
-  _skillName?: string;
-  _skillResult?: SkillResult;
-}
-
 export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
 export const requireProject: Middleware = async (ctx, next) => {
@@ -32,8 +27,7 @@ export const loadRecentLearnings: Middleware = async (ctx, next) => {
 };
 
 export const logTimelineStart: Middleware = async (ctx, next) => {
-  const extCtx = ctx as ExtendedContext;
-  const skillName = extCtx._skillName || 'unknown';
+  const skillName = (ctx as any)._skillName || 'unknown';
   const projectsDir = ctx.config.projectsDir;
   await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
@@ -43,14 +37,13 @@ export const logTimelineStart: Middleware = async (ctx, next) => {
 };
 
 export const logTimelineComplete: Middleware = async (ctx, next) => {
-  const extCtx = ctx as ExtendedContext;
-  const skillName = extCtx._skillName || 'unknown';
-  const result = extCtx._skillResult;
+  const skillName = (ctx as any)._skillName || 'unknown';
+  const result = (ctx as any)._skillResult as SkillResult;
   const projectsDir = ctx.config.projectsDir;
   await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
     event: 'completed',
-    outcome: result?.ok ? 'success' : 'failed',
+    outcome: result.ok ? 'success' : 'failed',
   });
   await next();
 };
@@ -91,14 +84,13 @@ export async function executeWithMiddlewares(
   skillName: string,
   middlewares: Middleware[] = defaultMiddlewares
 ): Promise<SkillResult> {
-  const extCtx = ctx as ExtendedContext;
-  extCtx._skillName = skillName;
+  (ctx as any)._skillName = skillName;
 
   await runMiddlewares(middlewares, ctx);
 
   const result = await executor.execute(args, ctx);
 
-  extCtx._skillResult = result;
+  (ctx as any)._skillResult = result;
   await logTimelineComplete(ctx, async () => {});
 
   return result;

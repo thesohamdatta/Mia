@@ -64,7 +64,6 @@ async function updatePackageVersion(newVersion: string, cwd: string): Promise<vo
   await Bun.write(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 
-import { chmodSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
@@ -220,23 +219,7 @@ Conventional commits enforced. Clean history = happy maintainers.`,
     }
 
     case 'clean': {
-      // Clean untracked build artifacts safely while preserving protected paths
-      const res = await runGit(
-        [
-          'clean',
-          '-fd',
-          '-X',
-          '-e',
-          '!.mia/**',
-          '-e',
-          '!.claude/**',
-          '-e',
-          '!.env*',
-          '-e',
-          '!*.log',
-        ],
-        cwd
-      );
+      const res = await runGit(['clean', '-fd', '-X'], cwd);
       return { ok: res.ok, output: res.output || 'Cleaned untracked build artifacts' };
     }
 
@@ -252,10 +235,6 @@ Conventional commits enforced. Clean history = happy maintainers.`,
 
     case 'hooks': {
       const hookDir = join(cwd, '.git', 'hooks');
-      if (!existsSync(hookDir)) {
-        mkdirSync(hookDir, { recursive: true });
-      }
-      const hookPath = join(hookDir, 'commit-msg');
       const hook = `#!/bin/sh
 # Conventional commit validation
 msg=$(cat "$1")
@@ -267,12 +246,7 @@ if ! echo "$msg" | grep -qE "$pattern"; then
   exit 1
 fi
 `;
-      await Bun.write(hookPath, hook);
-      try {
-        chmodSync(hookPath, 0o755);
-      } catch {
-        // Ignore chmod on non-POSIX if unsupported
-      }
+      await Bun.write(`${hookDir}/commit-msg`, hook);
       await runGit(['config', 'core.hooksPath', '.git/hooks'], cwd);
       return { ok: true, output: 'Installed commit-msg hook (conventional commits enforced)' };
     }

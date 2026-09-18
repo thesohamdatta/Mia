@@ -17,7 +17,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     }
     let output = '📚 Learnings:\n\n';
     for (const l of learnings) {
-      const d = l.data as { type?: string; key?: string; insight?: string };
+      const d = l.data as any;
       output += `  • [${d.type || 'pattern'}] ${d.key || 'unnamed'}: ${d.insight || ''}\n`;
     }
     return { ok: true, output };
