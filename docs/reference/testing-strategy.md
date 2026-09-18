@@ -18,7 +18,7 @@ bun run validate:frontmatter
 bun run build
 ```
 
-GitHub Actions is also intended to run automated lint/typecheck, documentation checks, tests, and the build pipeline. Keep the workflow aligned with the commands actually present in `package.json`.
+The current GitHub Actions workflow is not fully aligned with the repository scripts. `.github/workflows/ci.yml` still references `check:links`, `check:spelling`, `build:cli`, `build:daemon`, and `bin/miad`, none of which are part of the current package build surface. Treat that as separate CI maintenance work, not as evidence that those commands exist or pass.
 
 ## Current test organisation
 
