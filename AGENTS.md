@@ -168,7 +168,7 @@ Do not rewrite shared history or force-update branches without explicit instruct
 
 ## Repository validation
 
-Current package scripts include:
+Use the narrowest read-only checks that prove the claim:
 
 ```bash
 bun test
@@ -177,10 +177,12 @@ bun run lint:check
 bun run knip
 bun run lint:md
 bun run validate:frontmatter
-bun run gen:skill-docs
-bun run validate
 bun run build
 ```
+
+`bun run gen:skill-docs` regenerates generated skill docs and may write files. Run it intentionally when checking or updating generated documentation.
+
+`bun run validate` is a composite maintenance command that includes the write-enabled `lint` script. Treat it as a formatting/repair command, not a pure verification gate.
 
 If a command is not present in `package.json`, do not document it as a supported command.
 
