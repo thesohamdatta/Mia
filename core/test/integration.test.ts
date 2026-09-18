@@ -86,14 +86,18 @@ describe('Integration: CLI -> Skill -> Store', () => {
     // Query learnings
     const learnings = await store.listLearnings(projectsDir, slug, 10);
     expect(learnings.length).toBe(1);
-    const learning = learnings[0]!;
+    const learning = learnings[0];
+    expect(learning).toBeDefined();
+    if (!learning) throw new Error('learning not found');
     expect(learning.data).toEqual({ insight: 'Test learning', key: 'test-key' });
     expect(learning.type).toBe('learning');
 
     // Query timeline
     const timeline = await store.listTimeline(projectsDir, slug, 10);
     expect(timeline.length).toBe(1);
-    const tlEvent = timeline[0]!;
+    const tlEvent = timeline[0];
+    expect(tlEvent).toBeDefined();
+    if (!tlEvent) throw new Error('tlEvent not found');
     expect(tlEvent.data).toEqual({ skill: 'test', event: 'started' });
     expect(tlEvent.type).toBe('timeline');
 
