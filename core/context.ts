@@ -20,6 +20,7 @@ export interface AppConfig {
 }
 
 function getMiaDir(): string {
+  // biome-ignore lint/complexity/useLiteralKeys: TS noPropertyAccessFromIndexSignature
   return process.env['MIA_DIR'] || join(homedir(), '.mia');
 }
 

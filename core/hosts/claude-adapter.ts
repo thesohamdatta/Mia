@@ -16,6 +16,7 @@ export class ClaudeAdapter extends BaseHostAdapter {
 
   private createClient(config: HostConfig) {
     const extra = config.extra;
+    // biome-ignore lint/complexity/useLiteralKeys: TS noPropertyAccessFromIndexSignature
     const anthropicVer = extra ? (extra['anthropicVersion'] as string | undefined) : undefined;
     return {
       baseUrl: config.baseUrl || 'https://api.anthropic.com',
