@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { appendJsonl, readJsonl } from '../state/jsonl-store.js';
+import { appendJsonl, readJsonlTail } from '../state/jsonl-store.js';
 
 export type EventType = 'learning' | 'timeline' | 'checkpoint';
 
@@ -41,10 +41,13 @@ export class UnifiedStore {
   ): Promise<StoredEvent[]> {
     const path = eventsPath(projectsDir, slug);
     if (!existsSync(path)) return [];
-    const all = readJsonl<StoredEvent>(path);
-    let filtered = type ? all.filter((e) => e.type === type) : all;
-    if (filter) filtered = filtered.filter(filter);
-    return filtered.slice(-limit).reverse();
+    const combinedFilter = (e: StoredEvent) => {
+      if (type && e.type !== type) return false;
+      if (filter && !filter(e)) return false;
+      return true;
+    };
+    // Optimization: read tail lazily backwards from end of file with filter predicate
+    return readJsonlTail<StoredEvent>(path, limit, combinedFilter);
   }
 
   async listLearnings(projectsDir: string, slug: string, limit = 50) {

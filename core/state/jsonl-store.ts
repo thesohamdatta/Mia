@@ -86,7 +86,42 @@ export function readJsonl<T = unknown>(path: string): T[] {
   return out;
 }
 
-export function readJsonlTail<T = unknown>(path: string, limit: number): T[] {
-  const all = readJsonl<T>(path);
-  return all.slice(-limit).reverse();
+/**
+ * Reads the tail (most recent entries) from a JSONL file by iterating backwards from the end.
+ * Lazy JSON parsing and early termination reduce time complexity from O(N) full file parse to O(K)
+ * where K is the requested limit of matching records.
+ */
+export function readJsonlTail<T = unknown>(
+  path: string,
+  limit: number,
+  filter?: (item: T) => boolean
+): T[] {
+  if (!existsSync(path) || limit <= 0) return [];
+
+  let raw: string;
+  try {
+    raw = readFileSync(path, 'utf-8');
+  } catch {
+    return [];
+  }
+
+  const out: T[] = [];
+  const lines = raw.split('\n');
+  // Iterate backwards from the end of the file to parse only the most recent entries
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i];
+    if (!line) continue;
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      const parsed = JSON.parse(trimmed) as T;
+      if (!filter || filter(parsed)) {
+        out.push(parsed);
+        if (out.length >= limit) break;
+      }
+    } catch {
+      // Skip malformed lines
+    }
+  }
+  return out;
 }
