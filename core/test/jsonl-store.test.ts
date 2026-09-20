@@ -102,4 +102,15 @@ describe('jsonl-store performance & behavior', () => {
     expect((learnings[1]?.data as { index: number }).index).toBe(18);
     expect((learnings[2]?.data as { index: number }).index).toBe(16);
   });
+
+  it('should handle edge cases: malformed lines, extra newlines, no trailing newline', () => {
+    const content = `{"id":1}\nINVALID_JSON\n\n{"id":2}\n  \n{"id":3}`;
+    writeFileSync(jsonlFile, content, 'utf-8');
+
+    const tail = readJsonlTail<{ id: number }>(jsonlFile, 5);
+    expect(tail).toHaveLength(3);
+    expect(tail[0]?.id).toBe(3);
+    expect(tail[1]?.id).toBe(2);
+    expect(tail[2]?.id).toBe(1);
+  });
 });
