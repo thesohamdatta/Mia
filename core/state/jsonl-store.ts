@@ -106,22 +106,28 @@ export function readJsonlTail<T = unknown>(
   }
 
   const out: T[] = [];
-  const lines = raw.split('\n');
-  // Iterate backwards from the end of the file to parse only the most recent entries
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const line = lines[i];
-    if (!line) continue;
+  let end = raw.length;
+
+  // Optimize: Iterate backwards using lastIndexOf to slice lines on demand.
+  // This avoids raw.split('\n') which allocates an O(N) array of all line strings in memory,
+  // reducing memory allocations from O(N) to O(K) where K is the number of inspected tail entries.
+  while (end > 0 && out.length < limit) {
+    const start = raw.lastIndexOf('\n', end - 1);
+    const line = start === -1 ? raw.slice(0, end) : raw.slice(start + 1, end);
+    end = start;
+
     const trimmed = line.trim();
     if (!trimmed) continue;
+
     try {
       const parsed = JSON.parse(trimmed) as T;
       if (!filter || filter(parsed)) {
         out.push(parsed);
-        if (out.length >= limit) break;
       }
     } catch {
       // Skip malformed lines
     }
   }
+
   return out;
 }
