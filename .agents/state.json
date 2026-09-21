@@ -1,0 +1,29 @@
+{
+  "protocol_version": 1,
+  "cycle": "cycle-001",
+  "stage": "sentry",
+  "status": "complete",
+  "priority": "P3",
+  "writer": null,
+  "blocked_reason": null,
+  "stages": {
+    "sentry": {
+      "status": "complete",
+      "handoff": ".agents/handoffs/cycle-001-sentry.json"
+    },
+    "pulse": {
+      "status": "ready",
+      "handoff": null
+    },
+    "maintainer": {
+      "status": "waiting",
+      "handoff": null
+    },
+    "orchestrator": {
+      "status": "waiting",
+      "handoff": null
+    }
+  },
+  "last_updated_by": "sentry",
+  "notes": "Sentry quality review cycle 001 completed. Handing off to Pulse for verification."
+}
