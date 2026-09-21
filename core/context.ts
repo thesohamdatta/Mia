@@ -20,7 +20,7 @@ export interface AppConfig {
 }
 
 function getMiaDir(): string {
-  return process.env['MIA_DIR'] || join(homedir(), '.mia');
+  return process.env.MIA_DIR || join(homedir(), '.mia');
 }
 
 function getConfig(): AppConfig {

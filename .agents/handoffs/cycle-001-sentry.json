@@ -21,7 +21,7 @@
     },
     {
       "check": "bun run lint:check",
-      "result": "FAIL (2 linter errors in core/context.ts and core/hosts/claude-adapter.ts; 9 noExplicitAny warnings)"
+      "result": "FAIL (2 Biome linter errors in core/context.ts and core/hosts/claude-adapter.ts; 9 noExplicitAny warnings)"
     }
   ],
   "findings": [
@@ -30,14 +30,14 @@
       "location": "core/context.ts:23",
       "problem": "useLiteralKeys lint error for process.env['MIA_DIR']",
       "impact": "Linter failure on bun run lint:check",
-      "recommendation": "Replace with process.env.MIA_DIR"
+      "recommendation": "Maintain process.env['MIA_DIR'] to satisfy TS noPropertyAccessFromIndexSignature or update tsconfig"
     },
     {
       "severity": "LOW",
       "location": "core/hosts/claude-adapter.ts:21",
       "problem": "useLiteralKeys lint error for config.extra?.['anthropicVersion']",
       "impact": "Linter failure on bun run lint:check",
-      "recommendation": "Simplify computed key access"
+      "recommendation": "Maintain indexed access for record properties or refine HostConfig typing"
     },
     {
       "severity": "NIT",
