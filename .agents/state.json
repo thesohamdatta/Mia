@@ -1,0 +1,17 @@
+{
+  "protocol_version": 1,
+  "cycle": null,
+  "stage": "sentry",
+  "status": "ready",
+  "priority": "P3",
+  "writer": null,
+  "blocked_reason": null,
+  "stages": {
+    "sentry": {"status": "ready", "handoff": null},
+    "pulse": {"status": "waiting", "handoff": null},
+    "maintainer": {"status": "waiting", "handoff": null},
+    "orchestrator": {"status": "waiting", "handoff": null}
+  },
+  "last_updated_by": "bootstrap",
+  "notes": "Bootstrap state. Agents must establish a cycle identifier and update this file through an agreed serialized process before doing coordinated work."
+}
