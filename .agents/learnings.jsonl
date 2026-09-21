@@ -1,0 +1,1 @@
+{"observation": "Linter checks (biome) enforce strict key formatting and ban explicit 'any'.", "evidence": "2 errors and 9 warnings on bun run lint:check", "lesson": "All code entering MIA must satisfy Biome linting rules before merge.", "scope": "core/", "confidence": 10, "first_seen": "2026-09-21", "last_verified": "2026-09-21"}
