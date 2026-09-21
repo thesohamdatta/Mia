@@ -12,7 +12,6 @@ bun install
 
 # Configure git (one-time)
 git config --local include.path ../.gitconfig
-bunx husky install
 ```
 
 ## Git Workflow (GitHub Flow)
@@ -67,9 +66,9 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ### Examples
 ```bash
 feat(cli): add --json output flag
-fix(daemon): handle SIGTERM gracefully
+fix(core): correct store event query limit
 docs: update installation guide
-refactor(skills): simplify loader logic
+refactor(skills): simplify executor logic
 test: add config parser tests
 chore: upgrade typescript to 5.5
 ```
@@ -88,18 +87,18 @@ All checks must pass before merge:
 
 | Check | Command | Runs On |
 |-------|---------|---------|
-| Lint & Format | `bunx biome check --apply-unsafe .` | pre-commit, CI |
-| Type Check | `bunx tsc --noEmit` | pre-commit, CI |
-| Unused Code | `bunx knip` | pre-commit, CI |
+| Lint & Format | `bun run lint:check` | pre-commit, CI |
+| Type Check | `bun run typecheck` | pre-commit, CI |
+| Unused Code | `bun run knip` | pre-commit, CI |
 | Tests | `bun test` | pre-push, CI |
 | Build | `bun run build` | pre-push, CI |
 
 ### Local Development
 ```bash
 # Run all checks manually
-bunx biome check --apply-unsafe .
-bunx tsc --noEmit
-bunx knip
+bun run lint:check
+bun run typecheck
+bun run knip
 bun test
 bun run build
 ```
@@ -137,21 +136,21 @@ Fill out the PR template:
 ## Project Structure
 
 ```
-src/
-  cli/        # CLI commands
-  daemon/     # Background server
-  skills/     # Skill system
-  core/       # Shared utilities
-tests/        # Vitest tests
+core/
+  cli/        # CLI entry point and commands
+  skills/     # Executable skill modules
+  state/      # UnifiedStore, jsonl-store
+  config/     # Schema, loader, paths
+  hosts/      # Host adapters
+tests/        # Integration and unit tests
 scripts/      # Build/generation scripts
-templates/    # Handlebars templates
-docs/         # Documentation
+docs/         # Documentation tree
 ```
 
 ## Getting Help
 
 - Check existing issues and PRs
-- Read `ARCHITECTURE.md` and `PRINCIPLES.md`
+- Read `AGENTS.md` and `PRINCIPLES.md`
 - Ask in discussions or open an issue
 
 ---

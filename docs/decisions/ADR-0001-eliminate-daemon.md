@@ -1,94 +1,71 @@
 # ADR-0001: Eliminate Daemon — Direct Skill Execution
 
 ## Status
-
 Accepted
 
 ## Context
+The MIA architecture currently uses a CLI-daemon model:
+- `mia` CLI reads `~/.mia/state.json` (port, token) → sends HTTP to `miad` daemon
+- `miad` (Bun HTTP server) routes `/command` → skill registry → StateService → disk
+- Two compiled binaries: `mia` (~98MB) + `miad` (~98MB)
+- Daemon state: route map, rate limiter map, skill registry, config — all rebuilt on startup
+- Business data (learnings, timeline, checkpoints, memory, sessions) already persisted to disk via JSONL/MD
 
-MIA originally used a CLI + daemon architecture:
-
-```text
-mia CLI
-  ↓ HTTP
-miad daemon
-  ↓
-skill registry
-  ↓
-state
-```
-
-The daemon added a second process, an HTTP control path, lifecycle management, and state around a service that had no external consumers.
-
-The application data itself was already persisted locally. The daemon therefore became an additional layer rather than a necessary boundary.
+**Research findings:**
+- Zero external consumers of daemon API (only `core/cli/index.ts`)
+- No CI, scripts, editors, webhooks call daemon
+- Daemon serializes requests via single-threaded event loop (no parallelism benefit)
+- All StateStore operations use synchronous `appendFileSync`/`readFileSync` — no in-memory caches
+- Token auth provides no real security boundary (same user, same machine, token in readable state file)
+- Cold-start: compiled `mia` ~10ms; daemon adds ~5ms HTTP overhead per command
+- Reversibility: re-adding daemon is ~100 lines, zero migration (JSONL unchanged)
 
 ## Decision
+**Eliminate the daemon.** Execute skills directly in the CLI process.
 
-**Execute skills directly inside the CLI process.**
-
-The accepted architecture is:
-
-```text
-mia <skill>
-  ↓
-ExecutionContext
-  ↓
-middleware
-  ↓
-skill executor
-  ↓
-UnifiedStore / local files / optional host adapters
-```
-
-The daemon and its HTTP control plane are not part of the current runtime.
+### Changes
+1. **Inline `sendCommand()`** → call skill executor directly with `ExecutionContext`
+2. **Move route handlers** (`commandRoute`, etc.) into skill executors (they already contain business logic)
+3. **Remove**: `core/daemon/` (server, router, middleware, routes), `miad` build target, `state.json`
+4. **Collapse skill registry** → direct imports via `skills/index.ts` map
+5. **Unify 5 StateStores** → single `UnifiedStore` with typed `append(type, data)` / `query(type, filter)`
+6. **Simplify config** → `MIA_DIR` env var + sensible defaults, no Zod schema
+7. **Preamble** → composable middleware chain (not tiered)
 
 ## Consequences
 
 ### Positive
+- **Single binary** (~98MB → ~50MB estimated, no daemon duplication)
+- **Instant startup** — no "daemon not running" errors, no HTTP round-trip
+- **Deep modules** — skill = use case class; state = single append/query interface
+- **Testability** — skills importable directly, no HTTP mocking
+- **Orthogonality** — removes coupling between CLI and process lifecycle
+- **DRY** — eliminates duplicate config, manifest.json, category scanning
 
-- one normal CLI execution path
-- no daemon lifecycle to manage
-- no HTTP hop for local skill execution
-- easier direct skill testing
-- explicit skill wiring
-- shared `UnifiedStore` boundary
-- smaller conceptual surface
+### Negative / Risks
+- **Cross-process JSONL race**: Concurrent `mia` invocations could interleave lines (mitigation: single-line `appendFileSync` is fast; practical risk ~0 for human usage; add file locking later if needed)
+- **No background execution**: All skills synchronous (current behavior anyway)
+- **No hot reload**: Not used currently; can re-add via watcher if needed
+- **Build change**: CI must drop `build:daemon` and `daemon` script
 
-### Trade-offs
+### Neutral
+- JSONL format unchanged — zero migration
+- Checkpoint .md format unchanged
+- Memory.md format unchanged
 
-Direct local execution means:
+## Implementation Order
+1. Create `skills/index.ts` map + direct import pattern
+2. Create `state/unified-store.ts` (append/query by type)
+3. Create `context.ts` (ExecutionContext without daemon fields)
+4. Modify `core/cli/index.ts` to execute skills directly
+5. Move preamble to middleware chain
+6. Delete `core/daemon/`, update `package.json`
+7. Update tests to call skills directly
+8. Verify `bun run build` produces single `bin/mia`
 
-- concurrent writers to the same JSONL file still need care
-- long-running background work is not provided by a daemon
-- host integrations remain separate concerns
-- process-local state disappears when the command exits
-
-These are accepted trade-offs for the current use case.
-
-## Current implementation
-
-The decision is reflected in:
-
-- `core/cli/index.ts`
-- `core/context.ts`
-- `core/skills/index.ts`
-- `core/skills/preamble.ts`
-- `core/state/unified-store.ts`
-
-## Configuration note
-
-The current configuration schema still contains a small amount of daemon-era configuration such as port, idle timeout, and token fields.
-
-Those fields are compatibility residue in the config layer. They do not mean that the current CLI launches or depends on a daemon.
-
-## Historical note
-
-Older planning and reference documents may still mention `miad`, HTTP routes, separate learning/timeline files, or broader future skill ecosystems.
-
-Treat those as historical material unless the current source tree confirms the behaviour.
-
-## Revisit condition
-
-Reintroduce a background service only when there is a concrete requirement that direct process execution cannot satisfy cleanly, such as a demonstrated cross-process coordination need or a necessary long-running capability.
-
-Until then, keep the core simple.
+## References
+- Clean Architecture: "Database, web framework, UI are plugins — daemon is unnecessary plugin"
+- Refactoring: "Replace Delegation with Inheritance" — inline HTTP delegation
+- Code Complete: "Information hiding — hide data representation behind interface"
+- Pragmatic Programmer: "YAGNI — no evidence users need daemon features"
+- The Pragmatic Programmer: "Two-way door — reversible if profiling shows need"

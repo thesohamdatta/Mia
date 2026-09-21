@@ -19,11 +19,12 @@
     "noPropertyAccessFromIndexSignature": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["@types/bun"],
+    "types": ["vitest/globals", "@types/bun"],
+    "baseUrl": ".",
     "paths": {
-      "@core/*": ["./core/*"]
+      "@core/*": ["core/*"]
     }
   },
-  "include": ["core/**/*", "scripts/**/*"],
+  "include": ["core/**/*", "src/**/*", "scripts/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "build", "bin", "*.exe"]
 }

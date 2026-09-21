@@ -1,0 +1,13 @@
+{
+  "last_audit": "2026-09-21",
+  "agent": "sentry",
+  "commit": "7346c0a1ce402fac5bb40de38c8063e9e112c016",
+  "metrics": {
+    "test_pass_rate": "100%",
+    "typecheck": "pass",
+    "build": "pass",
+    "linter_errors": 2,
+    "linter_warnings": 9
+  },
+  "summary": "Repository is functional with passing integration tests and clean TypeScript compilation. Minor Biome linter errors present in core/."
+}

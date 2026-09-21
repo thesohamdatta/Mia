@@ -1,318 +1,98 @@
 <p align="center">
-  <img src="./docs/assets/mia-ascii.png" alt="MIA ASCII" width="540" />
+  <img src="./docs/assets/mia-ascii.png" alt="MIA ASCII (#B61C1C)" width="540" />
 </p>
 
-<h1 align="center">MIA</h1>
+<h1 align="center">MIA (Machine Intelligence Architecture)</h1>
 
 <p align="center">
-  <strong>Machine Intelligence Architecture</strong><br />
-  <em>My local-first AI engineering OS for thinking clearly, building carefully, and shipping with evidence.</em>
+  <em>A personal AI engineering OS — compiled, local-first, self-improving.</em>
 </p>
 
 <p align="center">
-  <a href="#why-mia">Why MIA</a> &bull;
-  <a href="#how-it-works">How it works</a> &bull;
-  <a href="#commands">Commands</a> &bull;
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#core-pipeline">Core Pipeline</a> &bull;
   <a href="#architecture">Architecture</a> &bull;
-  <a href="#development">Development</a>
+  <a href="#philosophy">Design Philosophy</a>
 </p>
 
 ---
 
-## why mia
+### What is MIA
 
-I built MIA because writing code is no longer the scarce part of software engineering.
+**MIA** (Machine Intelligence Architecture) is a compiled, local-first AI engineering harness that runs on your machine. It turns raw intent into verified code while compounding learnings across sessions.
 
-The scarce part is keeping the work coherent.
-
-When an AI agent can produce a thousand lines before anyone has agreed on the problem, speed becomes a liability. MIA is the engineering harness I use to put structure around that process.
-
-The idea is simple:
-
-> **think first → make the work explicit → execute → verify → learn → repeat**
-
-MIA is deliberately local-first and boring in the places where boring is useful. It is a compiled Bun CLI, its state lives on disk, and the core execution path does not need a long-running daemon or an HTTP control plane.
-
-The model can change. The workflow should not have to.
+- **Grill-to-Ship Pipeline** &mdash; Never write code without explicit clarification & verifiable plans.
+- **Self-Improving Memory** &mdash; Every session logs learnings (`.jsonl`) with confidence decay and global wisdom.
+- **Zero External Dependencies** &mdash; Single compiled Bun binary with sub-millisecond execution.
 
 ---
 
-## what i care about
-
-MIA is built around a few principles that keep showing up in the code:
-
-- **clarity before implementation** — understand the problem before touching the code.
-- **verification over confidence** — a green check is more useful than a convincing paragraph.
-- **small, deep modules** — simple interfaces with the complexity pushed underneath.
-- **human control** — agents can help execute, but important decisions stay explicit.
-- **memory that compounds** — useful context should survive the current terminal session.
-- **local by default** — project state is stored locally as files rather than hidden behind another service.
-
-That gives me a system that is less about “ask an LLM to code” and more about engineering the environment in which AI-assisted development happens.
-
----
-
-## how it works
-
-MIA's main development loop is:
-
-```text
-intent
-  ↓
-grill
-  ↓
-plan
-  ↓
-spec
-  ↓
-execute
-  ↓
-review
-  ↓
-ship
-  ↓
-learn
-  ↺
-```
-
-### grill
-
-I start by clarifying the actual problem, assumptions, risks, scope, and definition of done.
-
-### plan
-
-I turn the agreed intent into a concrete plan with verifiable success criteria.
-
-### spec
-
-I can turn the intent into a PRD-shaped specification and break the work into smaller issues.
-
-### execute
-
-Skills run directly in the CLI process. There is no daemon sitting between the command and the skill executor.
-
-### review
-
-The review skill is the pre-landing checkpoint for correctness, security, maintainability, architecture, and testing concerns.
-
-### ship
-
-The intended shipping path is:
-
-```text
-test → health → review → push → PR
-```
-
-The current implementation exposes this workflow through the CLI and keeps the policy visible in code and documentation.
-
-### learn
-
-MIA keeps project-level events in an append-only JSONL store. Learnings, timeline events, and checkpoints share the same event stream.
-
-This is the part I care about most: the system should get better because previous work was recorded, not because I have to remember everything again tomorrow.
-
----
-
-## commands
-
-The current CLI is intentionally small:
-
-| Command | What I use it for |
-| :--- | :--- |
-| `mia grill` | Clarify a non-trivial task before implementation |
-| `mia plan` | Create a verifiable implementation plan |
-| `mia spec` | Turn intent into a PRD-style spec and issues |
-| `mia review` | Run the pre-landing review workflow |
-| `mia health` | Inspect code-quality checks and shipping readiness |
-| `mia ship` | Start the test → review → push → PR workflow |
-| `mia learn` | List or add project learnings |
-| `mia retro` | Review recent activity and accumulated learnings |
-| `mia memory` | Read or append long-term memory |
-| `mia checkpoint` | Save, list, or load working state |
-| `mia vc` | Work with git status, commits, branches, tags, releases, and hooks |
-
-Run:
+### Quick Start
 
 ```bash
-mia --help
-```
+# Install MIA OS
+curl -fsSL https://raw.githubusercontent.com/thesohamdatta/Mia/main/scripts/bootstrap.sh | bash
 
-for the command surface compiled into the current version.
+# Daily engineering workflow
+mia grill       # Clarification interview before non-trivial tasks
+mia plan        # Create a verifiable plan with success criteria
+mia spec        # Turn intent into PRD & atomic issue tickets
+mia ship        # Test → health check → review → PR
+```
 
 ---
 
-## architecture
+### Core Pipeline
 
-MIA is a direct execution system.
+| Skill | Command | Purpose |
+| :--- | :--- | :--- |
+| **Grill** | `mia grill` | Clarification interview (never code without intent alignment) |
+| **Plan** | `mia plan` | Verifiable task plan with explicit success criteria |
+| **Spec** | `mia spec` | Turn intent into PRD & atomic issue tickets |
+| **Health** | `mia health` | Code quality scorekeeper with baked-in verification |
+| **Ship** | `mia ship` | Test verification → pre-landing review → git PR |
+| **Learn** | `mia learn` | Capture typed learnings, confidence scores & decay |
+| **Retro** | `mia retro` | Weekly retrospective with timeline + learnings |
+| **Memory** | `mia memory` | Read/write long-term memory (~/.mia/memory.md) |
+| **Checkpoint** | `mia checkpoint` | Save/resume working state |
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│                         MIA                             │
-│                                                         │
-│  CLI → Context → Middleware → Skill Executor            │
-│                         │                               │
-│                         ├── Config                      │
-│                         ├── UnifiedStore               │
-│                         └── Host adapters               │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+---
+
+### Architecture
+
 ```
-
-The important boundaries are:
-
-**CLI**
-
-`core/cli/` parses commands and dispatches them to the skill map.
-
-**Execution context**
-
-`core/context.ts` carries the current working directory, project slug, local configuration, and shared `UnifiedStore`.
-
-**Skills**
-
-`core/skills/` contains the executable workflows. The current map includes core workflow skills, learning and memory skills, review and health workflows, and version-control operations.
-
-**Middleware**
-
-`core/skills/preamble.ts` provides a small composable middleware chain. It can warn when I am outside a git repository, load recent learnings, and log timeline activity around skill execution.
-
-**State**
-
-`core/state/unified-store.ts` stores learning, timeline, and checkpoint events in per-project `events.jsonl` files.
-
-**Hosts**
-
-`core/hosts/` defines adapters for Claude, Codex, Hermes, and OpenCode. These are integration boundaries, not the core execution model.
-
-### local state
-
-By default MIA keeps its local state under:
-
-```text
 ~/.mia/
-├── memory.md
-├── skills/
-├── projects/
-│   └── <project-slug>/
-│       └── events.jsonl
-└── sessions/
+├── memory.md              # Global curated long-term wisdom
+├── bin/
+│   └── mia                # Single compiled binary (~50MB)
+└── projects/{slug}/       # Per-repository learning store
+    └── events.jsonl       # Unified event log (learnings, timeline, checkpoints)
 ```
 
-The project slug is derived from the git repository root. Outside a git repository, MIA falls back to `default`.
-
-There is no daemon in the current architecture. No `miad`. No HTTP hop in the normal CLI path. Just the process you started and the files it owns.
+**No daemon. No HTTP. No auth tokens. Just direct execution.**
 
 ---
 
-## configuration
+### Design Philosophy
 
-The current CLI uses `MIA_DIR` to choose the local state root, defaulting to `~/.mia`. The remaining runtime paths are derived from that root.
+> *"Simple is deep. The harness is more important than the model."*
 
-```text
-MIA_DIR
-```
-
-The repository also contains a broader `core/config/ConfigLoader` with JSON and environment override support, but that loader is not currently wired into `createExecutionContext()`. I treat it as transition/compatibility code rather than advertising it as the current CLI configuration contract.
-
-Some legacy daemon-related settings still exist in the configuration schema for compatibility. They are not part of the normal daemon-free execution path.
+1. **Simple** &mdash; Remove everything until you can't. Single binary, local JSONL, zero bloat.
+2. **Deep** &mdash; Clean interface on top, rich state engine underneath.
+3. **Verifiable** &mdash; Evidence before claims. Verification baked into every execution step.
 
 ---
 
-## development
-
-I keep the development toolchain intentionally light:
-
-- **Runtime:** Bun
-- **Language:** TypeScript
-- **Validation:** TypeScript, Biome, Knip, markdownlint, documentation sync checks
-- **Tests:** Bun test
-- **Git workflow:** Husky + Conventional Commits
-- **State:** JSONL + Markdown
-
-### clone and build
+### Building from Source
 
 ```bash
 git clone https://github.com/thesohamdatta/Mia.git
 cd Mia
-
-bun install
 bun run build
 ```
 
-### run locally
-
-```bash
-bun run dev
-```
-
-or invoke the CLI entry point directly:
-
-```bash
-bun run core/cli/index.ts grill
-```
-
-### quality checks
-
-```bash
-bun test
-bun run typecheck
-bun run lint:check
-bun run knip
-bun run lint:md
-bun run validate:frontmatter
-```
-
-The repository also uses pre-commit and pre-push checks through Husky.
-
 ---
 
-## documentation
-
-I keep the documentation split by purpose rather than dumping everything into one giant README.
-
-| Path | Purpose |
-| :--- | :--- |
-| `AGENTS.md` | Canonical workspace and agent instructions |
-| `CLAUDE.md` | Agent-entry alias pointing to `AGENTS.md` |
-| `GEMINI.md` | Agent-entry alias pointing to `AGENTS.md` |
-| `PRINCIPLES.md` | Short entry point for the engineering principles |
-| `docs/core/` | Architecture, context, principles, and design philosophy |
-| `docs/workflows/` | Development and contribution workflows |
-| `docs/reference/` | Testing, review, voice, and reference material |
-| `docs/skills/` | Skill-facing documentation |
-| `docs/decisions/` | Architecture decision records |
-| `docs/archive/` | Historical material kept for traceability |
-
-The repository includes a documentation synchronization script because stale documentation is still a bug. Humans just tend to ship that bug more politely.
-
----
-
-## design philosophy
-
-I keep coming back to three words:
-
-> **simple. deep. evolvable.**
-
-**Simple** means removing unnecessary machinery.
-
-**Deep** means keeping the surface easy to use while the implementation handles the hard parts underneath.
-
-**Evolvable** means making changes without forcing the whole system to be rewritten.
-
-For MIA, that shows up as a small CLI surface, modular skills, a shared event store, explicit architecture decisions, and verification built into the development loop.
-
----
-
-## project status
-
-MIA is an actively evolving engineering project.
-
-The current repository is versioned as `0.3.0`. The foundation is stable enough for continued development, while higher-level ideas are still evolving, especially around richer agent orchestration, deeper evaluation, and broader integrations.
-
-I would rather keep that visible than pretend the project is finished.
-
----
-
-## licence
-
-MIT
+<p align="center">
+  MIT Licensed &bull; Built for engineers who ship.
+</p>

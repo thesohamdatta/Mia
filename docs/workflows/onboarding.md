@@ -1,112 +1,82 @@
-# MIA Onboarding
+# ONBOARDING.md — New Member Onboarding & Knowledge Sharing
 
-> A small guide for a human or AI agent joining the MIA repository.
+> A lightweight, living guide for bringing new members (human or AI) up to speed and keeping team knowledge current.
 
-## Start here
+## Core Principles
 
-Read these in order:
+- **Documentation is a first‑class product** – treat it like code: review, test, version.
+- **Progressive disclosure** – newcomers get a starter kit; experts dive deeper on demand.
+- **Single source of truth** – the EKB (`ekb/`) is the canonical reference; project‑specific docs live in each repo’s `docs/` or `AGENTS.md`.
+- **Learn by doing** – pair programming, mobbing, and small, well‑scoped first tasks beat passive reading.
 
-1. `README.md` for what MIA is
-2. `AGENTS.md` for workspace rules
-3. `docs/core/architecture.md` for the runtime structure
-4. `docs/core/skills-index.md` for the current CLI surface
-5. the relevant workflow or reference document for the task
+## 1. Welcome Kit (Day 0‑1)
 
-Do not start by reading the entire repository. Find the smallest context that lets you make a correct change.
+| Item | Purpose | Location |
+|------|---------|----------|
+| Welcome email with links | Sets expectations, provides credentials | Sent by lead |
+| `README.md` at repo root | Project purpose, tech stack, one‑line setup | Repository root |
+| `AGENTS.md` (project‑specific) | Workspace conventions, memory, heartbeats, tool whitelist | Project root |
+| `ekb/GLOSSARY.md` | Shared vocabulary & acronyms | `ekb/` |
+| First‑ticket (≤ 2 h) | Low‑risk, well‑scoped issue with clear acceptance criteria | Issue tracker |
 
-## First local run
+## 2. Knowledge‑Sharing Practices
 
-```bash
-bun install
-bun run build
-bun test
-```
+### 2.1 Living Documentation
+- **README‑driven development**: keep the repo README up‑to‑date; it’s the first thing newcomers read.
+- **Decision Records (ADR)**: every architectural decision gets an `docs/adr/NNN-title.md` file (see `ekb/DECISION.md` for template).
+- **Inline documentation**: follow *Clean Code* – use intention‑revealing names; add comments only when code cannot be self‑explaining.
+- **Wiki‑style knowledge base**: for cross‑project patterns, use the `ekb/` folder (Markdown + YAML). Treat it like a wiki: searchable, linkable, versioned.
 
-Then inspect the CLI:
+### 2.2 Onboarding Buddy System
+- Assign a **buddy** (human or experienced AI agent) for the first week.
+- Buddy responsibilities:
+  - Review the newcomer’s first PR within 24 h.
+  - Answer “where‑is‑X” questions.
+  - Run a 30‑minute knowledge‑transfer session on the project’s architecture and conventions.
 
-```bash
-bun run dev
-```
+### 2.3 Regular Knowledge Syncs
+- **Weekly 15‑minute “Show & Tell”**: anyone shares a tip, a gotcha, or a small refactor.
+- **Monthly deep‑dive** (30 min): pick a subsystem, a library, or an AI‑agent pattern and walk through code + docs.
+- **Retrospective action items** that improve documentation are treated as regular tickets.
 
-or:
+### 2.4 Off‑boarding & Knowledge Retention
+- When someone leaves, schedule a **knowledge‑transfer session** and convert notes into `ekb/` entries or project ADRs.
+- Archive inactive repos but keep their `README` and `ADRs` accessible.
 
-```bash
-bun run core/cli/index.ts --help
-```
+## 3. Tooling for Documentation
 
-## Repository shape
+| Tool | Use | Why |
+|------|-----|-----|
+| **MkDocs / Docusaurus** | Public‑facing docs | Easy search, versioning, theme |
+| **Markdown + Prettier** | Internal notes (`*.md`) | Consistent formatting, diff‑friendly |
+| **Mermaid** | Diagrams in Markdown | Version‑controlled architecture diagrams |
+| **GitHub Wikis** (optional) | Legacy knowledge | Only if already in use; prefer `ekb/` |
+| **IDE plugins** (e.g., Grammarly, Vale) | Prose linting | Catch typos, passive voice, inconsistent terminology |
 
-```text
-MIA/
-├── core/
-│   ├── cli/          # command entry point
-│   ├── config/       # local config and overrides
-│   ├── generator/    # documentation generation
-│   ├── hosts/        # host adapters
-│   ├── skills/       # executable skills
-│   ├── state/        # JSONL and unified state
-│   └── test/         # current tests
-├── docs/             # project documentation
-├── .husky/           # commit/push hooks
-├── AGENTS.md         # canonical agent guidance
-├── CLAUDE.md         # alias
-├── GEMINI.md         # alias
-└── README.md         # public entry point
-```
+## 4. AI‑Assisted Onboarding
 
-## Make your first change
+- Use **AI‑powered documentation generators** (see *AI‑Assisted Programming* O'Reilly) to create initial drafts from code comments and type definitions.
+- Prompt the agent: “Generate a README for this repository based on the source tree and existing docstrings.”
+- Always **review and edit** AI output – treat it as a first draft, not final.
+- Leverage **context‑window management**: load only the relevant files (e.g., public API surface) when asking for docs to keep token usage low.
 
-Start from the actual problem.
+## 5. Checklist for a New Contributor
 
-```text
-grill → plan → spec → execute → review → ship
-```
+- [ ] Read the repo’s `README.md` and `AGENTS.md`.
+- [ ] Clone the repo, run the dev setup script (`scripts/setup.sh` or equivalent).
+- [ ] Run the test suite (`bun test` or `npm test`) – should pass.
+- [ ] Look at the latest open issue labeled `good first issue`.
+- [ ] Ask the buddy for clarification if anything is unclear.
+- [ ] Submit a small PR (e.g., typo fix, documentation improvement) to get familiar with the PR workflow.
+- [ ] After first PR is merged, take on a slightly larger task (bug‑fix or small feature).
+- [ ] Add any missing or outdated information to the project’s `README` or `AGENTS.md`.
+- [ ] Schedule a 15‑minute retro with the buddy to discuss what worked and what was confusing.
 
-For a small documentation or maintenance change, use judgement and keep the scope narrow.
+## 6. Keeping the EKB Fresh
 
-## Before opening a PR
-
-Run the relevant checks:
-
-```bash
-bun test
-bun run typecheck
-bun run lint:check
-bun run knip
-bun run lint:md
-bun run validate:frontmatter
-bun run build
-```
-
-Use a Conventional Commit message, for example:
-
-```text
-docs(readme): align documentation with current runtime
-```
-
-## When you learn something
-
-Do not leave the knowledge trapped in the conversation.
-
-Put it in the right place:
-
-| What changed | Where it belongs |
-| :--- | :--- |
-| Reusable agent rule | `AGENTS.md` |
-| Architecture decision | `docs/decisions/` |
-| Architecture behaviour | `docs/core/architecture.md` |
-| Workflow rule | `docs/workflows/` |
-| Test/review practice | `docs/reference/` |
-| Historical context | `docs/archive/` |
-
-## Current-source rule
-
-When documentation and source disagree, verify the source before updating anything.
-
-For the executable CLI, `core/cli/index.ts` and `core/skills/index.ts` are the runtime truth.
-
-Some older documents describe earlier MIA designs or broader agent ecosystems. They are useful as history, but they are not evidence that the current CLI implements those ideas.
+- **Monthly EKB grooming**: treat `ekb/` like a codebase – run `lint` (markdown linter), fix broken links, update outdated advice.
+- **Contribute via PR**: any team member can propose a change to an EKB file; follow the same PR workflow as code.
+- **Version‑tag major releases**: when the EKB undergoes a significant restructuring, tag a release (e.g., `ekb-v1.2.0`) and announce in the team channel.
 
 ---
-
-*Read enough to understand. Change little. Verify everything that matters.*
+*This document lives in `ekb/ONBOARDING.md`. Update it whenever you discover a better way to onboard or share knowledge.*

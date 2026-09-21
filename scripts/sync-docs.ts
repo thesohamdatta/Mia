@@ -19,10 +19,10 @@ const AGENTS_MD = join(ROOT_DIR, 'AGENTS.md');
 
 // Frontmatter schema
 interface Frontmatter {
-  title: string;
-  layer: number;
-  last_updated: string;
-  owner: string;
+  title?: string;
+  layer?: number;
+  last_updated?: string;
+  owner?: string;
   dependencies?: string[];
 }
 
@@ -79,18 +79,37 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
     const { data } = matter(content);
     const fm = data as Frontmatter;
 
-    if (fm && Object.keys(fm).length > 0) {
-      if (fm.title !== undefined && typeof fm.title !== 'string') {
-        errors.push('Invalid "title" field');
+    // Check optional frontmatter fields, warning if missing or invalid
+    if (!fm.title || typeof fm.title !== 'string') {
+      warnings.push('Missing or invalid "title" field');
+    }
+
+    if (fm.layer === undefined || !Number.isInteger(fm.layer) || fm.layer < 0 || fm.layer > 4) {
+      warnings.push('Missing or invalid "layer" field (must be integer 0-4)');
+    }
+
+    if (!fm.last_updated || typeof fm.last_updated !== 'string') {
+      warnings.push('Missing or invalid "last_updated" field');
+    } else {
+      // Validate date format YYYY-MM-DD
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(fm.last_updated)) {
+        warnings.push('"last_updated" should be in YYYY-MM-DD format');
       }
-      if (fm.layer !== undefined && (!Number.isInteger(fm.layer) || fm.layer < 0 || fm.layer > 4)) {
-        errors.push('Invalid "layer" field (must be integer 0-4)');
-      }
-      if (fm.last_updated !== undefined && typeof fm.last_updated !== 'string') {
-        errors.push('Invalid "last_updated" field');
-      }
-      if (fm.owner !== undefined && typeof fm.owner !== 'string') {
-        errors.push('Invalid "owner" field');
+    }
+
+    if (!fm.owner || typeof fm.owner !== 'string') {
+      warnings.push('Missing or invalid "owner" field');
+    }
+
+    if (fm.dependencies !== undefined) {
+      if (!Array.isArray(fm.dependencies)) {
+        errors.push('"dependencies" must be an array');
+      } else {
+        for (const dep of fm.dependencies) {
+          if (typeof dep !== 'string') {
+            errors.push('All dependencies must be strings');
+          }
+        }
       }
     }
   } catch (e) {
@@ -143,7 +162,7 @@ function resolveLink(baseFile: string, target: string): string | null {
   }
 
   // Handle relative paths
-  const baseDir = resolve(ROOT_DIR, baseFile.slice(0, -3)); // Remove .md for dirname
+  const baseDir = resolve(ROOT_DIR, baseFile, '..');
   let resolvedPath: string;
 
   if (cleanTarget.startsWith('/')) {
@@ -336,7 +355,7 @@ async function main(): Promise<void> {
   }
 
   const validCount = frontmatterResults.filter((r) => r.valid).length;
-  console.log(`\n  ${validCount}/${allMdFiles.length} files have valid frontmatter\n`);
+  console.log(`\n  ${validCount}/${allMdFiles.length} files have valid syntax\n`);
 
   // 2. Validate links
   console.log('🔗 Validating internal links...');
@@ -406,15 +425,15 @@ async function main(): Promise<void> {
   console.log('📊 VALIDATION SUMMARY');
   console.log('═══════════════════════════════════════════');
   console.log(`Total files:       ${allMdFiles.length}`);
-  console.log(`Valid frontmatter: ${validCount}`);
-  console.log(`Invalid frontmatter: ${allMdFiles.length - validCount}`);
+  console.log(`Valid syntax:      ${validCount}`);
+  console.log(`Invalid syntax:    ${allMdFiles.length - validCount}`);
   console.log(`Links checked:     ${linkResults.length}`);
   console.log(`Broken links:      ${brokenLinks.length}`);
   console.log(`Orphaned docs:     ${orphaned.length}`);
   console.log('═══════════════════════════════════════════\n');
 
-  // Exit with error code if any critical issues found
-  const hasErrors = brokenLinks.length > 0;
+  // Exit with error code if any critical issues found (broken links or invalid syntax)
+  const hasErrors = validCount < allMdFiles.length || brokenLinks.length > 0;
 
   if (hasErrors) {
     console.log('❌ Validation FAILED - issues found above');

@@ -15,13 +15,11 @@ export class ClaudeAdapter extends BaseHostAdapter {
   private client: ReturnType<typeof this.createClient> | null = null;
 
   private createClient(config: HostConfig) {
-    const extra = config.extra;
-    // biome-ignore lint/complexity/useLiteralKeys: TS noPropertyAccessFromIndexSignature
-    const anthropicVer = extra ? (extra['anthropicVersion'] as string | undefined) : undefined;
     return {
       baseUrl: config.baseUrl || 'https://api.anthropic.com',
       apiKey: config.apiKey || '',
-      anthropicVersion: anthropicVer || '2023-06-01',
+      // biome-ignore lint/complexity/useLiteralKeys: required by tsconfig noPropertyAccessFromIndexSignature
+      anthropicVersion: (config.extra?.['anthropicVersion'] as string) || '2023-06-01',
       timeout: config.timeout || 60000,
     };
   }

@@ -1,17 +1,29 @@
 {
   "protocol_version": 1,
-  "cycle": null,
-  "stage": "sentry",
+  "cycle": "cycle-001",
+  "stage": "orchestrator",
   "status": "ready",
   "priority": "P3",
   "writer": null,
   "blocked_reason": null,
   "stages": {
-    "sentry": {"status": "ready", "handoff": null},
-    "pulse": {"status": "waiting", "handoff": null},
-    "maintainer": {"status": "waiting", "handoff": null},
-    "orchestrator": {"status": "waiting", "handoff": null}
+    "sentry": {
+      "status": "complete",
+      "handoff": ".agents/handoffs/cycle-001-sentry.json"
+    },
+    "pulse": {
+      "status": "complete",
+      "handoff": ".agents/handoffs/cycle-001-pulse.json"
+    },
+    "maintainer": {
+      "status": "complete",
+      "handoff": ".agents/handoffs/cycle-001-maintainer.json"
+    },
+    "orchestrator": {
+      "status": "ready",
+      "handoff": null
+    }
   },
-  "last_updated_by": "bootstrap",
-  "notes": "Bootstrap state. Agents must establish a cycle identifier and update this file through an agreed serialized process before doing coordinated work."
+  "last_updated_by": "maintainer",
+  "notes": "Maintainer stage cycle 001 completed. Obsolete scripts removed, architecture docs aligned with ADR-0001, doc sync tool updated. Handing off to Orchestrator."
 }
