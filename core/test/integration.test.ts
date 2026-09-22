@@ -45,7 +45,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(skills).toContain('vc');
   });
 
-  it('should execute vc skill through CLI path', async () => {
+  it('should execute vc skill through validated CLI path', async () => {
     const ctx = createExecutionContext();
     const definition = getSkill('vc');
 
@@ -77,7 +77,6 @@ describe('Integration: CLI -> Skill -> Store', () => {
     const second = createExecutionContext().run.id;
     expect(first).not.toBe(second);
   });
-
 
   it('should create real plan and spec artifacts', async () => {
     const ctx = createExecutionContext();
