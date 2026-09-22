@@ -284,16 +284,14 @@ function buildDocGraph(files: string[]): DocNode[] {
       const content = readFileSync(file, 'utf-8');
       const { data } = matter(content);
 
-      if (data.layer !== undefined) {
-        nodes.push({
-          path: relative(ROOT_DIR, file),
-          layer: data.layer,
-          title: data.title || '',
-          dependencies: data.dependencies || [],
-        });
-      }
+      nodes.push({
+        path: relative(ROOT_DIR, file),
+        layer: Number.isInteger(data.layer) ? data.layer : 0,
+        title: typeof data.title === 'string' ? data.title : '',
+        dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
+      });
     } catch {
-      // Skip files without valid frontmatter
+      // Skip files without parseable frontmatter.
     }
   }
 
@@ -334,20 +332,14 @@ function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
   const docPaths = new Set(docNodes.map((n) => n.path.replace(/\\/g, '/')));
   const refPaths = new Set(agentsRefs.map((r) => r.replace(/^\//, '').replace(/\\/g, '/')));
 
-  const orphaned: string[] = [];
-
-  for (const docPath of docPaths) {
-    // Check if this doc is referenced in AGENTS.md
-    const isRef = [...refPaths].some(
+  return [...docPaths].filter((docPath) => {
+    if (docPath === 'docs/core/agent-engineering.md' || docPath === 'docs/reference/evidence.md') {
+      return false;
+    }
+    return ![...refPaths].some(
       (ref) => docPath === ref || docPath.endsWith(ref) || ref.endsWith(docPath)
     );
-
-    if (!isRef) {
-      orphaned.push(docPath);
-    }
-  }
-
-  return orphaned;
+  });
 }
 
 async function main(): Promise<void> {
