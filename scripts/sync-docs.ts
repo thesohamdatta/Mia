@@ -86,7 +86,7 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
     const { data } = matter(content);
     const fm = data as Frontmatter;
 
-    // Check optional legacy frontmatter fields.
+    // Legacy metadata remains warning-only; agent-facing metadata is enforced.
     if (!fm.title || typeof fm.title !== 'string') {
       warnings.push('Missing or invalid "title" field');
     }
