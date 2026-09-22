@@ -113,6 +113,38 @@ Prefer recoverable changes.
 
 ---
 
+## Multi-agent coordination
+
+MIA uses a serialized repository coordination protocol for Jules agents.
+
+Canonical coordination source:
+
+```text
+.agents/PROTOCOL.md
+```
+
+The normal stage order is:
+
+```text
+Sentry → Pulse → Maintainer → Orchestrator
+```
+
+Rules for coordinated work:
+
+- The repository default branch is the integration branch. Current integration branch: `master`.
+- Every coordinated PR must target the current integration branch.
+- Agents share one cycle state and one handoff lineage. Do not create duplicate state for the same cycle.
+- One repository-changing writer is active at a time.
+- A stale, duplicated, missing, malformed, or conflicting handoff means `HOLD`.
+- No agent may approve, merge, or release its own work.
+- Preserve newer benchmark, product, and repository changes when reconciling stale PRs.
+- Handoffs are evidence records, not merge authority.
+- The Orchestrator prepares the final repository state. Human review remains the final integration gate.
+
+When branch state and documentation disagree, inspect the current executable source, tests, accepted ADRs, and Git history before changing either.
+
+---
+
 ## Existing-solutions preflight
 
 Before building something custom, check for a maintained library, existing MIA skill, compatible host adapter, or other established solution.
