@@ -55,12 +55,7 @@ export async function executeSkillDefinition(
     };
   }
 
-  return executeWithMiddlewares(
-    definition.executor,
-    args,
-    context,
-    definition.manifest.name
-  );
+  return executeWithMiddlewares(definition.executor, args, context, definition.manifest.name);
 }
 
 export async function executeSkill(
