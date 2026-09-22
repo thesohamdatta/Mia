@@ -113,11 +113,13 @@ describe('skill execution lifecycle', () => {
       { execute: async () => ({ ok: true, output: 'done' }) },
       [],
       ctx,
-      'health',
-      []
+      'health'
     );
 
     expect(result).toEqual({ ok: true, output: 'done' });
+    expect(warn).toHaveBeenCalledWith(
+      '⚠️  Could not record timeline start: timeline unavailable'
+    );
     expect(warn).toHaveBeenCalledWith(
       '⚠️  Could not record timeline completion: timeline unavailable'
     );
