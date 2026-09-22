@@ -49,10 +49,6 @@ export function getSkill(name: string): SkillDefinition | undefined {
   return skills[name];
 }
 
-export function getSkillExecutor(name: string): SkillExecutor | undefined {
-  return getSkill(name)?.executor;
-}
-
 export function listSkills(): string[] {
   return Object.keys(skills);
 }
