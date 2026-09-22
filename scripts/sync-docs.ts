@@ -10,7 +10,7 @@
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { extname, join, relative, resolve } from 'node:path';
+import { dirname, extname, join, relative, resolve } from 'node:path';
 import matter from 'gray-matter';
 
 const ROOT_DIR = resolve(import.meta.dir, '..');
