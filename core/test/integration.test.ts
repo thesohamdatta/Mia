@@ -89,7 +89,11 @@ describe('Integration: CLI -> Skill -> Store', () => {
     const plan = await executeSkillDefinition(planDefinition, ['create', 'Improve', 'MIA'], ctx);
     expect(plan.ok).toBe(true);
 
-    const spec = await executeSkillDefinition(specDefinition, ['create', 'Make', 'runs', 'explicit'], ctx);
+    const spec = await executeSkillDefinition(
+      specDefinition,
+      ['create', 'Make', 'runs', 'explicit'],
+      ctx
+    );
     expect(spec.ok).toBe(true);
 
     const projectDir = join(ctx.config.projectsDir, ctx.slug);
@@ -163,7 +167,12 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(lastEvent).toBeDefined();
     if (!lastEvent) throw new Error('No timeline event');
 
-    const eventData = lastEvent.data as { skill?: string; event?: string; outcome?: string; runId?: string };
+    const eventData = lastEvent.data as {
+      skill?: string;
+      event?: string;
+      outcome?: string;
+      runId?: string;
+    };
     expect(eventData.skill).toBe('vc');
     expect(eventData.event).toBe('completed');
     expect(eventData.outcome).toBe('success');
