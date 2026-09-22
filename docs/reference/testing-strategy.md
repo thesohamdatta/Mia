@@ -18,7 +18,7 @@ bun run validate:frontmatter
 bun run build
 ```
 
-The current GitHub Actions workflow is not fully aligned with the repository scripts. `.github/workflows/ci.yml` still references `check:links`, `check:spelling`, `build:cli`, `build:daemon`, and `bin/miad`, none of which are part of the current package build surface. Treat that as separate CI maintenance work, not as evidence that those commands exist or pass.
+These are the supported deterministic repository gates. GitHub Actions is expected to run the corresponding commands on the repository's current integration branch.
 
 ## Current test organisation
 
