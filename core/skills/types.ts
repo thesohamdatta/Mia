@@ -61,6 +61,7 @@ export interface SkillManifest {
   allowedTools: readonly string[];
   sideEffects: 'none' | 'local-write' | 'git-write' | 'external';
   verification: readonly string[];
+  phase: 'clarify' | 'plan' | 'specify' | 'execute' | 'verify' | 'review' | 'handoff';
 }
 
 export interface SkillDefinition {
