@@ -329,7 +329,7 @@ function extractAgentsDocReferences(agentsContent: string): string[] {
   }
 
   // Match documentation paths recorded in inline code, including directory ownership entries.
-  const codePathRegex = /\`(docs\\/[^\`]+)\`/g;
+  const codePathRegex = /`(docs\/[^`]+)`/g;
   match = codePathRegex.exec(agentsContent);
 
   while (match !== null) {
