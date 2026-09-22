@@ -20,13 +20,7 @@
     "validate": "bun run lint && bun run typecheck && bun run knip",
     "prepare": "husky"
   },
-  "keywords": [
-    "ai",
-    "agent",
-    "workflow",
-    "automation",
-    "mia"
-  ],
+  "keywords": ["ai", "agent", "workflow", "automation", "mia"],
   "author": "Soham Datta",
   "license": "MIT",
   "dependencies": {},

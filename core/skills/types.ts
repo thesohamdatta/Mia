@@ -52,7 +52,7 @@ export interface SkillExecutor {
 }
 
 export interface Skill {
-  manifest?: any;
+  manifest?: SkillManifest;
   executor: SkillExecutor;
 }
 

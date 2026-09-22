@@ -1,5 +1,10 @@
 import type { ExecutionContext, SkillExecutor, SkillResult } from './types.js';
 
+export interface SkillExecutionContext extends ExecutionContext {
+  _skillName?: string;
+  _skillResult?: SkillResult;
+}
+
 export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
 export const requireProject: Middleware = async (ctx, next) => {
@@ -27,7 +32,7 @@ export const loadRecentLearnings: Middleware = async (ctx, next) => {
 };
 
 export const logTimelineStart: Middleware = async (ctx, next) => {
-  const skillName = (ctx as any)._skillName || 'unknown';
+  const skillName = (ctx as SkillExecutionContext)._skillName || 'unknown';
   const projectsDir = ctx.config.projectsDir;
   await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
@@ -37,8 +42,8 @@ export const logTimelineStart: Middleware = async (ctx, next) => {
 };
 
 export const logTimelineComplete: Middleware = async (ctx, next) => {
-  const skillName = (ctx as any)._skillName || 'unknown';
-  const result = (ctx as any)._skillResult as SkillResult;
+  const skillName = (ctx as SkillExecutionContext)._skillName || 'unknown';
+  const result = (ctx as SkillExecutionContext)._skillResult as SkillResult;
   const projectsDir = ctx.config.projectsDir;
   await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
@@ -84,13 +89,14 @@ export async function executeWithMiddlewares(
   skillName: string,
   middlewares: Middleware[] = defaultMiddlewares
 ): Promise<SkillResult> {
-  (ctx as any)._skillName = skillName;
+  const skillCtx = ctx as SkillExecutionContext;
+  skillCtx._skillName = skillName;
 
   await runMiddlewares(middlewares, ctx);
 
   const result = await executor.execute(args, ctx);
 
-  (ctx as any)._skillResult = result;
+  skillCtx._skillResult = result;
   await logTimelineComplete(ctx, async () => {});
 
   return result;
