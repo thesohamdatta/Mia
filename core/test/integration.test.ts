@@ -51,7 +51,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(executor).toBeDefined();
     if (!executor) throw new Error('vc executor not found');
 
-    const result = await executeWithMiddlewares(executor, ['help'], ctx, 'vc');
+    const result = await executeSkillDefinition(definition, ['help'], ctx);
 
     expect(result.ok).toBe(true);
     expect(result.output).toContain('mia vc — professional version control');
@@ -166,5 +166,34 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
     const evidence = await unifiedStore.listEvidence(projectsDir, slug, 5);
     expect(evidence).toEqual([]);
+  });
+
+  it('blocks an invalid skill definition before execution', async () => {
+    const ctx = createExecutionContext();
+    let executed = false;
+    const definition = {
+      manifest: {
+        name: 'broken',
+        version: '',
+        description: 'invalid',
+        allowedTools: [],
+        sideEffects: 'none' as const,
+        verification: [],
+        phase: 'execute' as const,
+      },
+      executor: {
+        execute: async () => {
+          executed = true;
+          return { ok: true, output: 'should not run' };
+        },
+      },
+    };
+
+    const result = await executeSkillDefinition(definition, [], ctx);
+
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe('blocked');
+    expect(result.error).toContain('must declare a version');
+    expect(executed).toBe(false);
   });
 });
