@@ -9,16 +9,34 @@ export class SkillContractError extends Error {
 }
 
 const phases = new Set<SkillDefinition['manifest']['phase']>([
-  'clarify', 'plan', 'specify', 'execute', 'verify', 'review', 'handoff'
+  'clarify',
+  'plan',
+  'specify',
+  'execute',
+  'verify',
+  'review',
+  'handoff',
 ]);
 
 export function validateSkillDefinition(definition: SkillDefinition): void {
   const { manifest } = definition;
-  if (!manifest.name.trim()) throw new SkillContractError('Skill manifest name must not be empty');
-  if (!manifest.version.trim()) throw new SkillContractError(`Skill "${manifest.name}" must declare a version`);
-  if (!manifest.description.trim()) throw new SkillContractError(`Skill "${manifest.name}" must declare a description`);
+
+  if (!manifest.name.trim()) {
+    throw new SkillContractError('Skill manifest name must not be empty');
+  }
+
+  if (!manifest.version.trim()) {
+    throw new SkillContractError(`Skill "${manifest.name}" must declare a version`);
+  }
+
+  if (!manifest.description.trim()) {
+    throw new SkillContractError(`Skill "${manifest.name}" must declare a description`);
+  }
+
   if (!phases.has(manifest.phase)) {
-    throw new SkillContractError(`Skill "${manifest.name}" has an unsupported phase "${manifest.phase}"`);
+    throw new SkillContractError(
+      `Skill "${manifest.name}" has an unsupported phase "${manifest.phase}"`
+    );
   }
 }
 
@@ -29,12 +47,20 @@ export async function executeSkillDefinition(
 ): Promise<SkillResult> {
   try {
     validateSkillDefinition(definition);
-    return await executeWithMiddlewares(definition.executor, args, context, definition.manifest.name);
+    return await executeWithMiddlewares(
+      definition.executor,
+      args,
+      context,
+      definition.manifest.name
+    );
   } catch (error) {
-    return { ok: false, status: 'blocked', error: error instanceof Error ? error.message : String(error) };
+    return {
+      ok: false,
+      status: 'blocked',
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
-
 
 export async function executeSkill(
   executor: SkillExecutor,
