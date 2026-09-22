@@ -4,11 +4,9 @@
  * Markdown Documentation Synchronization & Validation Engine
  *
  * Validates:
- * 1. Frontmatter shape across all docs/ markdown files
+ * 1. Frontmatter presence and schema across all docs/ markdown files
  * 2. Internal markdown file links and heading anchors
- * 3. Document graph information used for context navigation
- *
- * Missing optional frontmatter is non-blocking. Broken internal links remain blocking.
+ * 3. Orphaned documentation files missing from AGENTS.md context map
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -19,6 +17,7 @@ const ROOT_DIR = resolve(import.meta.dir, '..');
 const DOCS_DIR = join(ROOT_DIR, 'docs');
 const AGENTS_MD = join(ROOT_DIR, 'AGENTS.md');
 
+// Frontmatter schema
 interface Frontmatter {
   title?: string;
   layer?: number;
@@ -58,6 +57,7 @@ function getAllMarkdownFiles(dir: string): string[] {
       const fullPath = join(currentDir, entry.name);
 
       if (entry.isDirectory()) {
+        // Skip node_modules and .git
         if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
           walk(fullPath);
         }
@@ -79,25 +79,41 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
     const { data } = matter(content);
     const fm = data as Frontmatter;
 
-    if (fm && Object.keys(fm).length > 0) {
-      if (fm.title !== undefined && typeof fm.title !== 'string') {
-        errors.push('Invalid "title" field');
-      }
-      if (fm.layer !== undefined && (!Number.isInteger(fm.layer) || fm.layer < 0 || fm.layer > 4)) {
-        errors.push('Invalid "layer" field (must be integer 0-4)');
-      }
-      if (fm.last_updated !== undefined && typeof fm.last_updated !== 'string') {
-        errors.push('Invalid "last_updated" field');
-      }
-      if (fm.owner !== undefined && typeof fm.owner !== 'string') {
-        errors.push('Invalid "owner" field');
-      }
-      if (fm.dependencies !== undefined && (!Array.isArray(fm.dependencies) || fm.dependencies.some((d) => typeof d !== 'string'))) {
-        errors.push('"dependencies" must be an array of strings');
+    // Check optional frontmatter fields, warning if missing or invalid
+    if (!fm.title || typeof fm.title !== 'string') {
+      warnings.push('Missing or invalid "title" field');
+    }
+
+    if (fm.layer === undefined || !Number.isInteger(fm.layer) || fm.layer < 0 || fm.layer > 4) {
+      warnings.push('Missing or invalid "layer" field (must be integer 0-4)');
+    }
+
+    if (!fm.last_updated || typeof fm.last_updated !== 'string') {
+      warnings.push('Missing or invalid "last_updated" field');
+    } else {
+      // Validate date format YYYY-MM-DD
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(fm.last_updated)) {
+        warnings.push('"last_updated" should be in YYYY-MM-DD format');
       }
     }
-  } catch (error) {
-    errors.push(`Failed to parse frontmatter: ${error}`);
+
+    if (!fm.owner || typeof fm.owner !== 'string') {
+      warnings.push('Missing or invalid "owner" field');
+    }
+
+    if (fm.dependencies !== undefined) {
+      if (!Array.isArray(fm.dependencies)) {
+        errors.push('"dependencies" must be an array');
+      } else {
+        for (const dep of fm.dependencies) {
+          if (typeof dep !== 'string') {
+            errors.push('All dependencies must be strings');
+          }
+        }
+      }
+    }
+  } catch (e) {
+    errors.push(`Failed to parse frontmatter: ${e}`);
   }
 
   return {
@@ -110,6 +126,8 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
 
 function extractLinks(content: string): { link: string; target: string }[] {
   const links: { link: string; target: string }[] = [];
+
+  // Match markdown links [text](url)
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let match: RegExpExecArray | null = linkRegex.exec(content);
 
@@ -123,6 +141,7 @@ function extractLinks(content: string): { link: string; target: string }[] {
 }
 
 function resolveLink(baseFile: string, target: string): string | null {
+  // Skip external links
   if (
     target.startsWith('http://') ||
     target.startsWith('https://') ||
@@ -131,21 +150,33 @@ function resolveLink(baseFile: string, target: string): string | null {
     return null;
   }
 
+  // Handle file:// protocol
   let cleanTarget = target;
   if (target.startsWith('file://')) {
     cleanTarget = target.slice(7);
   }
 
+  // Handle anchor links
   if (cleanTarget.startsWith('#')) {
-    return baseFile;
+    return baseFile; // Same file anchor
   }
 
+  // Handle relative paths
   const baseDir = resolve(ROOT_DIR, baseFile, '..');
-  const resolvedPath = cleanTarget.startsWith('/')
-    ? join(ROOT_DIR, cleanTarget.slice(1))
-    : join(baseDir, cleanTarget);
+  let resolvedPath: string;
 
-  return resolve(rootedPath(resolvedPath));
+  if (cleanTarget.startsWith('/')) {
+    // Absolute from root
+    resolvedPath = join(ROOT_DIR, cleanTarget.slice(1));
+  } else {
+    // Relative to current file
+    resolvedPath = join(baseDir, cleanTarget);
+  }
+
+  // Normalize path
+  resolvedPath = resolve(rootedPath(resolvedPath));
+
+  return resolvedPath;
 }
 
 function rootedPath(path: string): string {
@@ -155,8 +186,8 @@ function rootedPath(path: string): string {
 function checkAnchorExists(filePath: string, anchor: string): boolean {
   try {
     const content = readFileSync(filePath, 'utf-8');
-    const normalized = anchor.replace(/-/g, '\\s+');
-    const headingPattern = new RegExp(`^#{1,6}\\\\s+${normalized}\\s*$`, 'mi');
+    // Convert anchor to heading pattern (e.g., #some-heading -> ## Some Heading)
+    const headingPattern = new RegExp(`^#{1,6}\\\\s+\${anchor.replace(/-/g, '\\\\s+')}`, 'mi');
     return headingPattern.test(content);
   } catch {
     return false;
@@ -165,8 +196,10 @@ function checkAnchorExists(filePath: string, anchor: string): boolean {
 
 function validateLinks(filePath: string, content: string): LinkCheckResult[] {
   const results: LinkCheckResult[] = [];
+  const links = extractLinks(content);
 
-  for (const { link, target } of extractLinks(content)) {
+  for (const { link, target } of links) {
+    // Skip external links, placeholders, regexes, or generic templates
     if (
       target.startsWith('http://') ||
       target.startsWith('https://') ||
@@ -179,18 +212,30 @@ function validateLinks(filePath: string, content: string): LinkCheckResult[] {
     }
 
     const resolvedPath = resolveLink(filePath, target);
-    if (!resolvedPath) continue;
 
+    if (!resolvedPath) {
+      results.push({
+        file: relative(ROOT_DIR, filePath),
+        link,
+        target,
+        valid: true, // External links assumed valid
+      });
+      continue;
+    }
+
+    // Check if target has anchor
     let targetFile = resolvedPath;
     let anchor = '';
 
     if (target.includes('#')) {
-      const [pathPart, anchorPart] = target.split('#');
-      targetFile = resolveLink(filePath, pathPart || '') || resolvedPath;
-      anchor = anchorPart || '';
+      const parts = target.split('#');
+      targetFile = resolveLink(filePath, parts[0]) || resolvedPath;
+      anchor = parts[1];
     }
 
     let valid = existsSync(targetFile);
+
+    // If anchor specified, check if it exists in target file
     if (valid && anchor) {
       valid = checkAnchorExists(targetFile, anchor);
     }
@@ -219,11 +264,11 @@ function buildDocGraph(files: string[]): DocNode[] {
           path: relative(ROOT_DIR, file),
           layer: data.layer,
           title: data.title || '',
-          dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
+          dependencies: data.dependencies || [],
         });
       }
     } catch {
-      // Ignore malformed docs here. Link and syntax validation already reports parse failures.
+      // Skip files without valid frontmatter
     }
   }
 
@@ -232,13 +277,27 @@ function buildDocGraph(files: string[]): DocNode[] {
 
 function extractAgentsDocReferences(agentsContent: string): string[] {
   const references: string[] = [];
+
+  // Match markdown links in AGENTS.md
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let match: RegExpExecArray | null = linkRegex.exec(agentsContent);
 
   while (match !== null) {
     const [, , url] = match;
-    if (url.startsWith('docs/') || url.startsWith('./docs/')) {
-      references.push(url.startsWith('./') ? url.slice(2) : url);
+    if (url.startsWith('docs/') || url.startsWith('./docs/') || url.startsWith('file:///')) {
+      let cleanUrl = url;
+      if (url.startsWith('file:///')) {
+        cleanUrl = url.slice(8); // Remove file:///
+        // On Windows, file:///D:/... -> D:/...
+        if (/^[A-Za-z]:/.test(cleanUrl)) {
+          // Already has drive letter
+        } else {
+          cleanUrl = `/${cleanUrl}`;
+        }
+      } else if (url.startsWith('./docs/')) {
+        cleanUrl = url.slice(2);
+      }
+      references.push(cleanUrl);
     }
     match = linkRegex.exec(agentsContent);
   }
@@ -250,38 +309,65 @@ function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
   const docPaths = new Set(docNodes.map((n) => n.path.replace(/\\/g, '/')));
   const refPaths = new Set(agentsRefs.map((r) => r.replace(/^\//, '').replace(/\\/g, '/')));
 
-  return [...docPaths].filter(
-    (docPath) => ![...refPaths].some(
+  const orphaned: string[] = [];
+
+  for (const docPath of docPaths) {
+    // Check if this doc is referenced in AGENTS.md
+    const isRef = [...refPaths].some(
       (ref) => docPath === ref || docPath.endsWith(ref) || ref.endsWith(docPath)
-    )
-  );
+    );
+
+    if (!isRef) {
+      orphaned.push(docPath);
+    }
+  }
+
+  return orphaned;
 }
 
 async function main(): Promise<void> {
-  console.log('MIA Documentation Sync & Validation Engine\n');
+  console.log('🔍 MIA Documentation Sync & Validation Engine\n');
 
+  // Gather all markdown files
   const allMdFiles = getAllMarkdownFiles(DOCS_DIR);
   console.log(`Found ${allMdFiles.length} markdown files in docs/\n`);
 
-  console.log('Validating frontmatter...');
-  const frontmatterResults = allMdFiles.map((file) =>
-    validateFrontmatter(file, readFileSync(file, 'utf-8'))
-  );
-  const invalidFrontmatter = frontmatterResults.filter((result) => !result.valid);
+  // 1. Validate frontmatter
+  console.log('📋 Validating frontmatter...');
+  const frontmatterResults: ValidationResult[] = [];
 
-  for (const result of invalidFrontmatter) {
-    console.log(`  ❌ ${result.file}`);
-    for (const error of result.errors) console.log(`     - ERROR: ${error}`);
+  for (const file of allMdFiles) {
+    const content = readFileSync(file, 'utf-8');
+    const result = validateFrontmatter(file, content);
+    frontmatterResults.push(result);
+
+    if (!result.valid) {
+      console.log(`  ❌ ${result.file}`);
+      for (const error of result.errors) {
+        console.log(`     - ERROR: ${error}`);
+      }
+    } else if (result.warnings.length > 0) {
+      console.log(`  ⚠️  ${result.file}`);
+      for (const warning of result.warnings) {
+        console.log(`     - WARNING: ${warning}`);
+      }
+    }
   }
 
-  console.log(`\n  ${allMdFiles.length - invalidFrontmatter.length}/${allMdFiles.length} files have valid syntax\n`);
+  const validCount = frontmatterResults.filter((r) => r.valid).length;
+  console.log(`\n  ${validCount}/${allMdFiles.length} files have valid syntax\n`);
 
-  console.log('Validating internal links...');
-  const linkResults = allMdFiles.flatMap((file) =>
-    validateLinks(file, readFileSync(file, 'utf-8'))
-  );
-  const brokenLinks = linkResults.filter((result) => !result.valid);
+  // 2. Validate links
+  console.log('🔗 Validating internal links...');
+  const linkResults: LinkCheckResult[] = [];
 
+  for (const file of allMdFiles) {
+    const content = readFileSync(file, 'utf-8');
+    const results = validateLinks(file, content);
+    linkResults.push(...results);
+  }
+
+  const brokenLinks = linkResults.filter((r) => !r.valid);
   if (brokenLinks.length > 0) {
     console.log(`  ❌ Found ${brokenLinks.length} broken link(s):`);
     for (const link of brokenLinks) {
@@ -292,46 +378,73 @@ async function main(): Promise<void> {
   }
   console.log();
 
+  // 3. Build documentation graph
+  console.log('📊 Building documentation graph...');
   const docNodes = buildDocGraph(allMdFiles);
+
+  // Group by layer
   const layers = new Map<number, DocNode[]>();
   for (const node of docNodes) {
-    layers.set(node.layer, [...(layers.get(node.layer) || []), node]);
+    const layerNodes = layers.get(node.layer) || [];
+    layerNodes.push(node);
+    layers.set(node.layer, layerNodes);
   }
 
   for (const [layer, nodes] of [...layers.entries()].sort((a, b) => a[0] - b[0])) {
-    const layerNames = ['Router Gateway', 'Core Architecture', 'Workflows', 'Specs & Decisions', 'Archive'];
+    const layerNames = [
+      'Router Gateway',
+      'Core Architecture',
+      'Workflows',
+      'Specs & Decisions',
+      'Archive',
+    ];
     console.log(`  Layer ${layer} (${layerNames[layer] || 'Unknown'}): ${nodes.length} files`);
   }
   console.log();
 
+  // 4. Check orphaned docs against AGENTS.md context map
+  console.log('🗺️  Checking AGENTS.md context map...');
   const agentsContent = readFileSync(AGENTS_MD, 'utf-8');
-  const orphaned = findOrphanedDocs(docNodes, extractAgentsDocReferences(agentsContent));
+  const agentsRefs = extractAgentsDocReferences(agentsContent);
+  const orphaned = findOrphanedDocs(docNodes, agentsRefs);
 
   if (orphaned.length > 0) {
-    console.log(`  ⚠️  ${orphaned.length} documented file(s) are not linked from AGENTS.md`);
-    for (const orphan of orphaned) console.log(`     - ${orphan}`);
+    console.log(
+      `  ⚠️  ${orphaned.length} orphaned documentation file(s) not referenced in AGENTS.md:`
+    );
+    for (const orphan of orphaned) {
+      console.log(`     - ${orphan}`);
+    }
   } else {
-    console.log(`  ✅ All ${docNodes.length} structured docs are referenced in AGENTS.md`);
+    console.log(`  ✅ All ${docNodes.length} documented files referenced in AGENTS.md`);
   }
   console.log();
 
-  console.log('VALIDATION SUMMARY');
-  console.log(`Total files:        ${allMdFiles.length}`);
-  console.log(`Invalid syntax:     ${invalidFrontmatter.length}`);
-  console.log(`Links checked:      ${linkResults.length}`);
-  console.log(`Broken links:       ${brokenLinks.length}`);
-  console.log(`Orphaned docs:      ${orphaned.length}`);
+  // Summary
+  console.log('═══════════════════════════════════════════');
+  console.log('📊 VALIDATION SUMMARY');
+  console.log('═══════════════════════════════════════════');
+  console.log(`Total files:       ${allMdFiles.length}`);
+  console.log(`Valid syntax:      ${validCount}`);
+  console.log(`Invalid syntax:    ${allMdFiles.length - validCount}`);
+  console.log(`Links checked:     ${linkResults.length}`);
+  console.log(`Broken links:      ${brokenLinks.length}`);
+  console.log(`Orphaned docs:     ${orphaned.length}`);
+  console.log('═══════════════════════════════════════════\n');
 
-  const hasErrors = invalidFrontmatter.length > 0 || brokenLinks.length > 0;
+  // Exit with error code if any critical issues found (broken links or invalid syntax)
+  const hasErrors = validCount < allMdFiles.length || brokenLinks.length > 0 || orphaned.length > 0;
+
   if (hasErrors) {
-    console.log('\nValidation FAILED');
+    console.log('❌ Validation FAILED - issues found above');
     process.exit(1);
+  } else {
+    console.log('✅ All validation checks PASSED');
+    process.exit(0);
   }
-
-  console.log('\nValidation PASSED');
 }
 
-main().catch((error) => {
-  console.error('Fatal error:', error);
+main().catch((err) => {
+  console.error('Fatal error:', err);
   process.exit(1);
 });
