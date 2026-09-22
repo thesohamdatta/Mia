@@ -1,5 +1,5 @@
-import { runVerification } from '../../verification/run-checks.js';
 import { repositoryChecks } from '../../verification/suite.js';
+import { runVerification } from '../../verification/run-checks.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
 export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
