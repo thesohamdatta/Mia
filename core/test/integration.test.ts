@@ -80,12 +80,18 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should create real plan and spec artifacts', async () => {
     const ctx = createExecutionContext();
+    const planDefinition = getSkill('plan');
+    const specDefinition = getSkill('spec');
 
-    const plan = await getSkillExecutor('plan')?.execute(['create', 'Improve', 'MIA'], ctx);
-    expect(plan?.ok).toBe(true);
+    expect(planDefinition).toBeDefined();
+    expect(specDefinition).toBeDefined();
+    if (!planDefinition || !specDefinition) throw new Error('plan/spec definition not found');
 
-    const spec = await getSkillExecutor('spec')?.execute(['create', 'Make', 'runs', 'explicit'], ctx);
-    expect(spec?.ok).toBe(true);
+    const plan = await executeSkillDefinition(planDefinition, ['create', 'Improve', 'MIA'], ctx);
+    expect(plan.ok).toBe(true);
+
+    const spec = await executeSkillDefinition(specDefinition, ['create', 'Make', 'runs', 'explicit'], ctx);
+    expect(spec.ok).toBe(true);
 
     const projectDir = join(ctx.config.projectsDir, ctx.slug);
     const planText = await Bun.file(join(projectDir, 'PLAN.md')).text();
