@@ -1,8 +1,8 @@
 // Checkpoint Skill Executor - Save/resume working state
 // Runs: mia checkpoint
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
@@ -43,8 +43,8 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       return { ok: true, output: 'No checkpoints yet.' };
     }
     let output = '📌 Checkpoints:\n\n';
-    for (const f of files) {
-      output += `  • ${f.replace('.md', '')}\n`;
+    for (const file of files) {
+      output += `  • ${file.replace('.md', '')}\n`;
     }
     return { ok: true, output };
   }
