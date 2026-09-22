@@ -47,12 +47,6 @@ export async function executeSkillDefinition(
 ): Promise<SkillResult> {
   try {
     validateSkillDefinition(definition);
-    return await executeWithMiddlewares(
-      definition.executor,
-      args,
-      context,
-      definition.manifest.name
-    );
   } catch (error) {
     return {
       ok: false,
@@ -60,6 +54,13 @@ export async function executeSkillDefinition(
       error: error instanceof Error ? error.message : String(error),
     };
   }
+
+  return executeWithMiddlewares(
+    definition.executor,
+    args,
+    context,
+    definition.manifest.name
+  );
 }
 
 export async function executeSkill(
