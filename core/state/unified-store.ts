@@ -2,7 +2,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { appendJsonl, readJsonlTail } from '../state/jsonl-store.js';
 
-export type EventType = 'learning' | 'timeline' | 'checkpoint';
+export type EventType = 'learning' | 'timeline' | 'checkpoint' | 'evidence';
 
 export interface UnifiedStore {
   append(projectsDir: string, type: EventType, slug: string, data: unknown): Promise<void>;
@@ -15,9 +15,11 @@ export interface UnifiedStore {
   ): Promise<StoredEvent[]>;
   listLearnings(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
   listTimeline(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
+  listEvidence(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
   appendLearning(projectsDir: string, slug: string, data: unknown): Promise<void>;
   appendTimeline(projectsDir: string, slug: string, data: unknown): Promise<void>;
   appendCheckpoint(projectsDir: string, slug: string, data: unknown): Promise<void>;
+  appendEvidence(projectsDir: string, slug: string, data: unknown): Promise<void>;
 }
 
 export interface StoredEvent<T = unknown> {
@@ -84,6 +86,14 @@ class JsonlUnifiedStore implements UnifiedStore {
 
   async appendCheckpoint(projectsDir: string, slug: string, data: unknown) {
     return this.append(projectsDir, 'checkpoint', slug, data);
+  }
+
+  async listEvidence(projectsDir: string, slug: string, limit = 50) {
+    return this.query(projectsDir, slug, 'evidence', undefined, limit);
+  }
+
+  async appendEvidence(projectsDir: string, slug: string, data: unknown) {
+    return this.append(projectsDir, 'evidence', slug, data);
   }
 }
 
