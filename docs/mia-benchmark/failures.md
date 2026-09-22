@@ -1,13 +1,17 @@
 # Failures
 
 ## F1 - CI contract drift
+
 Stage: Verify / Ship
 
-Evidence: Current CI workflow references check:links, check:spelling, build:cli, and build:daemon, while current package.json exposes build, test, typecheck, lint, Knip, markdownlint, and frontmatter validation.
+Evidence: The original CI workflow referenced commands and build targets that no longer existed in the supported package script surface. The workflow has since been consolidated and corrected.
 
-Impact: CI can fail for reasons unrelated to the current supported command surface, reducing trust in the pipeline as a representation of repository health.
+Impact: RESOLVED. Pull-request validation now runs only supported repository checks on the current `master` integration branch.
+
+Verification: GitHub Actions CI run #20 passed lint, typecheck, Knip, documentation validation, markdown lint, tests, build, and PR-title validation.
 
 ## F2 - End-to-end benchmark not yet runtime-proven
+
 Stage: Execute / Verify / Review
 
 Reason: Repository inspection alone cannot measure live model behavior, iterative reasoning, latency, or human intervention.

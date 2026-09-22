@@ -9,6 +9,7 @@ The current codebase is smaller than the historical testing strategy that inspir
 The main repository checks are:
 
 ```bash
+bun ci
 bun test
 bun run typecheck
 bun run lint:check
@@ -18,7 +19,7 @@ bun run validate:frontmatter
 bun run build
 ```
 
-The current GitHub Actions workflow is not fully aligned with the repository scripts. `.github/workflows/ci.yml` still references `check:links`, `check:spelling`, `build:cli`, `build:daemon`, and `bin/miad`, none of which are part of the current package build surface. Treat that as separate CI maintenance work, not as evidence that those commands exist or pass.
+GitHub Actions runs these supported checks from the repository's `master` integration branch. The CI workflow deliberately keeps dependency installation and repository validation in one job so pull requests do not repeat the same setup four times.
 
 ## Current test organisation
 

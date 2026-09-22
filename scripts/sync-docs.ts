@@ -10,7 +10,7 @@
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { extname, join, relative, resolve } from 'node:path';
+import { dirname, extname, join, relative, resolve } from 'node:path';
 import matter from 'gray-matter';
 
 const ROOT_DIR = resolve(import.meta.dir, '..');
@@ -143,7 +143,7 @@ function resolveLink(baseFile: string, target: string): string | null {
   }
 
   // Handle relative paths
-  const baseDir = resolve(ROOT_DIR, baseFile.slice(0, -3)); // Remove .md for dirname
+  const baseDir = dirname(resolve(ROOT_DIR, baseFile));
   let resolvedPath: string;
 
   if (cleanTarget.startsWith('/')) {

@@ -16,7 +16,6 @@ describe('Integration: CLI -> Skill -> Store', () => {
     testDir = mkdtempSync(join(tmpdir(), 'mia-test-'));
     process.chdir(testDir);
 
-    // Initialize git repo for slug detection
     const { execSync } = require('node:child_process');
     execSync('git init', { cwd: testDir, stdio: 'ignore' });
     execSync('git config user.email "test@test.com"', { cwd: testDir, stdio: 'ignore' });
@@ -68,7 +67,6 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
     const result = await executeWithMiddlewares(executor, [], ctx, 'grill');
 
-    // Grill skill should execute without error (may output help or start interview)
     expect(result.ok).toBe(true);
   });
 
@@ -77,27 +75,23 @@ describe('Integration: CLI -> Skill -> Store', () => {
     const projectsDir = join(testDir, '.mia', 'projects');
     const slug = 'test-project';
 
-    // Append a learning
     await store.appendLearning(projectsDir, slug, { insight: 'Test learning', key: 'test-key' });
-
-    // Append a timeline event
     await store.appendTimeline(projectsDir, slug, { skill: 'test', event: 'started' });
 
-    // Query learnings
     const learnings = await store.listLearnings(projectsDir, slug, 10);
     expect(learnings.length).toBe(1);
-    const learning = learnings[0]!;
+    const learning = learnings[0];
+    if (!learning) throw new Error('No learning found');
     expect(learning.data).toEqual({ insight: 'Test learning', key: 'test-key' });
     expect(learning.type).toBe('learning');
 
-    // Query timeline
     const timeline = await store.listTimeline(projectsDir, slug, 10);
     expect(timeline.length).toBe(1);
-    const tlEvent = timeline[0]!;
+    const tlEvent = timeline[0];
+    if (!tlEvent) throw new Error('No timeline event found');
     expect(tlEvent.data).toEqual({ skill: 'test', event: 'started' });
     expect(tlEvent.type).toBe('timeline');
 
-    // Query with filter
     const filtered = await store.query(projectsDir, slug, 'learning', (e) => {
       const data = e.data as { key?: string };
       return data.key === 'test-key';
@@ -119,7 +113,6 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
     expect(result.ok).toBe(true);
 
-    // Check timeline was recorded
     const timeline = await unifiedStore.listTimeline(projectsDir, slug, 5);
 
     expect(timeline.length).toBeGreaterThan(0);
