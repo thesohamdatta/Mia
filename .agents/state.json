@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "current_stage": "pulse",
+  "stage_locked": false,
+  "pipeline": ["sentry", "pulse", "maintainer", "orchestrator"],
+  "last_updated": "2026-08-10T00:00:00Z",
+  "active_agent": "maintainer",
+  "handoffs_count": 2
+}

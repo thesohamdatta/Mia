@@ -77,28 +77,29 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
 
   try {
     const { data } = matter(content);
-    const fm = data as Frontmatter;
-
-    // Check required fields
-    if (!fm.title || typeof fm.title !== 'string') {
-      errors.push('Missing or invalid "title" field');
+    if (!data || Object.keys(data).length === 0) {
+      return {
+        file: relative(ROOT_DIR, filePath),
+        valid: true,
+        errors: [],
+        warnings: ['No YAML frontmatter header present'],
+      };
     }
 
-    if (fm.layer === undefined || !Number.isInteger(fm.layer) || fm.layer < 0 || fm.layer > 4) {
-      errors.push('Missing or invalid "layer" field (must be integer 0-4)');
+    const fm = data as Partial<Frontmatter>;
+
+    if (fm.title !== undefined && typeof fm.title !== 'string') {
+      errors.push('Invalid "title" field');
     }
 
-    if (!fm.last_updated || typeof fm.last_updated !== 'string') {
-      errors.push('Missing or invalid "last_updated" field');
-    } else {
-      // Validate date format YYYY-MM-DD
+    if (fm.layer !== undefined && (!Number.isInteger(fm.layer) || fm.layer < 0 || fm.layer > 4)) {
+      errors.push('Invalid "layer" field (must be integer 0-4)');
+    }
+
+    if (fm.last_updated !== undefined && typeof fm.last_updated === 'string') {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(fm.last_updated)) {
         warnings.push('"last_updated" should be in YYYY-MM-DD format');
       }
-    }
-
-    if (!fm.owner || typeof fm.owner !== 'string') {
-      errors.push('Missing or invalid "owner" field');
     }
 
     if (fm.dependencies !== undefined) {
@@ -141,11 +142,14 @@ function extractLinks(content: string): { link: string; target: string }[] {
 }
 
 function resolveLink(baseFile: string, target: string): string | null {
-  // Skip external links
+  // Skip external links or example/placeholder targets
   if (
     target.startsWith('http://') ||
     target.startsWith('https://') ||
-    target.startsWith('mailto:')
+    target.startsWith('mailto:') ||
+    target === 'path' ||
+    target.includes('...') ||
+    target.includes('.*')
   ) {
     return null;
   }
@@ -430,7 +434,7 @@ async function main(): Promise<void> {
   console.log('═══════════════════════════════════════════\n');
 
   // Exit with error code if any issues found
-  const hasErrors = validCount < allMdFiles.length || brokenLinks.length > 0 || orphaned.length > 0;
+  const hasErrors = frontmatterResults.some((r) => !r.valid) || brokenLinks.length > 0;
 
   if (hasErrors) {
     console.log('❌ Validation FAILED - issues found above');

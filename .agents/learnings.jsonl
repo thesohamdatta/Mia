@@ -1,0 +1,1 @@
+{"observation":"Type assertions using 'as any' bypassed compile-time safety across skill executors.","evidence":"Found in core/skills/learn/execute.ts, retro/execute.ts, preamble.ts","lesson":"Explicit TypeScript interfaces should be defined for event and context data payloads.","scope":"core/skills","confidence":10,"first_seen":"2026-08-10","last_verified":"2026-08-10"}
