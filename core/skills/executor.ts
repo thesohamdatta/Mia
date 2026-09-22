@@ -1,5 +1,11 @@
 import { executeWithMiddlewares } from './preamble.js';
-import type { ExecutionContext, SkillDefinition, SkillExecutor, SkillResult } from './types.js';
+import type {
+  ExecutionContext,
+  SkillDefinition,
+  SkillExecutor,
+  SkillResult,
+  SkillInvocation,
+} from './types.js';
 
 export class SkillContractError extends Error {
   constructor(message: string) {
@@ -7,6 +13,8 @@ export class SkillContractError extends Error {
     this.name = 'SkillContractError';
   }
 }
+
+const invocations = new Set<SkillInvocation>(['user', 'model', 'both']);
 
 const phases = new Set<SkillDefinition['manifest']['phase']>([
   'clarify',
@@ -36,6 +44,12 @@ export function validateSkillDefinition(definition: SkillDefinition): void {
   if (!phases.has(manifest.phase)) {
     throw new SkillContractError(
       `Skill "${manifest.name}" has an unsupported phase "${manifest.phase}"`
+    );
+  }
+
+  if (manifest.invocation !== undefined && !invocations.has(manifest.invocation)) {
+    throw new SkillContractError(
+      `Skill "${manifest.name}" has an unsupported invocation "${manifest.invocation}"`
     );
   }
 }
