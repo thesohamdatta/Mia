@@ -25,8 +25,9 @@ export const loadRecentLearnings: Middleware = async (ctx, next) => {
         console.log(`  • ${data.insight || data.key}`);
       }
     }
-  } catch {
-    // Ignore
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`⚠️  Could not load recent learnings: ${message}`);
   }
   await next();
 };
@@ -45,11 +46,16 @@ export const logTimelineComplete: Middleware = async (ctx, next) => {
   const skillName = (ctx as SkillExecutionContext)._skillName || 'unknown';
   const result = (ctx as SkillExecutionContext)._skillResult as SkillResult;
   const projectsDir = ctx.config.projectsDir;
-  await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
-    skill: skillName,
-    event: 'completed',
-    outcome: result.ok ? 'success' : 'failed',
-  });
+  try {
+    await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
+      skill: skillName,
+      event: result.ok ? 'completed' : 'failed',
+      outcome: result.ok ? 'success' : 'failed',
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`⚠️  Could not record timeline completion: ${message}`);
+  }
   await next();
 };
 
@@ -92,9 +98,17 @@ export async function executeWithMiddlewares(
   const skillCtx = ctx as SkillExecutionContext;
   skillCtx._skillName = skillName;
 
-  await runMiddlewares(middlewares, ctx);
+  let result: SkillResult;
 
-  const result = await executor.execute(args, ctx);
+  try {
+    await runMiddlewares(middlewares, ctx);
+    result = await executor.execute(args, ctx);
+  } catch (error) {
+    result = {
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 
   skillCtx._skillResult = result;
   await logTimelineComplete(ctx, async () => {});
