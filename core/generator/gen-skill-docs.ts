@@ -58,8 +58,8 @@ The executable definition in \`core/skills/index.ts\` is authoritative. This pag
   let result = template;
 
   for (const [key, value] of Object.entries(data)) {
-    const regex = new RegExp(`\\\\{\\\\{\\\\${key}\\\\}\\\\}`, 'g');
-    result = result.replace(regex, Array.isArray(value) ? value.join('\\n') : String(value));
+    const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+    result = result.replace(regex, Array.isArray(value) ? value.join('\n') : String(value));
   }
 
   const eachRegex = /\\{\\{#each\\s+(\\w+)\\}\\}([\\s\\S]*?)\\{\\{\\/each\\}\\}/g;
