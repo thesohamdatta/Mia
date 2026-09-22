@@ -4,8 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
-import { getSkill, getSkillExecutor, listSkillDefinitions, listSkills } from '../skills/index.js';
-import { executeWithMiddlewares } from '../skills/preamble.js';
+import { getSkill, listSkillDefinitions, listSkills } from '../skills/index.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 
 describe('Integration: CLI -> Skill -> Store', () => {
