@@ -320,7 +320,7 @@ function extractAgentsDocReferences(agentsContent: string): string[] {
   };
 
   // Match Markdown links in AGENTS.md.
-  const linkRegex = /\\[([^\\]]+)\\]\\(([^)]+)\\)/g;
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let match: RegExpExecArray | null = linkRegex.exec(agentsContent);
 
   while (match !== null) {
