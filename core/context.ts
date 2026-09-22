@@ -3,25 +3,8 @@ import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import type { SkillRun } from './skills/types.js';
 import { createUnifiedStore } from './state/unified-store.js';
-import type { UnifiedStore } from './state/unified-store.js';
-
-export interface ExecutionContext {
-  cwd: string;
-  slug: string;
-  run: SkillRun;
-  unifiedStore: UnifiedStore;
-  config: AppConfig;
-}
-
-export interface AppConfig {
-  miaDir: string;
-  skillsDir: string;
-  projectsDir: string;
-  memoryFile: string;
-  sessionsDir: string;
-}
+import type { AppConfig, ExecutionContext, SkillRun } from './skills/types.js';
 
 function getMiaDir(): string {
   // biome-ignore lint/complexity/useLiteralKeys: TS noPropertyAccessFromIndexSignature
