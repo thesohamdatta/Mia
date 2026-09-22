@@ -17,7 +17,8 @@ const define = (
   sideEffects: SkillDefinition['manifest']['sideEffects'],
   verification: readonly string[],
   phase: SkillDefinition['manifest']['phase'],
-  executor: SkillExecutor
+  executor: SkillExecutor,
+  invocation: SkillDefinition['manifest']['invocation'] = 'user'
 ): SkillDefinition => ({
   manifest: {
     name,
@@ -27,6 +28,7 @@ const define = (
     sideEffects,
     verification,
     phase,
+    invocation,
   },
   executor,
 });
