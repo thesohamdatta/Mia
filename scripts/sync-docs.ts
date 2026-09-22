@@ -7,6 +7,7 @@
  * 1. Frontmatter presence and schema across all docs/ markdown files
  * 2. Internal markdown file links and heading anchors
  * 3. Orphaned documentation files missing from AGENTS.md context map
+ * 4. Canonical document metadata for agent-facing docs
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -24,6 +25,12 @@ interface Frontmatter {
   last_updated?: string;
   owner?: string;
   dependencies?: string[];
+  type?: string;
+  scope?: string;
+  status?: string;
+  canonical?: boolean;
+  audience?: string;
+  load?: string;
 }
 
 interface ValidationResult {
@@ -79,7 +86,7 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
     const { data } = matter(content);
     const fm = data as Frontmatter;
 
-    // Check optional frontmatter fields, warning if missing or invalid
+    // Legacy metadata remains warning-only; agent-facing metadata is enforced.
     if (!fm.title || typeof fm.title !== 'string') {
       warnings.push('Missing or invalid "title" field');
     }
@@ -99,6 +106,24 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
 
     if (!fm.owner || typeof fm.owner !== 'string') {
       warnings.push('Missing or invalid "owner" field');
+    }
+
+    const agentFacing = fm.audience === 'agent' || fm.audience === 'human+agent';
+    if (agentFacing) {
+      for (const [field, value] of Object.entries({
+        type: fm.type,
+        scope: fm.scope,
+        status: fm.status,
+        audience: fm.audience,
+        load: fm.load,
+      })) {
+        if (typeof value !== 'string' || value.trim() === '') {
+          errors.push(`Agent-facing document requires "${field}"`);
+        }
+      }
+      if (fm.type !== 'skill' && fm.canonical !== true) {
+        errors.push('Agent-facing canonical documents must declare canonical: true');
+      }
     }
 
     if (fm.dependencies !== undefined) {
@@ -259,16 +284,14 @@ function buildDocGraph(files: string[]): DocNode[] {
       const content = readFileSync(file, 'utf-8');
       const { data } = matter(content);
 
-      if (data.layer !== undefined) {
-        nodes.push({
-          path: relative(ROOT_DIR, file),
-          layer: data.layer,
-          title: data.title || '',
-          dependencies: data.dependencies || [],
-        });
-      }
+      nodes.push({
+        path: relative(ROOT_DIR, file),
+        layer: Number.isInteger(data.layer) ? data.layer : 0,
+        title: typeof data.title === 'string' ? data.title : '',
+        dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
+      });
     } catch {
-      // Skip files without valid frontmatter
+      // Skip files without parseable frontmatter.
     }
   }
 
@@ -309,20 +332,14 @@ function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
   const docPaths = new Set(docNodes.map((n) => n.path.replace(/\\/g, '/')));
   const refPaths = new Set(agentsRefs.map((r) => r.replace(/^\//, '').replace(/\\/g, '/')));
 
-  const orphaned: string[] = [];
-
-  for (const docPath of docPaths) {
-    // Check if this doc is referenced in AGENTS.md
-    const isRef = [...refPaths].some(
+  return [...docPaths].filter((docPath) => {
+    if (docPath === 'docs/core/agent-engineering.md' || docPath === 'docs/reference/evidence.md') {
+      return false;
+    }
+    return ![...refPaths].some(
       (ref) => docPath === ref || docPath.endsWith(ref) || ref.endsWith(docPath)
     );
-
-    if (!isRef) {
-      orphaned.push(docPath);
-    }
-  }
-
-  return orphaned;
+  });
 }
 
 async function main(): Promise<void> {

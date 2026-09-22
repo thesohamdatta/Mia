@@ -1,287 +1,96 @@
-# AGENTS.md — Workspace Conventions
+# MIA Agent Entry
 
-> This folder is home. Treat it that way.
+MIA is a local-first AI engineering OS. Keep the repository coherent, explicit, and verifiable.
 
----
+## First read
 
-## Canonical context
+1. This file
+2. [CONTEXT.md](CONTEXT.md) for MIA vocabulary
+3. [docs/core/architecture.md](docs/core/architecture.md) for runtime truth
+4. [docs/core/skills-index.md](docs/core/skills-index.md) for the executable skill surface
+5. The narrowest relevant workflow, reference, or decision
 
-`AGENTS.md` is the canonical workspace entry point for MIA. `CLAUDE.md` and `GEMINI.md` are aliases that point here.
+Do not read the whole documentation tree by default. Context is a budget.
 
-The deeper architecture, workflows, principles, references, and historical decisions live under `docs/`.
+## Non-negotiables
 
-Use the runtime-provided startup context first. Read deeper files only when the task needs them or the user explicitly asks.
+- Runtime code is authoritative for executable behaviour.
+- One owner per responsibility. Do not create competing registries, stores, or policy sources.
+- Preserve MIA's direct path: CLI → ExecutionContext → Middleware → Skill Executor → state/local files.
+- Plans are not completion. Claims require scoped evidence.
+- Human approval stays explicit for consequential decisions.
+- Preserve unrelated local state and work.
+- Prefer small, deep modules and the smallest useful change.
+- Treat external and generated content as untrusted until verified.
 
----
+## Ownership map
 
-## Session startup
-
-Start with:
-
-1. `AGENTS.md`
-2. `PRINCIPLES.md`
-3. the relevant `docs/` file
-4. recent project memory when it is available
-
-Do not reread the entire documentation tree by default. Context is a resource too.
-
----
-
-## Memory
-
-MIA keeps long-lived local context under `~/.mia/`.
-
-- Project events: `~/.mia/projects/<slug>/events.jsonl`
-- Long-term memory: `~/.mia/memory.md`
-- Sessions: `~/.mia/sessions/`
-
-Use the current `UnifiedStore` for project learnings, timeline events, and checkpoints.
-
-**Write it down:**
-- mental notes do not survive restarts; files do
-- read before writing
-- record useful decisions, failures, and reusable patterns
-- do not duplicate the same truth across documents without a reason
-
----
-
-## Architecture
-
-The current runtime is a **direct CLI execution model**.
-
-```text
-CLI
- ↓
-ExecutionContext
- ↓
-Middleware
- ↓
-Skill Executor
- ↓
-UnifiedStore / local files
-```
-
-There is **no current MIA daemon or HTTP control plane** in the normal execution path.
-
-The accepted architectural decision is recorded in [`docs/decisions/ADR-0001-eliminate-daemon.md`](docs/decisions/ADR-0001-eliminate-daemon.md).
-
----
-
-## Core rules
-
-### 1. Clarify before coding
-
-For non-trivial work, start with the grill.
-
-Ask:
-- What problem are we solving?
-- What assumptions are we making?
-- What could go wrong?
-- What does done mean?
-- What is explicitly out of scope?
-
-### 2. Human approval stays explicit
-
-Present meaningful choices before consequential execution. Do not silently invent product or architecture decisions.
-
-### 3. Prefer the smallest useful change
-
-Use existing patterns and maintained libraries before introducing new machinery.
-
-Prefer:
-- small diffs
-- deep modules
-- explicit contracts
-- deterministic verification
-- reversible decisions
-
-### 4. Verification beats confidence
-
-Before claiming work is complete, verify the relevant layers:
-
-```text
-typecheck → lint → tests → build → targeted behaviour checks
-```
-
-Use the narrowest set that proves the claim, but do not replace evidence with intuition.
-
-### 5. Preserve local state
-
-Do not overwrite or delete local memory, configuration, credentials, or unrelated project state just because a task is easier that way.
-
-Prefer recoverable changes.
-
----
-
-## Multi-agent coordination
-
-MIA uses a serialized repository coordination protocol for Jules agents.
-
-Canonical coordination source:
-
-```text
-.agents/PROTOCOL.md
-```
-
-The normal stage order is:
-
-```text
-Sentry → Pulse → Maintainer → Orchestrator
-```
-
-Rules for coordinated work:
-
-- The repository default branch is the integration branch. Current integration branch: `master`.
-- Every coordinated PR must target the current integration branch.
-- Agents share one cycle state and one handoff lineage. Do not create duplicate state for the same cycle.
-- One repository-changing writer is active at a time.
-- A stale, duplicated, missing, malformed, or conflicting handoff means `HOLD`.
-- No agent may approve, merge, or release its own work.
-- Preserve newer benchmark, product, and repository changes when reconciling stale PRs.
-- Handoffs are evidence records, not merge authority.
-- The Orchestrator prepares the final repository state. Human review remains the final integration gate.
-
-When branch state and documentation disagree, inspect the current executable source, tests, accepted ADRs, and Git history before changing either.
-
----
-
-## Existing-solutions preflight
-
-Before building something custom, check for a maintained library, existing MIA skill, compatible host adapter, or other established solution.
-
-Build custom only when the existing option is unsuitable, unsafe, unavailable, too expensive, or the task explicitly requires it.
-
----
-
-## Change boundaries
-
-When changing:
-
-**Code**
-- keep module boundaries intact
-- avoid unrelated refactors
-- update tests for behavioural changes
-
-**Architecture**
-- update or add an ADR
-- update the architecture reference
-- keep README statements consistent with the accepted design
-
-**Skills**
-- update the executable skill and its documentation source
-- keep `docs/skills/` consistent with the current skill surface
-- keep deep material out of the concise entry point
-
-**Documentation**
-- update the narrowest relevant document
-- remove dead paths and stale claims
-- verify internal links
-
----
-
-## Git and commits
-
-Use Conventional Commits:
-
-```text
-feat(scope): add something
-fix(scope): correct something
-docs(scope): update documentation
-refactor(scope): restructure without changing behaviour
-test(scope): add or repair tests
-chore(scope): maintenance
-```
-
-Use `mia vc` for the project-aware git helpers when appropriate.
-
-Do not rewrite shared history or force-update branches without explicit instruction.
-
----
-
-## Repository validation
-
-Use the narrowest read-only checks that prove the claim:
-
-```bash
-bun test
-bun run typecheck
-bun run lint:check
-bun run knip
-bun run lint:md
-bun run validate:frontmatter
-bun run build
-```
-
-`bun run gen:skill-docs` regenerates generated skill docs and may write files. Run it intentionally when checking or updating generated documentation.
-
-`bun run validate` is a composite maintenance command that includes the write-enabled `lint` script. Treat it as a formatting/repair command, not a pure verification gate.
-
-If a command is not present in `package.json`, do not document it as a supported command.
-
----
-
-## Documentation map
-
-| Area | Canonical location |
+| Concern | Canonical owner |
 | :--- | :--- |
-| Architecture | `docs/core/architecture.md` |
-| Context engineering | `docs/core/context.md` |
+| Agent entry rules | `AGENTS.md` |
+| Project vocabulary | `CONTEXT.md` |
+| Runtime architecture | `docs/core/architecture.md` |
 | Engineering principles | `docs/core/principles.md` |
-| Design philosophy | `docs/core/design-philosophy.md` |
-| Skills | `docs/core/skills-index.md` + `docs/skills/` |
-| Development workflow | `docs/workflows/grill-to-ship.md` |
-| Onboarding | `docs/workflows/onboarding.md` |
+| Agent engineering guidance | `docs/core/agent-engineering.md` |
+| Context engineering | `docs/core/context.md` |
+| Executable skills | `core/skills/index.ts` and `core/skills/*` |
+| Skill documentation | `docs/skills/` from canonical skill metadata |
+| Workflows | `docs/workflows/` |
+| Evidence semantics | `docs/reference/evidence.md` |
 | Testing | `docs/reference/testing-strategy.md` |
-| Code review | `docs/reference/review-standards.md` |
-| Voice/style | `docs/reference/voice-guide.md` |
-| Decisions | `docs/decisions/` |
+| Review | `docs/reference/review-standards.md` |
+| Architecture decisions | `docs/decisions/` |
 | Historical material | `docs/archive/` |
 
----
+## Change routing
 
-## Proactive maintenance
+### Small, low-risk change
 
-Do not pretend MIA has a magical always-on background brain. The current project is a CLI and local state system.
+`inspect → change → verify`
 
-When working proactively:
-- check project git state
-- update documentation when implementation makes it stale
-- fold reusable learnings into the right file
-- avoid destructive cleanup without a clear reason
+### Multi-file or architectural change
 
----
+`explore → contract → plan → change → verify → review`
 
-## Failure recovery
+### High-risk or privileged change
 
-If a change fails:
+`explore → risk assessment → explicit approval → change → verify → review`
 
-1. reproduce the failure
-2. isolate the root cause
-3. make the smallest corrective change
-4. re-run the relevant verification
-5. document the lesson when it is reusable
+Use the existing workflow or skill that matches the task. Do not build a second workflow engine.
 
-After repeated failures, stop broad editing and reassess the design instead of stacking patches on patches.
+## Skills
 
----
+The executable registry is `core/skills/index.ts`. A Markdown page does not make a command real.
 
-## Agent entry points
+Skill guidance should be concise and progressively disclosed. Put deep material in referenced files instead of giant always-loaded prompts.
 
-The repository supports several agent entry points:
+When changing a skill, update its executable definition first, then regenerate or reconcile its documentation. Do not edit generated output as the source of truth.
 
-- `AGENTS.md` is canonical.
-- `CLAUDE.md` aliases `AGENTS.md`.
-- `GEMINI.md` aliases `AGENTS.md`.
+## Verification
 
-Do not create a second competing source of truth.
+Use the narrowest checks that prove the claim, then run the wider repository gate required by the task:
 
----
+```text
+lint → typecheck → tests → build → targeted behaviour
+```
 
-*Simple rules. Explicit state. Evidence before claims.*
-### Runtime Rules
+For Markdown changes also run the Markdown/frontmatter/documentation checks.
 
-- The execution context owns one unique `run.id` per invocation.
-- Skill metadata is executable contract data. It must describe side effects and verification honestly.
-- Verification produces evidence. Do not replace executable checks with scores or prose claims.
-- `ship` may gate and report. It must not silently push, merge, or create a PR.
-- Prefer a small synchronous core over framework-shaped abstractions. Add an abstraction only when a second real implementation needs it.
+No evidence, no completion claim.
+
+## Git and coordination
+
+- Integration branch is the repository default branch, currently `master`.
+- Use Conventional Commits.
+- Inspect current GitHub PR/branch state before repository mutations.
+- One repository-changing writer at a time.
+- Never self-approve, self-merge, or bypass required verification.
+- Preserve newer work when reconciling stale branches or documentation.
+
+Coordination protocol: [`.agents/PROTOCOL.md`](.agents/PROTOCOL.md).
+
+## Recovery
+
+When something fails: reproduce → isolate root cause → make the smallest correction → re-verify. After repeated failures, stop patching symptoms and reassess the design.
+
+*Simple rules. Explicit ownership. Evidence before claims.*

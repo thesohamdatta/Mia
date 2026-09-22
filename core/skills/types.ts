@@ -54,6 +54,8 @@ export interface SkillExecutor {
   execute(args: string[], context: ExecutionContext): Promise<SkillResult>;
 }
 
+export type SkillInvocation = 'user' | 'model' | 'both';
+
 export interface SkillManifest {
   name: string;
   version: string;
@@ -62,6 +64,7 @@ export interface SkillManifest {
   sideEffects: 'none' | 'local-write' | 'git-write' | 'external';
   verification: readonly string[];
   phase: 'clarify' | 'plan' | 'specify' | 'execute' | 'verify' | 'review' | 'handoff';
+  invocation?: SkillInvocation;
 }
 
 export interface SkillDefinition {

@@ -33,5 +33,5 @@
     "MD035": false,
     "MD027": false
   },
-  "ignorePaths": ["node_modules/**/*", "docs/skills/**/*", "*.exe", "research/**/*"]
+  "ignorePaths": ["node_modules/**/*", "*.exe", "research/**/*"]
 }
