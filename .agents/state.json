@@ -1,17 +1,29 @@
 {
   "protocol_version": 1,
-  "cycle": null,
-  "stage": "sentry",
+  "cycle": "cycle-001",
+  "stage": "pulse",
   "status": "ready",
   "priority": "P3",
   "writer": null,
   "blocked_reason": null,
   "stages": {
-    "sentry": {"status": "ready", "handoff": null},
-    "pulse": {"status": "waiting", "handoff": null},
-    "maintainer": {"status": "waiting", "handoff": null},
-    "orchestrator": {"status": "waiting", "handoff": null}
+    "sentry": {
+      "status": "complete",
+      "handoff": ".agents/handoffs/cycle-001-sentry.json"
+    },
+    "pulse": {
+      "status": "ready",
+      "handoff": null
+    },
+    "maintainer": {
+      "status": "waiting",
+      "handoff": null
+    },
+    "orchestrator": {
+      "status": "waiting",
+      "handoff": null
+    }
   },
-  "last_updated_by": "bootstrap",
-  "notes": "Bootstrap state. Agents must establish a cycle identifier and update this file through an agreed serialized process before doing coordinated work."
+  "last_updated_by": "sentry",
+  "notes": "Sentry stage cycle 001 completed. Recorded quality baseline and findings. Handing off to Pulse for verification and repair."
 }
