@@ -15,5 +15,5 @@
     "tests": "pass",
     "build": "pass"
   },
-  "summary": "All configured deterministic CI gates passed on the consolidated master-based cycle."
+  "summary": "All configured deterministic CI gates passed for the cycle-001 reconciliation before the CI contract was subsequently consolidated in PR #32."
 }

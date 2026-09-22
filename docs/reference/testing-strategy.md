@@ -9,6 +9,7 @@ The current codebase is smaller than the historical testing strategy that inspir
 The main repository checks are:
 
 ```bash
+bun ci
 bun test
 bun run typecheck
 bun run lint:check
@@ -18,7 +19,7 @@ bun run validate:frontmatter
 bun run build
 ```
 
-These are the supported deterministic repository gates. GitHub Actions is expected to run the corresponding commands on the repository's current integration branch.
+GitHub Actions runs these supported checks from the repository's `master` integration branch. The CI workflow deliberately keeps dependency installation and repository validation in one job so pull requests do not repeat the same setup four times.
 
 ## Current test organisation
 

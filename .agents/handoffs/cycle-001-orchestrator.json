@@ -18,7 +18,7 @@
     "status": "PASS"
   },
   "result": "MERGE_READY_PENDING_HUMAN_REVIEW",
-  "next_action": "Human review and merge consolidated PR #31 into master.",
+  "next_action": "Human review of the cycle-001 coordination changes after CI maintenance was merged separately in PR #32.",
   "status": "COMPLETE",
   "merge_authority": "human"
 }

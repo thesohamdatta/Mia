@@ -11,15 +11,14 @@
     "test:watch": "bun test --watch",
     "gen:skill-docs": "bun run core/generator/gen-skill-docs.ts",
     "lint": "bun x biome check --write --unsafe .",
-    "lint:check": "bun x biome check .",
+    "lint:check": "bun x biome ci .",
     "lint:md": "bun x markdownlint-cli2 \"*.md\" \"docs/**/*.md\" \"scripts/**/*.md\" --config .markdownlint-cli2.jsonc",
     "lint:md:fix": "bun x markdownlint-cli2 \"**/*.md\" --fix --config .markdownlint-cli2.jsonc",
     "validate:frontmatter": "bun run scripts/sync-docs.ts",
     "typecheck": "bun x tsc --noEmit",
     "knip": "bun x knip",
     "validate": "bun run lint && bun run typecheck && bun run knip",
-    "prepare": "husky install",
-    "postinstall": "bun run build"
+    "prepare": "husky"
   },
   "keywords": ["ai", "agent", "workflow", "automation", "mia"],
   "author": "Soham Datta",
@@ -35,5 +34,6 @@
     "gray-matter": "^4.0.3",
     "zod": "^3.22.0",
     "@types/bun": "^1.1.0"
-  }
+  },
+  "packageManager": "bun@1.4.2"
 }

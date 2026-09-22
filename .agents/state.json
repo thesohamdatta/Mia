@@ -27,5 +27,5 @@
     }
   },
   "last_updated_by": "orchestrator",
-  "notes": "Cycle 001 was reconciled on master and verified by GitHub Actions run 14. Human review and merge remain explicit."
+  "notes": "Cycle 001 was reconciled on master before CI maintenance was consolidated in PR #32. The coordination record remains historical; current CI is authoritative on master. Human review and merge remain explicit."
 }
