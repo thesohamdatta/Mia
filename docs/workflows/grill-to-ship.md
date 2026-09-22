@@ -1,117 +1,65 @@
-# Grill-to-Ship
+---
+type: workflow
+scope: repository
+status: active
+owner: engineering
+canonical: true
+audience: agent
+load: on-demand
+---
 
-This is the development workflow I want MIA to make repeatable.
+# Engineering Workflow
 
-## Core loop
+MIA uses an adaptive workflow. The full loop is available when the task needs it, but small changes do not require ceremonial phases.
 
-```text
-intent → grill → plan → spec → execute → review → ship → learn
-```
+## Choose the path
 
-The phases can be shortened for tiny changes, but the reasoning should not disappear just because the diff is small.
-
-## 1. Grill
-
-For non-trivial work, make the problem explicit:
-
-- What are we actually solving?
-- What assumptions are we making?
-- What could go wrong?
-- What does done mean?
-- What is out of scope?
-
-The point is not bureaucracy. It is avoiding expensive work on the wrong problem.
-
-## 2. Plan
-
-Turn the clarified intent into a sequence of concrete steps.
-
-Each meaningful step should have a success condition that can be checked.
-
-## 3. Spec
-
-When the change deserves more structure, turn the intent into a PRD-style specification.
-
-Capture the problem, use cases, acceptance criteria, technical approach, risks, and explicit non-goals. Break the work into smaller issues when that makes execution clearer.
-
-## 4. Execute
-
-Implement the smallest coherent change.
-
-MIA's current runtime is direct CLI execution:
+### Small / low-risk
 
 ```text
-CLI → context → middleware → skill executor
+inspect → change → verify
 ```
 
-No daemon, no HTTP control plane, and no second MIA process are required for the normal path.
-
-## 5. Review
-
-Before shipping, inspect:
-
-- correctness
-- architecture
-- maintainability
-- testing
-- security-sensitive behaviour
-- unintended scope growth
-
-Read the affected code, not just the final diff.
-
-## 6. Ship
-
-The intended path is:
+### Multi-file / architectural / uncertain
 
 ```text
-tests → health → review → push → PR
+explore → contract → plan → change → verify → review
 ```
 
-The current `mia ship` command exposes this workflow. The executable is a workflow surface, not a promise that every remote step is fully automated.
-
-Use `mia vc` for repository-aware git operations when appropriate.
-
-## 7. Learn
-
-After meaningful work:
-
-- record a reusable learning
-- preserve relevant timeline activity
-- save a checkpoint when work needs to resume later
-- update documentation when implementation changes the contract
-
-That is the compounding loop:
+### High-risk / privileged
 
 ```text
-observe → learn → distill → apply → verify → evolve
+explore → risk assessment → explicit approval → change → verify → review
 ```
+
+## Explore
+
+Read the current source, callers, tests, accepted decisions, and relevant documentation until the intended outcome and violated invariant are supported by evidence.
+
+## Contract
+
+Make the expected outcome, scope, non-goals, side effects, and verification explicit. Use an existing skill or workflow rather than inventing a second process.
+
+## Plan
+
+Create a concrete sequence with observable success conditions. A plan is not proof that implementation works.
+
+## Change
+
+Make the smallest coherent change. Preserve unrelated work and local state.
+
+## Verify
+
+Run the narrowest checks that prove the changed behaviour, then the wider repository gate required for integration.
+
+## Review
+
+Review correctness, architecture, maintainability, security-sensitive behaviour, tests, scope, and documentation against the actual source.
+
+## Learn
+
+Record reusable learnings and update the canonical documentation when an accepted contract changes.
 
 ## Human control
 
-MIA is meant to strengthen human judgement, not hide it.
-
-For consequential decisions:
-- surface trade-offs
-- keep decisions explicit
-- document irreversible architecture choices
-- do not silently widen scope
-
-## Verification
-
-Use the repository's actual checks:
-
-```bash
-bun test
-bun run typecheck
-bun run lint:check
-bun run knip
-bun run lint:md
-bun run validate:frontmatter
-bun run build
-```
-
-Choose the narrowest verification set that proves the claim, and run the broader set before a meaningful release.
-
----
-
-*Think first. Execute cleanly. Verify before claiming done.*
+Consequential product, architecture, permission, migration, and release decisions remain explicit. Do not infer approval from silence.
