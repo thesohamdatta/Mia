@@ -8,8 +8,8 @@ import { execute as retroExecute } from './retro/execute.js';
 import { execute as reviewExecute } from './review/execute.js';
 import { execute as shipExecute } from './ship/execute.js';
 import { execute as specExecute } from './spec/execute.js';
-import { execute as vcExecute } from './vc/execute.js';
 import type { SkillDefinition, SkillExecutor } from './types.js';
+import { execute as vcExecute } from './vc/execute.js';
 
 const define = (
   name: string,
@@ -69,9 +69,14 @@ export const skills: Record<string, SkillDefinition> = {
   checkpoint: define('checkpoint', 'Save or load working state', 'local-write', [], 'execute', {
     execute: checkpointExecute,
   }),
-  review: define('review', 'Prepare a review surface for the current change', 'none', [], 'review', {
-    execute: reviewExecute,
-  }),
+  review: define(
+    'review',
+    'Prepare a review surface for the current change',
+    'none',
+    [],
+    'review',
+    { execute: reviewExecute }
+  ),
   vc: define('vc', 'Inspect and deliberately mutate Git state', 'git-write', [], 'execute', {
     execute: vcExecute,
   }),
