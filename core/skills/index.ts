@@ -8,29 +8,55 @@ import { execute as retroExecute } from './retro/execute.js';
 import { execute as reviewExecute } from './review/execute.js';
 import { execute as shipExecute } from './ship/execute.js';
 import { execute as specExecute } from './spec/execute.js';
-import type { SkillExecutor } from './types.js';
 import { execute as vcExecute } from './vc/execute.js';
+import type { SkillDefinition, SkillExecutor } from './types.js';
 
-export const skillMap: Record<string, SkillExecutor> = {
-  grill: { execute: grillExecute },
-  plan: { execute: planExecute },
-  spec: { execute: specExecute },
-  ship: { execute: shipExecute },
-  health: { execute: healthExecute },
-  learn: { execute: learnExecute },
-  retro: { execute: retroExecute },
-  memory: { execute: memoryExecute },
-  checkpoint: { execute: checkpointExecute },
-  review: { execute: reviewExecute },
-  vc: { execute: vcExecute },
+const define = (
+  name: string,
+  description: string,
+  sideEffects: SkillDefinition['manifest']['sideEffects'],
+  verification: readonly string[],
+  executor: SkillExecutor
+): SkillDefinition => ({
+  manifest: {
+    name,
+    version: '1.0.0',
+    description,
+    allowedTools: [],
+    sideEffects,
+    verification,
+  },
+  executor,
+});
+
+export const skills: Record<string, SkillDefinition> = {
+  grill: define('grill', 'Clarify intent before non-trivial work', 'none', [], { execute: grillExecute }),
+  plan: define('plan', 'Create an explicit implementation plan', 'local-write', [], { execute: planExecute }),
+  spec: define('spec', 'Shape intent into a project specification', 'local-write', [], { execute: specExecute }),
+  ship: define('ship', 'Run repository verification before handoff', 'none', ['typecheck', 'lint', 'unused-code', 'tests', 'build'], { execute: shipExecute }),
+  health: define('health', 'Run the repository verification suite', 'none', ['typecheck', 'lint', 'unused-code', 'tests', 'build'], { execute: healthExecute }),
+  learn: define('learn', 'Store and retrieve project learnings', 'local-write', [], { execute: learnExecute }),
+  retro: define('retro', 'Review recent activity and learnings', 'none', [], { execute: retroExecute }),
+  memory: define('memory', 'Read or append long-term memory', 'local-write', [], { execute: memoryExecute }),
+  checkpoint: define('checkpoint', 'Save or load working state', 'local-write', [], { execute: checkpointExecute }),
+  review: define('review', 'Prepare a review surface for the current change', 'none', [], { execute: reviewExecute }),
+  vc: define('vc', 'Inspect and deliberately mutate Git state', 'git-write', [], { execute: vcExecute }),
 };
 
+export function getSkill(name: string): SkillDefinition | undefined {
+  return skills[name];
+}
+
 export function getSkillExecutor(name: string): SkillExecutor | undefined {
-  return skillMap[name];
+  return getSkill(name)?.executor;
 }
 
 export function listSkills(): string[] {
-  return Object.keys(skillMap);
+  return Object.keys(skills);
+}
+
+export function listSkillDefinitions(): SkillDefinition[] {
+  return Object.values(skills);
 }
 
 export * from './types.js';
