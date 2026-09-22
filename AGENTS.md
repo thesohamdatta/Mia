@@ -186,7 +186,7 @@ Use Conventional Commits:
 ```text
 feat(scope): add something
 fix(scope): correct something
-docs(scope): update something
+docs(scope): update documentation
 refactor(scope): restructure without changing behaviour
 test(scope): add or repair tests
 chore(scope): maintenance
