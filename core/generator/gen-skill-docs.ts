@@ -62,20 +62,6 @@ The executable definition in \`core/skills/index.ts\` is authoritative. This pag
     result = result.replace(regex, Array.isArray(value) ? value.join('\n') : String(value));
   }
 
-  const eachRegex = /\\{\\{#each\\s+(\\w+)\\}\\}([\\s\\S]*?)\\{\\{\\/each\\}\\}/g;
-  result = result.replace(eachRegex, (_match, key, block) => {
-    const value = data[key];
-    if (!Array.isArray(value)) return '';
-    return value.map((item) => {
-      let rendered = block;
-      if (typeof item === 'object' && item !== null) {
-        for (const [k, v] of Object.entries(item)) {
-          rendered = rendered.replace(new RegExp(`\\\\{\\\\{${k}\\\\}\\\\}`, 'g'), String(v));
-        }
-      }
-      return rendered.replace(/\\{\\{this\\}\\}/g, String(item));
-    }).join('\\n');
-  });
 
   return result;
 }
