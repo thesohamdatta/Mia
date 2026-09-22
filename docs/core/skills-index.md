@@ -49,6 +49,8 @@ The manifest records:
 - declared verification names
 - workflow phase
 
+Skill documentation is generated from the executable registry. Do not infer command availability, invocation semantics, or permissions from Markdown alone.
+
 The CLI does not execute a raw executor. It resolves a `SkillDefinition` and sends it through the execution boundary, which validates the manifest before middleware and executor code run.
 
 ## Verification boundary
