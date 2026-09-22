@@ -7,6 +7,7 @@
  * 1. Frontmatter presence and schema across all docs/ markdown files
  * 2. Internal markdown file links and heading anchors
  * 3. Orphaned documentation files missing from AGENTS.md context map
+ * 4. Canonical document metadata for agent-facing docs
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -24,6 +25,12 @@ interface Frontmatter {
   last_updated?: string;
   owner?: string;
   dependencies?: string[];
+  type?: string;
+  scope?: string;
+  status?: string;
+  canonical?: boolean;
+  audience?: string;
+  load?: string;
 }
 
 interface ValidationResult {
@@ -79,7 +86,7 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
     const { data } = matter(content);
     const fm = data as Frontmatter;
 
-    // Check optional frontmatter fields, warning if missing or invalid
+    // Check optional legacy frontmatter fields.
     if (!fm.title || typeof fm.title !== 'string') {
       warnings.push('Missing or invalid "title" field');
     }
@@ -99,6 +106,24 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
 
     if (!fm.owner || typeof fm.owner !== 'string') {
       warnings.push('Missing or invalid "owner" field');
+    }
+
+    const agentFacing = fm.audience === 'agent' || fm.audience === 'human+agent';
+    if (agentFacing) {
+      for (const [field, value] of Object.entries({
+        type: fm.type,
+        scope: fm.scope,
+        status: fm.status,
+        audience: fm.audience,
+        load: fm.load,
+      })) {
+        if (typeof value !== 'string' || value.trim() === '') {
+          errors.push(`Agent-facing document requires "${field}"`);
+        }
+      }
+      if (fm.canonical !== true) {
+        errors.push('Agent-facing canonical documents must declare canonical: true');
+      }
     }
 
     if (fm.dependencies !== undefined) {
