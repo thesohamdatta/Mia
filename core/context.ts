@@ -1,8 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
-import { randomUUID } from 'node:crypto';
 import { createUnifiedStore } from './state/unified-store.js';
 import type { AppConfig, ExecutionContext } from './skills/types.js';
 
@@ -24,9 +24,6 @@ function getConfig(): AppConfig {
 
 /**
  * Fast filesystem lookup to find the git repository root folder name (slug).
- * Optimization: Replaces synchronous `execSync('git rev-parse ...')` process spawning
- * with recursive directory traversal using `existsSync`/`statSync`/`readFileSync`.
- * Reduces CLI execution setup time from ~5.5ms down to ~0.005ms (1000x faster).
  */
 function getSlug(cwd?: string): string {
   const targetCwd = cwd || process.cwd();
@@ -35,7 +32,6 @@ function getSlug(cwd?: string): string {
   while (true) {
     const gitPath = join(curr, '.git');
     if (existsSync(gitPath)) {
-      // .git (directory or worktree/submodule file) marks the top-level repository working tree root.
       return basename(curr) || 'default';
     }
 
@@ -44,7 +40,6 @@ function getSlug(cwd?: string): string {
     curr = parent;
   }
 
-  // Fall back to git subprocess if filesystem traversal finds no .git
   try {
     const toplevel = execSync('git rev-parse --show-toplevel', {
       encoding: 'utf-8',
