@@ -32,17 +32,49 @@ const define = (
 });
 
 export const skills: Record<string, SkillDefinition> = {
-  grill: define('grill', 'Clarify intent before non-trivial work', 'none', [], 'clarify', { execute: grillExecute }),
-  plan: define('plan', 'Create an explicit implementation plan', 'local-write', [], 'plan', { execute: planExecute }),
-  spec: define('spec', 'Shape intent into a project specification', 'local-write', [], 'specify', { execute: specExecute }),
-  ship: define('ship', 'Run repository verification before handoff', 'none', ['typecheck', 'lint', 'unused-code', 'tests', 'build'], 'handoff', { execute: shipExecute }),
-  health: define('health', 'Run the repository verification suite', 'none', ['typecheck', 'lint', 'unused-code', 'tests', 'build'], 'verify', { execute: healthExecute }),
-  learn: define('learn', 'Store and retrieve project learnings', 'local-write', [], 'verify', { execute: learnExecute }),
-  retro: define('retro', 'Review recent activity and learnings', 'none', [], 'review', { execute: retroExecute }),
-  memory: define('memory', 'Read or append long-term memory', 'local-write', [], 'review', { execute: memoryExecute }),
-  checkpoint: define('checkpoint', 'Save or load working state', 'local-write', [], 'execute', { execute: checkpointExecute }),
-  review: define('review', 'Prepare a review surface for the current change', 'none', [], 'review', { execute: reviewExecute }),
-  vc: define('vc', 'Inspect and deliberately mutate Git state', 'git-write', [], 'execute', { execute: vcExecute }),
+  grill: define('grill', 'Clarify intent before non-trivial work', 'none', [], 'clarify', {
+    execute: grillExecute,
+  }),
+  plan: define('plan', 'Create an explicit implementation plan', 'local-write', [], 'plan', {
+    execute: planExecute,
+  }),
+  spec: define('spec', 'Shape intent into a project specification', 'local-write', [], 'specify', {
+    execute: specExecute,
+  }),
+  ship: define(
+    'ship',
+    'Run repository verification before handoff',
+    'none',
+    ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
+    'handoff',
+    { execute: shipExecute }
+  ),
+  health: define(
+    'health',
+    'Run the repository verification suite',
+    'none',
+    ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
+    'verify',
+    { execute: healthExecute }
+  ),
+  learn: define('learn', 'Store and retrieve project learnings', 'local-write', [], 'verify', {
+    execute: learnExecute,
+  }),
+  retro: define('retro', 'Review recent activity and learnings', 'none', [], 'review', {
+    execute: retroExecute,
+  }),
+  memory: define('memory', 'Read or append long-term memory', 'local-write', [], 'review', {
+    execute: memoryExecute,
+  }),
+  checkpoint: define('checkpoint', 'Save or load working state', 'local-write', [], 'execute', {
+    execute: checkpointExecute,
+  }),
+  review: define('review', 'Prepare a review surface for the current change', 'none', [], 'review', {
+    execute: reviewExecute,
+  }),
+  vc: define('vc', 'Inspect and deliberately mutate Git state', 'git-write', [], 'execute', {
+    execute: vcExecute,
+  }),
 };
 
 export function getSkill(name: string): SkillDefinition | undefined {
