@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ExecutionContext } from '../skills/types.js';
 import { executeWithMiddlewares } from '../skills/preamble.js';
+import type { ExecutionContext } from '../skills/types.js';
 import type { UnifiedStore } from '../state/unified-store.js';
 
 describe('skill execution lifecycle', () => {
@@ -67,9 +67,7 @@ describe('skill execution lifecycle', () => {
     );
 
     expect(result).toEqual({ ok: false, error: 'verification failed' });
-    expect(store.timeline).toEqual([
-      { event: 'failed', outcome: 'failed' },
-    ]);
+    expect(store.timeline).toEqual([{ event: 'failed', outcome: 'failed' }]);
   });
 
   it('records failure instead of losing lifecycle state when a skill throws', async () => {
@@ -117,9 +115,7 @@ describe('skill execution lifecycle', () => {
     );
 
     expect(result).toEqual({ ok: true, output: 'done' });
-    expect(warn).toHaveBeenCalledWith(
-      '⚠️  Could not record timeline start: timeline unavailable'
-    );
+    expect(warn).toHaveBeenCalledWith('⚠️  Could not record timeline start: timeline unavailable');
     expect(warn).toHaveBeenCalledWith(
       '⚠️  Could not record timeline completion: timeline unavailable'
     );
