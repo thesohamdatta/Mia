@@ -1,34 +1,32 @@
-// Health Skill Executor - Code quality scorekeeper
-// Runs: mia health
-
+import { runVerification } from '../../verification/run-checks.js';
+import { repositoryChecks } from '../../verification/suite.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
-export async function execute(_args: string[], _ctx: ExecutionContext): Promise<SkillResult> {
+export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
+  const verification = await runVerification(ctx, repositoryChecks);
+
+  for (const record of verification.records) {
+    await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);
+  }
+
+  const lines = verification.records.map(
+    (record) =>
+      `${record.status === 'passed' ? 'PASS' : 'FAIL'} ${record.name} (${record.durationMs}ms)`
+  );
+
   return {
-    ok: true,
-    output: `🏥  HEALTH CHECK
-
-Code quality scorekeeper (verification baked in, not afterthought)
-
-Checks:
-- TypeScript: tsc --noEmit
-- Lint: biome check / eslint
-- Dead code: knip
-- Tests: coverage ≥ 80%
-- Security: audit
-- Complexity: cyclomatic, cognitive
-
-Composite score: 0-10
-- ≥ 7: ship allowed
-- 5-6: warning, investigate
-- < 5: block ship
-
-Trend tracking: health-history.jsonl
-
-Run 'mia health' to score current state.
-Run 'mia health history' for trends.
-
-~ In the land of AI agents, the verifiers are king ~ (Tariq Shaukat, Sonar)`,
+    ok: verification.passed,
+    status: verification.passed ? 'success' : 'failed',
+    output: [
+      'MIA health verification',
+      '',
+      ...lines,
+      '',
+      verification.passed
+        ? 'All configured repository checks passed.'
+        : 'Repository verification failed. Inspect the recorded evidence before shipping.',
+    ].join('\n'),
+    error: verification.passed ? undefined : 'One or more repository checks failed',
   };
 }
 

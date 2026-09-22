@@ -1,58 +1,67 @@
-// Plan Skill Executor - Verifiable planning
-// Runs: mia plan
-
+import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
-export async function execute(args: string[], _ctx: ExecutionContext): Promise<SkillResult> {
+export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'create';
-
-  if (subcmd === 'create') {
-    return {
-      ok: true,
-      output: `📋 PLAN MODE
-
-Grill-to-Ship pipeline:
-brainstorm → grill → plan → spec → TDD → execute → review → commit
-
-Write a verifiable plan with success criteria before implementing.
-Run 'mia spec' to turn intent into a PRD first.`,
-    };
-  }
+  const objective = args.slice(1).join(' ').trim();
 
   if (subcmd === 'template') {
     return {
       ok: true,
-      output: `Plan Template:
-
-## Objective
-[One sentence: what are we building?]
-
-## Success Criteria (verifiable)
-- [ ] Criterion 1: measurable outcome
-- [ ] Criterion 2: measurable outcome
-- [ ] Criterion 3: measurable outcome
-
-## Steps
-1. [Step 1: specific, testable]
-2. [Step 2: specific, testable]
-3. [Step 3: specific, testable]
-
-## Risks & Mitigations
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-
-## Dependencies
-- [ ] Dependency 1
-- [ ] Dependency 2
-
-## Out of Scope
-- [Explicitly not doing]
-
-Run 'mia plan create' to start.`,
+      status: 'success',
+      output: [
+        '## Objective',
+        '[one sentence]',
+        '',
+        '## Success Criteria',
+        '- [ ] observable outcome',
+        '',
+        '## Steps',
+        '1. [small vertical slice]',
+        '',
+        '## Risks',
+        '- [risk and mitigation]',
+        '',
+        '## Out of Scope',
+        '- [explicit exclusion]',
+      ].join('\n'),
     };
   }
 
-  return { ok: true, output: 'Usage: mia plan [create|template]' };
+  if (subcmd === 'create') {
+    if (!objective) {
+      return { ok: false, status: 'blocked', error: 'Usage: mia plan create <objective>' };
+    }
+    const path = join(ctx.config.projectsDir, ctx.slug, 'PLAN.md');
+    const content = [
+      '# MIA Plan',
+      '',
+      `Run: ${ctx.run.id}`,
+      '',
+      '## Objective',
+      objective,
+      '',
+      '## Success Criteria',
+      '- [ ] Define observable outcomes',
+      '- [ ] Define required verification',
+      '',
+      '## Steps',
+      '1. [ ] Identify the smallest vertical slice',
+      '2. [ ] Implement the slice',
+      '3. [ ] Verify the slice',
+      '',
+      '## Risks',
+      '- [ ] Record material risks and mitigations',
+      '',
+      '## Out of Scope',
+      '- [ ] Record explicit exclusions',
+    ].join('\n');
+    await writeFile(path, content, 'utf8');
+    return { ok: true, status: 'success', output: `Plan written to ${path}` };
+  }
+
+  return { ok: false, status: 'blocked', error: 'Usage: mia plan [create <objective>|template]' };
 }
 
 export const executor: SkillExecutor = { execute };

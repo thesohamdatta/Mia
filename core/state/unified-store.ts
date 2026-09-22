@@ -2,7 +2,25 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { appendJsonl, readJsonlTail } from '../state/jsonl-store.js';
 
-export type EventType = 'learning' | 'timeline' | 'checkpoint';
+export type EventType = 'learning' | 'timeline' | 'checkpoint' | 'evidence';
+
+export interface UnifiedStore {
+  append(projectsDir: string, type: EventType, slug: string, data: unknown): Promise<void>;
+  query(
+    projectsDir: string,
+    slug: string,
+    type?: EventType,
+    filter?: (event: StoredEvent) => boolean,
+    limit?: number
+  ): Promise<StoredEvent[]>;
+  listLearnings(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
+  listTimeline(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
+  listEvidence(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
+  appendLearning(projectsDir: string, slug: string, data: unknown): Promise<void>;
+  appendTimeline(projectsDir: string, slug: string, data: unknown): Promise<void>;
+  appendCheckpoint(projectsDir: string, slug: string, data: unknown): Promise<void>;
+  appendEvidence(projectsDir: string, slug: string, data: unknown): Promise<void>;
+}
 
 export interface StoredEvent<T = unknown> {
   type: EventType;
@@ -25,7 +43,7 @@ function ensureProjectDir(projectsDir: string, slug: string): string {
   return dir;
 }
 
-export class UnifiedStore {
+class JsonlUnifiedStore implements UnifiedStore {
   async append(projectsDir: string, type: EventType, slug: string, data: unknown): Promise<void> {
     ensureProjectDir(projectsDir, slug);
     const event: StoredEvent = { type, ts: new Date().toISOString(), slug, data };
@@ -69,8 +87,16 @@ export class UnifiedStore {
   async appendCheckpoint(projectsDir: string, slug: string, data: unknown) {
     return this.append(projectsDir, 'checkpoint', slug, data);
   }
+
+  async listEvidence(projectsDir: string, slug: string, limit = 50) {
+    return this.query(projectsDir, slug, 'evidence', undefined, limit);
+  }
+
+  async appendEvidence(projectsDir: string, slug: string, data: unknown) {
+    return this.append(projectsDir, 'evidence', slug, data);
+  }
 }
 
 export function createUnifiedStore(): UnifiedStore {
-  return new UnifiedStore();
+  return new JsonlUnifiedStore();
 }

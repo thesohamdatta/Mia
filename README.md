@@ -93,17 +93,17 @@ Skills run directly in the CLI process. There is no daemon sitting between the c
 
 ### review
 
-The review skill is the pre-landing checkpoint for correctness, security, maintainability, architecture, and testing concerns.
+The review skill is the deterministic pre-landing verification step. It reports executable evidence; human review remains responsible for architecture, security, maintainability, and product decisions.
 
 ### ship
 
-The intended shipping path is:
+The shipping gate is:
 
 ```text
-test → health → review → push → PR
+verify → review → ship gate
 ```
 
-The current implementation exposes this workflow through the CLI and keeps the policy visible in code and documentation.
+The current `ship` implementation verifies the repository and reports whether the handoff is unblocked. It does not push, merge, or create a pull request.
 
 ### learn
 
@@ -153,7 +153,7 @@ MIA is a direct execution system.
 │                         │                               │
 │                         ├── Config                      │
 │                         ├── UnifiedStore               │
-│                         └── Host adapters               │
+│                         └── local files                 │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -178,11 +178,7 @@ The important boundaries are:
 
 **State**
 
-`core/state/unified-store.ts` stores learning, timeline, and checkpoint events in per-project `events.jsonl` files.
-
-**Hosts**
-
-`core/hosts/` defines adapters for Claude, Codex, Hermes, and OpenCode. These are integration boundaries, not the core execution model.
+`core/state/unified-store.ts` stores learning, timeline, checkpoint, and verification evidence events in per-project `events.jsonl` files.
 
 ### local state
 

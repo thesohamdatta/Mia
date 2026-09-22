@@ -3,8 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createExecutionContext } from '../context.js';
-import { getSkillExecutor, listSkills } from '../skills/index.js';
-import { executeWithMiddlewares } from '../skills/preamble.js';
+import { executeSkillDefinition } from '../skills/executor.js';
+import { getSkill, listSkillDefinitions, listSkills } from '../skills/index.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 
 describe('Integration: CLI -> Skill -> Store', () => {
@@ -44,28 +44,75 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(skills).toContain('vc');
   });
 
-  it('should execute vc skill through CLI path', async () => {
+  it('should execute vc skill through validated CLI path', async () => {
     const ctx = createExecutionContext();
-    const executor = getSkillExecutor('vc');
+    const definition = getSkill('vc');
 
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('vc executor not found');
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
 
-    const result = await executeWithMiddlewares(executor, ['help'], ctx, 'vc');
+    const result = await executeSkillDefinition(definition, ['help'], ctx);
 
     expect(result.ok).toBe(true);
     expect(result.output).toContain('mia vc — professional version control');
     expect(result.output).toContain('Commands:');
   });
 
-  it('should execute grill skill through CLI path', async () => {
+  it('should expose executable skill definitions with explicit safety contracts', () => {
+    const definitions = listSkillDefinitions();
+    expect(definitions).toHaveLength(11);
+    expect(getSkill('vc')?.manifest.sideEffects).toBe('git-write');
+    expect(getSkill('health')?.manifest.verification).toEqual([
+      'typecheck',
+      'lint',
+      'unused-code',
+      'tests',
+      'build',
+    ]);
+  });
+
+  it('should create a unique run identity for each execution', () => {
+    const first = createExecutionContext().run.id;
+    const second = createExecutionContext().run.id;
+    expect(first).not.toBe(second);
+  });
+
+  it('should create real plan and spec artifacts', async () => {
     const ctx = createExecutionContext();
-    const executor = getSkillExecutor('grill');
+    const planDefinition = getSkill('plan');
+    const specDefinition = getSkill('spec');
 
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('grill executor not found');
+    expect(planDefinition).toBeDefined();
+    expect(specDefinition).toBeDefined();
+    if (!planDefinition || !specDefinition) throw new Error('plan/spec definition not found');
 
-    const result = await executeWithMiddlewares(executor, [], ctx, 'grill');
+    const plan = await executeSkillDefinition(planDefinition, ['create', 'Improve', 'MIA'], ctx);
+    expect(plan.ok).toBe(true);
+
+    const spec = await executeSkillDefinition(
+      specDefinition,
+      ['create', 'Make', 'runs', 'explicit'],
+      ctx
+    );
+    expect(spec.ok).toBe(true);
+
+    const projectDir = join(ctx.config.projectsDir, ctx.slug);
+    const planText = await Bun.file(join(projectDir, 'PLAN.md')).text();
+    const specText = await Bun.file(join(projectDir, 'SPEC.md')).text();
+
+    expect(planText).toContain('Improve MIA');
+    expect(planText).toContain(ctx.run.id);
+    expect(specText).toContain('Make runs explicit');
+  });
+
+  it('should execute grill skill through validated CLI path', async () => {
+    const ctx = createExecutionContext();
+    const definition = getSkill('grill');
+
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('grill definition not found');
+
+    const result = await executeSkillDefinition(definition, [], ctx);
 
     expect(result.ok).toBe(true);
   });
@@ -105,11 +152,11 @@ describe('Integration: CLI -> Skill -> Store', () => {
     const slug = ctx.slug;
     const unifiedStore = ctx.unifiedStore;
 
-    const executor = getSkillExecutor('vc');
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('vc executor not found');
+    const definition = getSkill('vc');
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
 
-    const result = await executeWithMiddlewares(executor, ['help'], ctx, 'vc');
+    const result = await executeSkillDefinition(definition, ['help'], ctx);
 
     expect(result.ok).toBe(true);
 
@@ -120,9 +167,47 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(lastEvent).toBeDefined();
     if (!lastEvent) throw new Error('No timeline event');
 
-    const eventData = lastEvent.data as { skill?: string; event?: string; outcome?: string };
+    const eventData = lastEvent.data as {
+      skill?: string;
+      event?: string;
+      outcome?: string;
+      runId?: string;
+    };
     expect(eventData.skill).toBe('vc');
     expect(eventData.event).toBe('completed');
     expect(eventData.outcome).toBe('success');
+    expect(eventData.runId).toBe(ctx.run.id);
+
+    const evidence = await unifiedStore.listEvidence(projectsDir, slug, 5);
+    expect(evidence).toEqual([]);
+  });
+
+  it('blocks an invalid skill definition before execution', async () => {
+    const ctx = createExecutionContext();
+    let executed = false;
+    const definition = {
+      manifest: {
+        name: 'broken',
+        version: '',
+        description: 'invalid',
+        allowedTools: [],
+        sideEffects: 'none' as const,
+        verification: [],
+        phase: 'execute' as const,
+      },
+      executor: {
+        execute: async () => {
+          executed = true;
+          return { ok: true, output: 'should not run' };
+        },
+      },
+    };
+
+    const result = await executeSkillDefinition(definition, [], ctx);
+
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe('blocked');
+    expect(result.error).toContain('must declare a version');
+    expect(executed).toBe(false);
   });
 });

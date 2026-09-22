@@ -14,8 +14,7 @@ MIA is a compiled Bun CLI with direct skill execution.
 │  CLI → ExecutionContext → Middleware → Skill Executor        │
 │                         │                     │              │
 │                         │                     ├→ local files │
-│                         │                     ├→ UnifiedStore│
-│                         │                     └→ host adapter│
+│                         │                     └→ UnifiedStore│
 │                         │                                    │
 │                         └→ Config                             │
 │                                                              │
@@ -34,7 +33,6 @@ There is no current daemon in this architecture. The old CLI → HTTP → daemon
 | **Middleware** | `core/skills/preamble.ts` | Project checks, recent learnings, timeline logging |
 | **State** | `core/state/` | JSONL storage interfaces and `UnifiedStore` |
 | **Config** | `core/config/` | Local defaults, config-file loading, environment overrides |
-| **Hosts** | `core/hosts/` | Optional integrations with external or local AI hosts |
 | **Docs generator** | `core/generator/` | Skill documentation generation utility |
 | **Tests** | `core/test/` | Current regression and integration-oriented coverage |
 
@@ -124,19 +122,6 @@ logTimelineComplete
 ```
 
 This keeps cross-cutting behaviour separate from skill logic without recreating a service layer around the CLI.
-
-## Host adapters
-
-The host layer defines a stable adapter interface.
-
-Current implementations include:
-
-- Claude
-- Codex
-- Hermes
-- OpenCode
-
-These adapters provide integration boundaries for model hosts. They are not required for the core local CLI execution path.
 
 ## Configuration
 

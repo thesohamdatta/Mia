@@ -58,7 +58,7 @@ Middleware
  ↓
 Skill Executor
  ↓
-UnifiedStore / local files / optional host integrations
+UnifiedStore / local files
 ```
 
 There is **no current MIA daemon or HTTP control plane** in the normal execution path.
@@ -278,3 +278,10 @@ Do not create a second competing source of truth.
 ---
 
 *Simple rules. Explicit state. Evidence before claims.*
+### Runtime Rules
+
+- The execution context owns one unique `run.id` per invocation.
+- Skill metadata is executable contract data. It must describe side effects and verification honestly.
+- Verification produces evidence. Do not replace executable checks with scores or prose claims.
+- `ship` may gate and report. It must not silently push, merge, or create a PR.
+- Prefer a small synchronous core over framework-shaped abstractions. Add an abstraction only when a second real implementation needs it.

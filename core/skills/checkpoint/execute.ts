@@ -1,6 +1,7 @@
 // Checkpoint Skill Executor - Save/resume working state
 // Runs: mia checkpoint
 
+import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
@@ -13,11 +14,20 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
 
   if (subcmd === 'save') {
     const name = args[1] || `checkpoint-${Date.now()}`;
-    const summary = args.slice(2).join(' ');
+    const summary = args.slice(2).join(' ').trim();
+    if (!summary) {
+      return { ok: false, status: 'blocked', error: 'Checkpoint summary required.' };
+    }
+    const checkpointId = randomUUID();
     const file = join(checkpointDir, `${name}.md`);
-    const content = `---\nts: ${new Date().toISOString()}\nbranch: ${ctx.slug}\nphase: active\nsummary: ${summary}\n---\n\n`;
+    const content = `---\nts: ${new Date().toISOString()}\nid: ${checkpointId}\nproject: ${ctx.slug}\nphase: active\nsummary: ${summary}\n---\n\n`;
     writeFileSync(file, content, 'utf-8');
-    await ctx.unifiedStore.appendCheckpoint(projectsDir, ctx.slug, { name, summary });
+    await ctx.unifiedStore.appendCheckpoint(projectsDir, ctx.slug, {
+      id: checkpointId,
+      name,
+      summary,
+      runId: ctx.run.id,
+    });
     return { ok: true, output: `✓ Checkpoint saved: ${name}` };
   }
 
@@ -33,8 +43,8 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       return { ok: true, output: 'No checkpoints yet.' };
     }
     let output = '📌 Checkpoints:\n\n';
-    for (const f of files) {
-      output += `  • ${f.replace('.md', '')}\n`;
+    for (const file of files) {
+      output += `  • ${file.replace('.md', '')}\n`;
     }
     return { ok: true, output };
   }

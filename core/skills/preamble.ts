@@ -1,75 +1,56 @@
 import type { ExecutionContext, SkillExecutor, SkillResult } from './types.js';
 
-export interface SkillExecutionContext extends ExecutionContext {
-  _skillName?: string;
-  _skillResult?: SkillResult;
-}
-
 export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
 export const requireProject: Middleware = async (ctx, next) => {
   if (ctx.slug === 'default') {
-    console.warn('⚠️  Not in a git repository. Using default project.');
+    console.warn('Not in a git repository. Using default project.');
   }
   await next();
 };
 
 export const loadRecentLearnings: Middleware = async (ctx, next) => {
   try {
-    const projectsDir = ctx.config.projectsDir;
-    const learnings = await ctx.unifiedStore.listLearnings(projectsDir, ctx.slug, 5);
+    const learnings = await ctx.unifiedStore.listLearnings(ctx.config.projectsDir, ctx.slug, 5);
     if (learnings.length > 0) {
-      console.log('📚 Recent learnings:');
-      for (const l of learnings) {
-        const data = l.data as { insight?: string; key?: string };
+      console.log('Recent learnings:');
+      for (const learning of learnings) {
+        const data = learning.data as { insight?: string; key?: string };
         console.log(`  • ${data.insight || data.key}`);
       }
     }
-  } catch {
-    // Ignore
+  } catch (error) {
+    console.warn(
+      `Could not load recent learnings: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
   await next();
 };
 
 export const logTimelineStart: Middleware = async (ctx, next) => {
-  const skillName = (ctx as SkillExecutionContext)._skillName || 'unknown';
-  const projectsDir = ctx.config.projectsDir;
-  await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
-    skill: skillName,
-    event: 'started',
-  });
+  try {
+    await ctx.unifiedStore.appendTimeline(ctx.config.projectsDir, ctx.slug, {
+      runId: ctx.run.id,
+      skill: ctx.run.skill,
+      event: 'started',
+    });
+  } catch (error) {
+    console.warn(
+      `Could not record timeline start: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
   await next();
 };
-
-export const logTimelineComplete: Middleware = async (ctx, next) => {
-  const skillName = (ctx as SkillExecutionContext)._skillName || 'unknown';
-  const result = (ctx as SkillExecutionContext)._skillResult as SkillResult;
-  const projectsDir = ctx.config.projectsDir;
-  await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
-    skill: skillName,
-    event: 'completed',
-    outcome: result.ok ? 'success' : 'failed',
-  });
-  await next();
-};
-
-export const defaultMiddlewares: Middleware[] = [
-  requireProject,
-  loadRecentLearnings,
-  logTimelineStart,
-];
 
 export async function runMiddlewares(
-  middlewares: Middleware[],
+  middlewares: readonly Middleware[],
   ctx: ExecutionContext
 ): Promise<void> {
   let index = 0;
   const next = async (): Promise<void> => {
-    if (index < middlewares.length) {
-      const mw = middlewares[index++];
-      if (mw) {
-        await mw(ctx, next);
-      }
+    const middleware = middlewares[index++];
+    if (middleware) {
+      await middleware(ctx, next);
     }
   };
   await next();
@@ -77,9 +58,24 @@ export async function runMiddlewares(
 
 export function formatSkillOutput(result: SkillResult): string {
   if (!result.ok) {
-    return `❌ ${result.error}`;
+    return `Error: ${result.error}`;
   }
-  return result.output || '✅ Done';
+  return result.output || 'Done';
+}
+
+async function recordCompletion(ctx: ExecutionContext, result: SkillResult): Promise<void> {
+  try {
+    await ctx.unifiedStore.appendTimeline(ctx.config.projectsDir, ctx.slug, {
+      runId: ctx.run.id,
+      skill: ctx.run.skill,
+      event: result.ok ? 'completed' : 'failed',
+      outcome: result.ok ? 'success' : 'failed',
+    });
+  } catch (error) {
+    console.warn(
+      `Could not record timeline completion: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 }
 
 export async function executeWithMiddlewares(
@@ -87,17 +83,43 @@ export async function executeWithMiddlewares(
   args: string[],
   ctx: ExecutionContext,
   skillName: string,
-  middlewares: Middleware[] = defaultMiddlewares
+  middlewares: readonly Middleware[] = defaultMiddlewares
 ): Promise<SkillResult> {
-  const skillCtx = ctx as SkillExecutionContext;
-  skillCtx._skillName = skillName;
+  const run: ExecutionContext['run'] = {
+    ...ctx.run,
+    skill: skillName,
+    status: 'running',
+  };
+  const executionContext: ExecutionContext = { ...ctx, run };
 
-  await runMiddlewares(middlewares, ctx);
+  let result: SkillResult = {
+    ok: false,
+    status: 'unknown',
+    error: 'Skill did not produce a result',
+  };
 
-  const result = await executor.execute(args, ctx);
-
-  skillCtx._skillResult = result;
-  await logTimelineComplete(ctx, async () => {});
+  try {
+    await runMiddlewares(middlewares, executionContext);
+    result = await executor.execute(args, executionContext);
+  } catch (error) {
+    result = {
+      ok: false,
+      status: 'failed',
+      error: error instanceof Error ? error.message : String(error),
+    };
+  } finally {
+    const status = result.status ?? (result.ok ? 'success' : 'failed');
+    executionContext.run.status = status;
+    executionContext.run.finishedAt = new Date().toISOString();
+    executionContext.run.error = result.error;
+    await recordCompletion(executionContext, result);
+  }
 
   return result;
 }
+
+export const defaultMiddlewares: Middleware[] = [
+  requireProject,
+  loadRecentLearnings,
+  logTimelineStart,
+];

@@ -2,7 +2,7 @@
 
 This page describes the executable skill surface that exists in the current repository.
 
-Skills are wired explicitly in `core/skills/index.ts`. This is intentionally simpler than the earlier filesystem-scanning design.
+Skills are registered explicitly in `core/skills/index.ts`. The registry is a direct map of `SkillDefinition` values, not filesystem discovery.
 
 ## Core workflow
 
@@ -10,10 +10,10 @@ Skills are wired explicitly in `core/skills/index.ts`. This is intentionally sim
 | :--- | :--- | :--- |
 | `grill` | `mia grill` | Clarify problem, assumptions, risks, scope, and definition of done |
 | `plan` | `mia plan` | Build a plan around explicit success criteria |
-| `spec` | `mia spec` | Shape intent into a PRD-style specification and issues |
-| `review` | `mia review` | Pre-landing review workflow |
-| `health` | `mia health` | Code-quality and verification surface |
-| `ship` | `mia ship` | Shipping workflow |
+| `spec` | `mia spec` | Shape intent into a project specification |
+| `review` | `mia review` | Run deterministic pre-landing verification |
+| `health` | `mia health` | Run the repository verification suite |
+| `ship` | `mia ship` | Gate handoff on repository verification |
 
 ## Learning and state
 
@@ -28,33 +28,40 @@ Skills are wired explicitly in `core/skills/index.ts`. This is intentionally sim
 
 | Skill | CLI | Current role |
 | :--- | :--- | :--- |
-| `vc` | `mia vc` | Git status, diffs, commits, branches, tags, releases, ignores, and hooks |
+| `vc` | `mia vc` | Inspect and deliberately mutate Git state |
 
 ## Skill contract
 
-A current executable skill implements:
+Each registered skill is a `SkillDefinition`:
 
 ```ts
-interface SkillExecutor {
-  execute(args: string[], context: ExecutionContext): Promise<SkillResult>;
+interface SkillDefinition {
+  manifest: SkillManifest;
+  executor: SkillExecutor;
 }
 ```
 
-The CLI resolves the skill from the direct `skillMap` and runs it inside the shared middleware chain.
+The manifest records:
 
-## Skill documentation
+- identity and description
+- allowed tools
+- declared side-effect class
+- declared verification names
+- workflow phase
 
-Skill-facing documentation lives under `docs/skills/`.
+The CLI does not execute a raw executor. It resolves a `SkillDefinition` and sends it through the execution boundary, which validates the manifest before middleware and executor code run.
 
-The repository also contains `core/generator/gen-skill-docs.ts`, which is intended to generate those pages from skill metadata.
+## Verification boundary
 
-Because the executable source is the authoritative runtime surface, a Markdown page must not be treated as evidence that a command exists unless `core/skills/index.ts` maps it.
+Executable verification is implemented in `core/verification/`.
 
-## Current boundary
+`health` and `ship` run the configured repository checks and persist their `EvidenceRecord` results through `UnifiedStore`. `review` runs the deterministic pre-landing subset.
 
-MIA's current executable skills are not the same thing as every workflow described in historical or design documents.
+The manifest's `verification` field is currently declarative metadata. The runtime does not yet expose a generic tool/permission engine or a generic verification resolver. Keeping that machinery out of the core is intentional until a second concrete implementation requires it.
 
-Some documents in the repository describe future ideas, external agent ecosystems, or earlier iterations. The source of truth for commands available through the current CLI is `core/skills/index.ts`.
+## Source of truth
+
+The authoritative command surface is `core/skills/index.ts`. Documentation describes that executable source and must not be used as evidence that an unregistered command exists.
 
 ---
 

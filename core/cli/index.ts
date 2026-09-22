@@ -1,11 +1,6 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createExecutionContext } from '../context.js';
-import { getSkillExecutor, listSkills } from '../skills/index.js';
-import { executeWithMiddlewares } from '../skills/preamble.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { executeSkillDefinition } from '../skills/executor.js';
+import { getSkill, listSkills } from '../skills/index.js';
 
 function showHelp(): void {
   console.log(`MIA (Machine Intelligence Architecture) CLI
@@ -40,9 +35,9 @@ function showVersion(): void {
 }
 
 async function runSkill(skillName: string, args: string[] = []): Promise<void> {
-  const executor = getSkillExecutor(skillName);
+  const definition = getSkill(skillName);
 
-  if (!executor) {
+  if (!definition) {
     const available = listSkills().join(', ');
     console.error(`❌ Unknown skill: ${skillName}`);
     console.error(`Available: ${available}`);
@@ -50,7 +45,7 @@ async function runSkill(skillName: string, args: string[] = []): Promise<void> {
   }
 
   const ctx = createExecutionContext();
-  const result = await executeWithMiddlewares(executor, args, ctx, skillName);
+  const result = await executeSkillDefinition(definition, args, ctx);
 
   if (!result.ok) {
     console.error(`❌ ${result.error ?? 'Unknown error'}`);
