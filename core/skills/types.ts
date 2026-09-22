@@ -1,42 +1,45 @@
+import type { UnifiedStore } from '../state/unified-store.js';
+
+export type RunStatus = 'running' | 'success' | 'failed' | 'blocked' | 'partial' | 'unknown';
+
 export interface SkillResult {
   ok: boolean;
+  status?: Exclude<RunStatus, 'running'>;
   output?: string;
+  error?: string;
+}
+
+export interface SkillRun {
+  id: string;
+  skill: string;
+  startedAt: string;
+  status: RunStatus;
+  finishedAt?: string;
   error?: string;
 }
 
 export interface ExecutionContext {
   cwd: string;
   slug: string;
+  run: SkillRun;
   unifiedStore: UnifiedStore;
   config: AppConfig;
 }
 
-export interface UnifiedStore {
-  append(
-    projectsDir: string,
-    type: 'learning' | 'timeline' | 'checkpoint',
-    slug: string,
-    data: unknown
-  ): Promise<void>;
-  query(
-    projectsDir: string,
-    slug: string,
-    type?: 'learning' | 'timeline' | 'checkpoint',
-    filter?: (event: StoredEvent) => boolean,
-    limit?: number
-  ): Promise<StoredEvent[]>;
-  listLearnings(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
-  listTimeline(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
-  appendLearning(projectsDir: string, slug: string, data: unknown): Promise<void>;
-  appendTimeline(projectsDir: string, slug: string, data: unknown): Promise<void>;
-  appendCheckpoint(projectsDir: string, slug: string, data: unknown): Promise<void>;
-}
-
 export interface StoredEvent<T = unknown> {
-  type: 'learning' | 'timeline' | 'checkpoint';
+  type: 'learning' | 'timeline' | 'checkpoint' | 'evidence';
   ts: string;
   slug: string;
   data: T;
+}
+
+export interface EvidenceRecord {
+  runId: string;
+  name: string;
+  status: 'passed' | 'failed' | 'skipped' | 'unavailable';
+  command?: string;
+  durationMs?: number;
+  detail?: string;
 }
 
 export interface AppConfig {
@@ -51,26 +54,17 @@ export interface SkillExecutor {
   execute(args: string[], context: ExecutionContext): Promise<SkillResult>;
 }
 
-export interface Skill {
-  manifest?: SkillManifest;
-  executor: SkillExecutor;
-}
-
 export interface SkillManifest {
   name: string;
   version: string;
   description: string;
-  workflow?: string;
-  whenToInvoke?: string;
-  preambleTier?: string;
-  allowedTools?: string[];
-  triggers?: string[];
-  dependencies?: string[];
+  allowedTools: readonly string[];
+  sideEffects: 'none' | 'local-write' | 'git-write' | 'external';
+  verification: readonly string[];
+  phase: 'clarify' | 'plan' | 'specify' | 'execute' | 'verify' | 'review' | 'handoff';
 }
 
-export interface SkillRegistry {
-  get(name: string): Skill | undefined;
-  list(): Skill[];
-  findByTrigger(trigger: string): Skill | undefined;
-  reload(): Promise<void>;
+export interface SkillDefinition {
+  manifest: SkillManifest;
+  executor: SkillExecutor;
 }
