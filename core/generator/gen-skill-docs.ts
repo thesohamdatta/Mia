@@ -62,7 +62,6 @@ The executable definition in \`core/skills/index.ts\` is authoritative. This pag
     result = result.replace(regex, Array.isArray(value) ? value.join('\n') : String(value));
   }
 
-
   return result;
 }
 
@@ -78,9 +77,10 @@ function skillData([_name, definition]: [string, SkillDefinition]): Record<strin
     PHASE: manifest.phase,
     INVOCATION: manifest.invocation ?? 'user',
     PREAMBLE: '',
-    WHEN_TO_INVOKE: manifest.invocation === 'model' || manifest.invocation === 'both'
-      ? 'Available to model-triggered workflows when the task matches this skill.'
-      : 'Explicitly invoked by the user through the MIA CLI.',
+    WHEN_TO_INVOKE:
+      manifest.invocation === 'model' || manifest.invocation === 'both'
+        ? 'Available to model-triggered workflows when the task matches this skill.'
+        : 'Explicitly invoked by the user through the MIA CLI.',
     WORKFLOW: `Phase: ${manifest.phase}`,
   };
 }
@@ -96,7 +96,9 @@ function main(): void {
     console.log(`Generated: ${outPath}`);
   }
 
-  console.log(`\\nDone. Generated ${Object.keys(skills).length} skill docs from core/skills/index.ts.`);
+  console.log(
+    `\\nDone. Generated ${Object.keys(skills).length} skill docs from core/skills/index.ts.`
+  );
 }
 
 main();
