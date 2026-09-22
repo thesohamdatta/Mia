@@ -3,8 +3,8 @@ import type {
   ExecutionContext,
   SkillDefinition,
   SkillExecutor,
-  SkillResult,
   SkillInvocation,
+  SkillResult,
 } from './types.js';
 
 export class SkillContractError extends Error {
