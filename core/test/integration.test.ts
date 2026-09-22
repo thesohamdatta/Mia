@@ -3,7 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createExecutionContext } from '../context.js';
-import { getSkillExecutor, listSkills } from '../skills/index.js';
+import { getSkill, getSkillExecutor, listSkills } from '../skills/index.js';
+import { executeSkillDefinition } from '../skills/executor.js';
 import { executeWithMiddlewares } from '../skills/preamble.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 
@@ -124,5 +125,46 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(eventData.skill).toBe('vc');
     expect(eventData.event).toBe('completed');
     expect(eventData.outcome).toBe('success');
+  });
+
+  it('executes skills through their validated definitions', async () => {
+    const ctx = createExecutionContext();
+    const definition = getSkill('grill');
+
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('grill definition not found');
+
+    const result = await executeSkillDefinition(definition, [], ctx);
+
+    expect(result.ok).toBe(true);
+  });
+
+  it('blocks an invalid skill definition before execution', async () => {
+    const ctx = createExecutionContext();
+    let executed = false;
+    const definition = {
+      manifest: {
+        name: 'broken',
+        version: '',
+        description: 'invalid',
+        allowedTools: [],
+        sideEffects: 'none' as const,
+        verification: [],
+        phase: 'execute' as const,
+      },
+      executor: {
+        execute: async () => {
+          executed = true;
+          return { ok: true, output: 'should not run' };
+        },
+      },
+    };
+
+    const result = await executeSkillDefinition(definition, [], ctx);
+
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe('blocked');
+    expect(result.error).toContain('must declare a version');
+    expect(executed).toBe(false);
   });
 });
