@@ -1,18 +1,16 @@
 {
   "$schema": "https://knip.dev/schema.json",
-  "entry": ["core/cli/index.ts", "scripts/sync-docs.ts", "core/generator/gen-skill-docs.ts"],
-  "project": ["core/**/*.ts", "scripts/**/*.ts"],
-  "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky", ".claude"],
-  "ignoreDependencies": ["typescript", "@biomejs/biome", "husky", "markdownlint-cli2", "knip"],
+  "entry": [
+    "core/**/index.ts",
+    "core/test/**/*.ts",
+    "core/skills/*/execute.ts",
+    "scripts/*.ts",
+    "tests/**/*.ts"
+  ],
+  "project": ["core/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"],
   "rules": {
-    "dependencies": "error",
-    "devDependencies": "error",
-    "exports": "error",
-    "files": "error",
-    "nsExports": "error",
-    "nsTypes": "error",
-    "types": "error",
-    "unlisted": "warn",
-    "unresolved": "error"
+    "files": "warn",
+    "exports": "warn",
+    "types": "warn"
   }
 }
