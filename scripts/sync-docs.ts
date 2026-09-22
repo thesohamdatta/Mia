@@ -121,7 +121,7 @@ function validateFrontmatter(filePath: string, content: string): ValidationResul
           errors.push(`Agent-facing document requires "${field}"`);
         }
       }
-      if (fm.canonical !== true) {
+      if (fm.type !== 'skill' && fm.canonical !== true) {
         errors.push('Agent-facing canonical documents must declare canonical: true');
       }
     }
