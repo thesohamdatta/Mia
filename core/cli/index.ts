@@ -4,9 +4,6 @@ import { createExecutionContext } from '../context.js';
 import { getSkill, listSkills } from '../skills/index.js';
 import { executeSkillDefinition } from '../skills/executor.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 function showHelp(): void {
   console.log(`MIA (Machine Intelligence Architecture) CLI
 Version: 0.3.0
