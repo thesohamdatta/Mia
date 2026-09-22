@@ -22,9 +22,6 @@ function getConfig(): AppConfig {
   };
 }
 
-/**
- * Fast filesystem lookup to find the git repository root folder name (slug).
- */
 function getSlug(cwd?: string): string {
   const targetCwd = cwd || process.cwd();
   let curr = targetCwd;
