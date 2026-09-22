@@ -9,19 +9,32 @@ load: on-demand
 name: grill
 version: 1.0.0
 invocation: user
+phase: clarify
+side-effects: none
 ---
 
 # grill
 
-This is generated skill-facing documentation. The executable definition in core/skills/index.ts is authoritative.
+Clarify intent before non-trivial work
 
-## Runtime contract
+## Invocation
 
-See [MIA Skills and Commands](../core/skills-index.md) for the current phase, invocation mode, side-effect declaration, and verification surface.
+Explicitly invoked by the user through the MIA CLI.
 
-## Authority
+## Contract
 
-This document does not create a command, permission, or runtime capability. Changes to executable behaviour belong in core/skills/index.ts and the corresponding skill implementation.
+- Phase: clarify
+- Invocation: user
+- Side effects: none
+- Verification:
+
+## Runtime authority
+
+The executable definition in `core/skills/index.ts` is authoritative. This page is generated documentation.
+
+## Workflow
+
+Phase: clarify
 
 ---
 

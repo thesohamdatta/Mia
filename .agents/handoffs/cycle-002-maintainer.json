@@ -1,0 +1,28 @@
+{
+  "agent": "maintainer",
+  "cycle": "cycle-002",
+  "integration_branch": "master",
+  "verification_commit": "baa96b73059e60af9d6c45dc68b826398ea6eab2",
+  "objective": "Synchronize generated skill documentation surface with executable runtime skill registry.",
+  "findings": [
+    {
+      "priority": "P3",
+      "evidence": "docs/skills/ was out of sync with core/skills/index.ts; checkpoint.md and memory.md were missing while other skill files contained obsolete template prose.",
+      "impact": "Documentation drift across skill surface.",
+      "action": "Regenerate docs/skills/*.md via bun run gen:skill-docs."
+    }
+  ],
+  "changes": ["Regenerated 11 skill docs from core/skills/index.ts into docs/skills/."],
+  "checks": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "knip": "PASS",
+    "tests": "PASS",
+    "documentation": "PASS",
+    "build": "PASS"
+  },
+  "blocking_issues": [],
+  "uncertainty": [],
+  "status": "COMPLETE",
+  "next_agent": "orchestrator"
+}
