@@ -346,7 +346,8 @@ function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
   );
 
   const agentFacingCanonicalDocs = docNodes.filter(
-    (node) => node.canonical === true && (node.audience === 'agent' || node.audience === 'human+agent')
+    (node) =>
+      node.canonical === true && (node.audience === 'agent' || node.audience === 'human+agent')
   );
 
   return agentFacingCanonicalDocs
@@ -446,7 +447,8 @@ async function main(): Promise<void> {
     }
   } else {
     const canonicalAgentFacingCount = docNodes.filter(
-      (node) => node.canonical === true && (node.audience === 'agent' || node.audience === 'human+agent')
+      (node) =>
+        node.canonical === true && (node.audience === 'agent' || node.audience === 'human+agent')
     ).length;
     console.log(
       `  ✅ All ${canonicalAgentFacingCount} canonical agent-facing documents are covered by AGENTS.md`
