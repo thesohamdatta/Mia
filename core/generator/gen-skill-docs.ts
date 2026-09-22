@@ -109,6 +109,11 @@ fi
 }
 
 function main() {
+  if (!existsSync(TEMPLATE_PATH) || !existsSync(SKILLS_DIR)) {
+    console.log('No legacy templates or skills directory found. Skill docs up-to-date.');
+    process.exit(0);
+  }
+
   const template = readTemplate();
   const manifests = loadManifests();
 
