@@ -13,7 +13,21 @@ function ensureDir(dir: string): void {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 }
 
-function render(data: Record<string, unknown>): string {
+interface SkillDocData {
+  SKILL_NAME: string;
+  VERSION: string;
+  DESCRIPTION: string;
+  ALLOWED_TOOLS: readonly string[];
+  SIDE_EFFECTS: string;
+  VERIFICATION: readonly string[];
+  PHASE: string;
+  INVOCATION: string;
+  PREAMBLE: string;
+  WHEN_TO_INVOKE: string;
+  WORKFLOW: string;
+}
+
+function render(data: SkillDocData): string {
   const template = `---
 type: skill
 scope: project
@@ -62,11 +76,10 @@ The executable definition in \`core/skills/index.ts\` is authoritative. This pag
     result = result.replace(regex, Array.isArray(value) ? value.join('\n') : String(value));
   }
 
-
   return result;
 }
 
-function skillData([name, definition]: [string, SkillDefinition]): Record<string, unknown> {
+function skillData([_name, definition]: [string, SkillDefinition]): SkillDocData {
   const manifest = definition.manifest;
   return {
     SKILL_NAME: manifest.name,
@@ -78,9 +91,10 @@ function skillData([name, definition]: [string, SkillDefinition]): Record<string
     PHASE: manifest.phase,
     INVOCATION: manifest.invocation ?? 'user',
     PREAMBLE: '',
-    WHEN_TO_INVOKE: manifest.invocation === 'model' || manifest.invocation === 'both'
-      ? 'Available to model-triggered workflows when the task matches this skill.'
-      : 'Explicitly invoked by the user through the MIA CLI.',
+    WHEN_TO_INVOKE:
+      manifest.invocation === 'model' || manifest.invocation === 'both'
+        ? 'Available to model-triggered workflows when the task matches this skill.'
+        : 'Explicitly invoked by the user through the MIA CLI.',
     WORKFLOW: `Phase: ${manifest.phase}`,
   };
 }
@@ -96,7 +110,9 @@ function main(): void {
     console.log(`Generated: ${outPath}`);
   }
 
-  console.log(`\\nDone. Generated ${Object.keys(skills).length} skill docs from core/skills/index.ts.`);
+  console.log(
+    `\\nDone. Generated ${Object.keys(skills).length} skill docs from core/skills/index.ts.`
+  );
 }
 
 main();

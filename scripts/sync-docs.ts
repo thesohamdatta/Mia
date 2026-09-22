@@ -52,6 +52,8 @@ interface DocNode {
   layer: number;
   title: string;
   dependencies: string[];
+  audience?: string;
+  canonical?: boolean;
 }
 
 function getAllMarkdownFiles(dir: string): string[] {
@@ -285,10 +287,12 @@ function buildDocGraph(files: string[]): DocNode[] {
       const { data } = matter(content);
 
       nodes.push({
-        path: relative(ROOT_DIR, file),
+        path: relative(ROOT_DIR, file).replace(/\\/g, '/'),
         layer: Number.isInteger(data.layer) ? data.layer : 0,
         title: typeof data.title === 'string' ? data.title : '',
         dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
+        audience: typeof data.audience === 'string' ? data.audience : undefined,
+        canonical: data.canonical === true,
       });
     } catch {
       // Skip files without parseable frontmatter.
@@ -299,47 +303,56 @@ function buildDocGraph(files: string[]): DocNode[] {
 }
 
 function extractAgentsDocReferences(agentsContent: string): string[] {
-  const references: string[] = [];
+  const references = new Set<string>();
 
-  // Match markdown links in AGENTS.md
+  const addReference = (value: string): void => {
+    let cleanUrl = value.trim();
+
+    if (cleanUrl.startsWith('file:///')) {
+      cleanUrl = cleanUrl.slice(8);
+    } else if (cleanUrl.startsWith('./')) {
+      cleanUrl = cleanUrl.slice(2);
+    }
+
+    if (cleanUrl.startsWith('docs/')) {
+      references.add(cleanUrl.replace(/\\/g, '/'));
+    }
+  };
+
+  // Match Markdown links in AGENTS.md.
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let match: RegExpExecArray | null = linkRegex.exec(agentsContent);
 
   while (match !== null) {
-    const [, , url] = match;
-    if (url.startsWith('docs/') || url.startsWith('./docs/') || url.startsWith('file:///')) {
-      let cleanUrl = url;
-      if (url.startsWith('file:///')) {
-        cleanUrl = url.slice(8); // Remove file:///
-        // On Windows, file:///D:/... -> D:/...
-        if (/^[A-Za-z]:/.test(cleanUrl)) {
-          // Already has drive letter
-        } else {
-          cleanUrl = `/${cleanUrl}`;
-        }
-      } else if (url.startsWith('./docs/')) {
-        cleanUrl = url.slice(2);
-      }
-      references.push(cleanUrl);
-    }
+    addReference(match[2]);
     match = linkRegex.exec(agentsContent);
   }
 
-  return references;
+  // Match documentation paths recorded in inline code, including directory ownership entries.
+  const codePathRegex = /`(docs\/[^`]+)`/g;
+  match = codePathRegex.exec(agentsContent);
+
+  while (match !== null) {
+    addReference(match[1]);
+    match = codePathRegex.exec(agentsContent);
+  }
+
+  return [...references];
 }
 
 function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
-  const docPaths = new Set(docNodes.map((n) => n.path.replace(/\\/g, '/')));
-  const refPaths = new Set(agentsRefs.map((r) => r.replace(/^\//, '').replace(/\\/g, '/')));
+  const refPaths = agentsRefs.map((ref) =>
+    ref.replace(/^\//, '').replace(/\\/g, '/').replace(/\/$/, '')
+  );
 
-  return [...docPaths].filter((docPath) => {
-    if (docPath === 'docs/core/agent-engineering.md' || docPath === 'docs/reference/evidence.md') {
-      return false;
-    }
-    return ![...refPaths].some(
-      (ref) => docPath === ref || docPath.endsWith(ref) || ref.endsWith(docPath)
-    );
-  });
+  const agentFacingCanonicalDocs = docNodes.filter(
+    (node) =>
+      node.canonical === true && (node.audience === 'agent' || node.audience === 'human+agent')
+  );
+
+  return agentFacingCanonicalDocs
+    .map((node) => node.path.replace(/\\/g, '/'))
+    .filter((docPath) => !refPaths.some((ref) => docPath === ref || docPath.startsWith(`${ref}/`)));
 }
 
 async function main(): Promise<void> {
@@ -419,7 +432,7 @@ async function main(): Promise<void> {
   }
   console.log();
 
-  // 4. Check orphaned docs against AGENTS.md context map
+  // 4. Check canonical agent-facing docs against AGENTS.md context map.
   console.log('🗺️  Checking AGENTS.md context map...');
   const agentsContent = readFileSync(AGENTS_MD, 'utf-8');
   const agentsRefs = extractAgentsDocReferences(agentsContent);
@@ -427,13 +440,19 @@ async function main(): Promise<void> {
 
   if (orphaned.length > 0) {
     console.log(
-      `  ⚠️  ${orphaned.length} orphaned documentation file(s) not referenced in AGENTS.md:`
+      `  ⚠️  ${orphaned.length} canonical agent-facing document(s) not referenced in AGENTS.md:`
     );
     for (const orphan of orphaned) {
       console.log(`     - ${orphan}`);
     }
   } else {
-    console.log(`  ✅ All ${docNodes.length} documented files referenced in AGENTS.md`);
+    const canonicalAgentFacingCount = docNodes.filter(
+      (node) =>
+        node.canonical === true && (node.audience === 'agent' || node.audience === 'human+agent')
+    ).length;
+    console.log(
+      `  ✅ All ${canonicalAgentFacingCount} canonical agent-facing documents are covered by AGENTS.md`
+    );
   }
   console.log();
 
