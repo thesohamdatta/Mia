@@ -9,7 +9,6 @@ The current codebase is smaller than the historical testing strategy that inspir
 The main repository checks are:
 
 ```bash
-bun ci
 bun test
 bun run typecheck
 bun run lint:check
