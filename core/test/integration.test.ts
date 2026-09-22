@@ -143,8 +143,9 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(eventData.skill).toBe('vc');
     expect(eventData.event).toBe('completed');
     expect(eventData.outcome).toBe('success');
+    expect(eventData.runId).toBe(ctx.run.id);
+
     const evidence = await unifiedStore.listEvidence(projectsDir, slug, 5);
     expect(evidence).toEqual([]);
-
   });
 });
