@@ -303,33 +303,41 @@ function buildDocGraph(files: string[]): DocNode[] {
 }
 
 function extractAgentsDocReferences(agentsContent: string): string[] {
-  const references: string[] = [];
+  const references = new Set<string>();
 
-  // Match markdown links in AGENTS.md
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const addReference = (value: string): void => {
+    let cleanUrl = value.trim();
+
+    if (cleanUrl.startsWith('file:///')) {
+      cleanUrl = cleanUrl.slice(8);
+    } else if (cleanUrl.startsWith('./')) {
+      cleanUrl = cleanUrl.slice(2);
+    }
+
+    if (cleanUrl.startsWith('docs/')) {
+      references.add(cleanUrl.replace(/\\/g, '/'));
+    }
+  };
+
+  // Match Markdown links in AGENTS.md.
+  const linkRegex = /\\[([^\\]]+)\\]\\(([^)]+)\\)/g;
   let match: RegExpExecArray | null = linkRegex.exec(agentsContent);
 
   while (match !== null) {
-    const [, , url] = match;
-    if (url.startsWith('docs/') || url.startsWith('./docs/') || url.startsWith('file:///')) {
-      let cleanUrl = url;
-      if (url.startsWith('file:///')) {
-        cleanUrl = url.slice(8); // Remove file:///
-        // On Windows, file:///D:/... -> D:/...
-        if (/^[A-Za-z]:/.test(cleanUrl)) {
-          // Already has drive letter
-        } else {
-          cleanUrl = `/${cleanUrl}`;
-        }
-      } else if (url.startsWith('./docs/')) {
-        cleanUrl = url.slice(2);
-      }
-      references.push(cleanUrl);
-    }
+    addReference(match[2]);
     match = linkRegex.exec(agentsContent);
   }
 
-  return references;
+  // Match documentation paths recorded in inline code, including directory ownership entries.
+  const codePathRegex = /\`(docs\\/[^\`]+)\`/g;
+  match = codePathRegex.exec(agentsContent);
+
+  while (match !== null) {
+    addReference(match[1]);
+    match = codePathRegex.exec(agentsContent);
+  }
+
+  return [...references];
 }
 
 function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
