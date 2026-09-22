@@ -1,4 +1,4 @@
-import type { ExecutionContext, EvidenceRecord } from '../skills/types.js';
+import type { EvidenceRecord, ExecutionContext } from '../skills/types.js';
 
 export interface VerificationCheck {
   name: string;
