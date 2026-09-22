@@ -77,6 +77,25 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(first).not.toBe(second);
   });
 
+
+  it('should create real plan and spec artifacts', async () => {
+    const ctx = createExecutionContext();
+
+    const plan = await getSkillExecutor('plan')?.execute(['create', 'Improve', 'MIA'], ctx);
+    expect(plan?.ok).toBe(true);
+
+    const spec = await getSkillExecutor('spec')?.execute(['create', 'Make', 'runs', 'explicit'], ctx);
+    expect(spec?.ok).toBe(true);
+
+    const projectDir = join(ctx.config.projectsDir, ctx.slug);
+    const planText = await Bun.file(join(projectDir, 'PLAN.md')).text();
+    const specText = await Bun.file(join(projectDir, 'SPEC.md')).text();
+
+    expect(planText).toContain('Improve MIA');
+    expect(planText).toContain(ctx.run.id);
+    expect(specText).toContain('Make runs explicit');
+  });
+
   it('should execute grill skill through CLI path', async () => {
     const ctx = createExecutionContext();
     const executor = getSkillExecutor('grill');
