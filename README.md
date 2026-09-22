@@ -124,7 +124,7 @@ The current CLI is intentionally small:
 | `mia spec` | Turn intent into a PRD-style spec and issues |
 | `mia review` | Run the pre-landing review workflow |
 | `mia health` | Inspect code-quality checks and shipping readiness |
-| `mia ship` | Start the test → review → push → PR workflow |
+| `mia ship` | Gate handoff on repository verification |
 | `mia learn` | List or add project learnings |
 | `mia retro` | Review recent activity and accumulated learnings |
 | `mia memory` | Read or append long-term memory |
