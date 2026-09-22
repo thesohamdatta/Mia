@@ -6,7 +6,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..', '..');
 const TEMPLATE_PATH = join(ROOT, 'templates', 'skill.tmpl');
-const SKILLS_DIR = join(ROOT, 'skills');
 const OUTPUT_DIR = join(ROOT, 'docs', 'skills');
 
 function ensureDir(dir: string) {
@@ -53,31 +52,33 @@ interface SkillManifest {
   name: string;
   version: string;
   description: string;
-  preambleTier: number;
   allowedTools: string[];
-  triggers: string[];
-  whenToInvoke: string;
-  workflow: string;
+  sideEffects: string;
+  verification: string[];
+  phase: string;
+  invocation?: string;
 }
 
 function loadManifests(): SkillManifest[] {
+  const indexPath = join(ROOT, 'core', 'skills', 'index.ts');
+  const source = readFileSync(indexPath, 'utf-8');
   const manifests: SkillManifest[] = [];
-
-  for (const category of readdirSync(SKILLS_DIR, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name)) {
-    const catDir = join(SKILLS_DIR, category);
-    for (const skillDir of readdirSync(catDir, { withFileTypes: true })
-      .filter((d) => d.isDirectory())
-      .map((d) => d.name)) {
-      const manifestPath = join(catDir, skillDir, 'manifest.json');
-      if (existsSync(manifestPath)) {
-        const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as SkillManifest;
-        manifests.push(manifest);
-      }
-    }
+  const pattern = /([A-Za-z0-9_]+): define\(\1, '([^']+)', '([^']+)', \[([^\]]*)\], '([^']+)'/g;
+  let match: RegExpExecArray | null = pattern.exec(source);
+  while (match) {
+    const [, name, description, sideEffects, verification, phase] = match;
+    manifests.push({
+      name,
+      version: '1.0.0',
+      description,
+      allowedTools: [],
+      sideEffects,
+      verification: verification.split(',').map((value) => value.trim().replace(/['"]/g, '')).filter(Boolean),
+      phase,
+      invocation: 'user',
+    });
+    match = pattern.exec(source);
   }
-
   return manifests;
 }
 
