@@ -1,5 +1,3 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createExecutionContext } from '../context.js';
 import { getSkill, listSkills } from '../skills/index.js';
 import { executeSkillDefinition } from '../skills/executor.js';
