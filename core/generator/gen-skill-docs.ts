@@ -13,7 +13,21 @@ function ensureDir(dir: string): void {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 }
 
-function render(data: Record<string, unknown>): string {
+interface SkillDocData {
+  SKILL_NAME: string;
+  VERSION: string;
+  DESCRIPTION: string;
+  ALLOWED_TOOLS: readonly string[];
+  SIDE_EFFECTS: string;
+  VERIFICATION: readonly string[];
+  PHASE: string;
+  INVOCATION: string;
+  PREAMBLE: string;
+  WHEN_TO_INVOKE: string;
+  WORKFLOW: string;
+}
+
+function render(data: SkillDocData): string {
   const template = `---
 type: skill
 scope: project
@@ -65,7 +79,7 @@ The executable definition in \`core/skills/index.ts\` is authoritative. This pag
   return result;
 }
 
-function skillData([_name, definition]: [string, SkillDefinition]): Record<string, unknown> {
+function skillData([_name, definition]: [string, SkillDefinition]): SkillDocData {
   const manifest = definition.manifest;
   return {
     SKILL_NAME: manifest.name,
