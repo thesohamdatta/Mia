@@ -1,3 +1,4 @@
+import type { UnifiedStore } from '../state/unified-store.js';
 export interface SkillResult {
   ok: boolean;
   output?: string;
@@ -9,27 +10,6 @@ export interface ExecutionContext {
   slug: string;
   unifiedStore: UnifiedStore;
   config: AppConfig;
-}
-
-export interface UnifiedStore {
-  append(
-    projectsDir: string,
-    type: 'learning' | 'timeline' | 'checkpoint',
-    slug: string,
-    data: unknown
-  ): Promise<void>;
-  query(
-    projectsDir: string,
-    slug: string,
-    type?: 'learning' | 'timeline' | 'checkpoint',
-    filter?: (event: StoredEvent) => boolean,
-    limit?: number
-  ): Promise<StoredEvent[]>;
-  listLearnings(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
-  listTimeline(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
-  appendLearning(projectsDir: string, slug: string, data: unknown): Promise<void>;
-  appendTimeline(projectsDir: string, slug: string, data: unknown): Promise<void>;
-  appendCheckpoint(projectsDir: string, slug: string, data: unknown): Promise<void>;
 }
 
 export interface StoredEvent<T = unknown> {
