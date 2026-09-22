@@ -95,7 +95,7 @@ describe('skill execution lifecycle', () => {
       []
     );
 
-    expect(result).toEqual({ ok: false, error: 'boom' });
+    expect(result).toEqual({ ok: false, status: 'failed', error: 'boom' });
     expect(store.timeline).toEqual([{ event: 'failed', outcome: 'failed' }]);
   });
 
@@ -124,9 +124,9 @@ describe('skill execution lifecycle', () => {
     );
 
     expect(result).toEqual({ ok: true, output: 'done' });
-    expect(warn).toHaveBeenCalledWith('⚠️  Could not record timeline start: timeline unavailable');
+    expect(warn).toHaveBeenCalledWith('Could not record timeline start: timeline unavailable');
     expect(warn).toHaveBeenCalledWith(
-      '⚠️  Could not record timeline completion: timeline unavailable'
+      'Could not record timeline completion: timeline unavailable'
     );
   });
 });
