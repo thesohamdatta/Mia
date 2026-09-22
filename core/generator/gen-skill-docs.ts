@@ -7,18 +7,54 @@ import type { SkillDefinition } from '../skills/types.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..', '..');
-const TEMPLATE_PATH = join(ROOT, 'templates', 'skill.tmpl');
 const OUTPUT_DIR = join(ROOT, 'docs', 'skills');
 
 function ensureDir(dir: string): void {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 }
 
-function readTemplate(): string {
-  return readFileSync(TEMPLATE_PATH, 'utf8');
-}
+function render(data: Record<string, unknown>): string {
+  const template = `---
+type: skill
+scope: project
+status: active
+owner: runtime
+canonical: false
+audience: agent
+load: on-demand
+name: {{SKILL_NAME}}
+version: {{VERSION}}
+invocation: {{INVOCATION}}
+phase: {{PHASE}}
+side-effects: {{SIDE_EFFECTS}}
+---
 
-function render(template: string, data: Record<string, unknown>): string {
+# {{SKILL_NAME}}
+
+{{DESCRIPTION}}
+
+## Invocation
+
+{{WHEN_TO_INVOKE}}
+
+## Contract
+
+- Phase: {{PHASE}}
+- Invocation: {{INVOCATION}}
+- Side effects: {{SIDE_EFFECTS}}
+- Verification: {{VERIFICATION}}
+
+## Runtime authority
+
+The executable definition in \`core/skills/index.ts\` is authoritative. This page is generated documentation.
+
+## Workflow
+
+{{WORKFLOW}}
+
+---
+
+*Generated from the executable skill registry.*`;
   let result = template;
 
   for (const [key, value] of Object.entries(data)) {
@@ -64,12 +100,11 @@ function skillData([name, definition]: [string, SkillDefinition]): Record<string
 }
 
 function main(): void {
-  const template = readTemplate();
   ensureDir(OUTPUT_DIR);
 
   for (const entry of Object.entries(skills)) {
     const data = skillData(entry);
-    const output = render(template, data);
+    const output = render(data);
     const outPath = join(OUTPUT_DIR, `${data.SKILL_NAME}.md`);
     writeFileSync(outPath, output, 'utf8');
     console.log(`Generated: ${outPath}`);
