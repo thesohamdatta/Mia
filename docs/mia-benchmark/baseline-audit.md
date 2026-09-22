@@ -16,10 +16,10 @@ core/state/unified-store.ts defines learning, timeline, and checkpoint events an
 AGENTS.md requires clarify-before-coding, explicit human approval, smallest useful changes, and verification before claims.
 
 ### Testing
-docs/reference/testing-strategy.md lists tests, typecheck, lint, Knip, markdown checks, frontmatter validation, and build. It also explicitly says current CI is not fully aligned with repository scripts.
+docs/reference/testing-strategy.md lists tests, typecheck, lint, Knip, markdown checks, frontmatter validation, and build. The current CI workflow runs these supported checks on the master integration branch.
 
-### CI discrepancy
-The current .github/workflows/ci.yml still calls commands/targets not present in the current package.json, including check:links, check:spelling, build:cli, and build:daemon. The testing strategy documents this mismatch as maintenance work rather than evidence of passing verification.
+### CI
+The CI discrepancy identified in the original baseline has been resolved. The current workflow targets master, uses supported package scripts, uses a single repository validation job, pins the Bun runtime through package.json, and keeps pull-request title validation separate within the same workflow.
 
 ### Recent development history
 Recent MIA commits include performance work on JSONL tail queries and git-root lookup, a documentation alignment pass, and coordination-state/Jules protocol changes. Recent Jules PRs include #23, #24, and #25, all focused on performance improvements.
