@@ -4,7 +4,7 @@ import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { createUnifiedStore } from './state/unified-store.js';
-import type { AppConfig, ExecutionContext, SkillRun } from './skills/types.js';
+import type { AppConfig, ExecutionContext } from './skills/types.js';
 
 function getMiaDir(): string {
   // biome-ignore lint/complexity/useLiteralKeys: TS noPropertyAccessFromIndexSignature
