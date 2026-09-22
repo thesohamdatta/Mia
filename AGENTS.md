@@ -58,7 +58,7 @@ Middleware
  ↓
 Skill Executor
  ↓
-UnifiedStore / local files / optional host integrations
+UnifiedStore / local files
 ```
 
 There is **no current MIA daemon or HTTP control plane** in the normal execution path.
