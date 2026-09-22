@@ -97,7 +97,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(specText).toContain('Make runs explicit');
   });
 
-  it('should execute grill skill through CLI path', async () => {
+  it('should execute grill skill through validated CLI path', async () => {
     const ctx = createExecutionContext();
     const definition = getSkill('grill');
 
