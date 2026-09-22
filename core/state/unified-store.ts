@@ -4,6 +4,22 @@ import { appendJsonl, readJsonlTail } from '../state/jsonl-store.js';
 
 export type EventType = 'learning' | 'timeline' | 'checkpoint';
 
+export interface UnifiedStore {
+  append(projectsDir: string, type: EventType, slug: string, data: unknown): Promise<void>;
+  query(
+    projectsDir: string,
+    slug: string,
+    type?: EventType,
+    filter?: (event: StoredEvent) => boolean,
+    limit?: number
+  ): Promise<StoredEvent[]>;
+  listLearnings(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
+  listTimeline(projectsDir: string, slug: string, limit?: number): Promise<StoredEvent[]>;
+  appendLearning(projectsDir: string, slug: string, data: unknown): Promise<void>;
+  appendTimeline(projectsDir: string, slug: string, data: unknown): Promise<void>;
+  appendCheckpoint(projectsDir: string, slug: string, data: unknown): Promise<void>;
+}
+
 export interface StoredEvent<T = unknown> {
   type: EventType;
   ts: string;
@@ -25,7 +41,7 @@ function ensureProjectDir(projectsDir: string, slug: string): string {
   return dir;
 }
 
-export class UnifiedStore {
+class JsonlUnifiedStore implements UnifiedStore {
   async append(projectsDir: string, type: EventType, slug: string, data: unknown): Promise<void> {
     ensureProjectDir(projectsDir, slug);
     const event: StoredEvent = { type, ts: new Date().toISOString(), slug, data };
@@ -72,5 +88,5 @@ export class UnifiedStore {
 }
 
 export function createUnifiedStore(): UnifiedStore {
-  return new UnifiedStore();
+  return new JsonlUnifiedStore();
 }
