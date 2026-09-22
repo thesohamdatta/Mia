@@ -1,10 +1,10 @@
-import { randomUUID } from 'node:crypto';
 import { execSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
-import { createUnifiedStore } from './state/unified-store.js';
 import type { AppConfig, ExecutionContext } from './skills/types.js';
+import { createUnifiedStore } from './state/unified-store.js';
 
 function getMiaDir(): string {
   // biome-ignore lint/complexity/useLiteralKeys: TS noPropertyAccessFromIndexSignature
