@@ -66,7 +66,7 @@ The executable definition in \`core/skills/index.ts\` is authoritative. This pag
   return result;
 }
 
-function skillData([name, definition]: [string, SkillDefinition]): Record<string, unknown> {
+function skillData([_name, definition]: [string, SkillDefinition]): Record<string, unknown> {
   const manifest = definition.manifest;
   return {
     SKILL_NAME: manifest.name,
