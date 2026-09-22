@@ -52,6 +52,8 @@ interface DocNode {
   layer: number;
   title: string;
   dependencies: string[];
+  audience?: string;
+  canonical?: boolean;
 }
 
 function getAllMarkdownFiles(dir: string): string[] {
@@ -285,10 +287,12 @@ function buildDocGraph(files: string[]): DocNode[] {
       const { data } = matter(content);
 
       nodes.push({
-        path: relative(ROOT_DIR, file),
+        path: relative(ROOT_DIR, file).replace(/\\/g, '/'),
         layer: Number.isInteger(data.layer) ? data.layer : 0,
         title: typeof data.title === 'string' ? data.title : '',
         dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
+        audience: typeof data.audience === 'string' ? data.audience : undefined,
+        canonical: data.canonical === true,
       });
     } catch {
       // Skip files without parseable frontmatter.
@@ -329,17 +333,24 @@ function extractAgentsDocReferences(agentsContent: string): string[] {
 }
 
 function findOrphanedDocs(docNodes: DocNode[], agentsRefs: string[]): string[] {
-  const docPaths = new Set(docNodes.map((n) => n.path.replace(/\\/g, '/')));
-  const refPaths = new Set(agentsRefs.map((r) => r.replace(/^\//, '').replace(/\\/g, '/')));
+  const refPaths = agentsRefs.map((ref) =>
+    ref.replace(/^\//, '').replace(/\\/g, '/').replace(/\/$/, '')
+  );
 
-  return [...docPaths].filter((docPath) => {
-    if (docPath === 'docs/core/agent-engineering.md' || docPath === 'docs/reference/evidence.md') {
-      return false;
-    }
-    return ![...refPaths].some(
-      (ref) => docPath === ref || docPath.endsWith(ref) || ref.endsWith(docPath)
+  const agentFacingCanonicalDocs = docNodes.filter(
+    (node) =>
+      node.canonical === true &&
+      (node.audience === 'agent' || node.audience === 'human+agent')
+  );
+
+  return agentFacingCanonicalDocs
+    .map((node) => node.path.replace(/\\/g, '/'))
+    .filter(
+      (docPath) =>
+        !refPaths.some(
+          (ref) => docPath === ref || docPath.startsWith(`${ref}/`)
+        )
     );
-  });
 }
 
 async function main(): Promise<void> {
@@ -419,7 +430,7 @@ async function main(): Promise<void> {
   }
   console.log();
 
-  // 4. Check orphaned docs against AGENTS.md context map
+  // 4. Check canonical agent-facing docs against AGENTS.md context map.
   console.log('🗺️  Checking AGENTS.md context map...');
   const agentsContent = readFileSync(AGENTS_MD, 'utf-8');
   const agentsRefs = extractAgentsDocReferences(agentsContent);
@@ -427,13 +438,20 @@ async function main(): Promise<void> {
 
   if (orphaned.length > 0) {
     console.log(
-      `  ⚠️  ${orphaned.length} orphaned documentation file(s) not referenced in AGENTS.md:`
+      `  ⚠️  ${orphaned.length} canonical agent-facing document(s) not referenced in AGENTS.md:`
     );
     for (const orphan of orphaned) {
       console.log(`     - ${orphan}`);
     }
   } else {
-    console.log(`  ✅ All ${docNodes.length} documented files referenced in AGENTS.md`);
+    const canonicalAgentFacingCount = docNodes.filter(
+      (node) =>
+        node.canonical === true &&
+        (node.audience === 'agent' || node.audience === 'human+agent')
+    ).length;
+    console.log(
+      `  ✅ All ${canonicalAgentFacingCount} canonical agent-facing documents are covered by AGENTS.md`
+    );
   }
   console.log();
 
