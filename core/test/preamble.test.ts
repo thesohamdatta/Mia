@@ -1,4 +1,5 @@
 import { mkdtempSync, rmSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -22,6 +23,12 @@ describe('skill execution lifecycle', () => {
     return {
       cwd: testDir,
       slug: 'test-project',
+      run: {
+        id: randomUUID(),
+        skill: 'test',
+        startedAt: new Date().toISOString(),
+        status: 'running',
+      },
       unifiedStore: store,
       config: {
         miaDir: join(testDir, '.mia'),
@@ -44,6 +51,8 @@ describe('skill execution lifecycle', () => {
       listTimeline: async () => [],
       appendLearning: async () => {},
       appendCheckpoint: async () => {},
+      listEvidence: async () => [],
+      appendEvidence: async () => {},
       appendTimeline: async (_projectsDir, _slug, data) => {
         const event = data as { event?: string; outcome?: string };
         timeline.push({ event: event.event ?? 'unknown', outcome: event.outcome });
@@ -98,6 +107,8 @@ describe('skill execution lifecycle', () => {
       listTimeline: async () => [],
       appendLearning: async () => {},
       appendCheckpoint: async () => {},
+      listEvidence: async () => [],
+      appendEvidence: async () => {},
       appendTimeline: async () => {
         throw new Error('timeline unavailable');
       },
