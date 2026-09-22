@@ -17,7 +17,6 @@ import matter from 'gray-matter';
 const ROOT_DIR = resolve(import.meta.dir, '..');
 const DOCS_DIR = join(ROOT_DIR, 'docs');
 const AGENTS_MD = join(ROOT_DIR, 'AGENTS.md');
-const AGENTS_MD = join(ROOT_DIR, 'AGENTS.md');
 
 // Frontmatter schema
 interface Frontmatter {
