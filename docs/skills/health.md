@@ -13,18 +13,16 @@ invocation: user
 
 # health
 
-Executable runtime contract is defined by `core/skills/index.ts`. This page is generated documentation and must not be treated as permission or command authority.
+This is generated skill-facing documentation. The executable definition in core/skills/index.ts is authoritative.
 
-## Contract
+## Runtime contract
 
-- Invocation: user
-- Runtime source: `core/skills/index.ts`
-- Documentation source: executable skill metadata
+See [MIA Skills and Commands](../core/skills-index.md) for the current phase, invocation mode, side-effect declaration, and verification surface.
 
-## Current role
+## Authority
 
-See [the skill index](../core/skills-index.md) for the current phase, side-effect declaration, verification surface, and command mapping.
+This document does not create a command, permission, or runtime capability. Changes to executable behaviour belong in core/skills/index.ts and the corresponding skill implementation.
 
 ---
 
-*Generated documentation. Do not edit as a source of truth.*
+*Generated from the executable skill registry.*
