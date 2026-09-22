@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createExecutionContext } from '../context.js';
+import { executeSkillDefinition } from '../skills/executor.js';
 import { getSkill, getSkillExecutor, listSkillDefinitions, listSkills } from '../skills/index.js';
 import { executeWithMiddlewares } from '../skills/preamble.js';
 import { createUnifiedStore } from '../state/unified-store.js';
@@ -46,10 +47,10 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should execute vc skill through CLI path', async () => {
     const ctx = createExecutionContext();
-    const executor = getSkillExecutor('vc');
+    const definition = getSkill('vc');
 
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('vc executor not found');
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
 
     const result = await executeSkillDefinition(definition, ['help'], ctx);
 
@@ -98,12 +99,12 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should execute grill skill through CLI path', async () => {
     const ctx = createExecutionContext();
-    const executor = getSkillExecutor('grill');
+    const definition = getSkill('grill');
 
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('grill executor not found');
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('grill definition not found');
 
-    const result = await executeWithMiddlewares(executor, [], ctx, 'grill');
+    const result = await executeSkillDefinition(definition, [], ctx);
 
     expect(result.ok).toBe(true);
   });
@@ -143,11 +144,11 @@ describe('Integration: CLI -> Skill -> Store', () => {
     const slug = ctx.slug;
     const unifiedStore = ctx.unifiedStore;
 
-    const executor = getSkillExecutor('vc');
-    expect(executor).toBeDefined();
-    if (!executor) throw new Error('vc executor not found');
+    const definition = getSkill('vc');
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
 
-    const result = await executeWithMiddlewares(executor, ['help'], ctx, 'vc');
+    const result = await executeSkillDefinition(definition, ['help'], ctx);
 
     expect(result.ok).toBe(true);
 
@@ -158,7 +159,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(lastEvent).toBeDefined();
     if (!lastEvent) throw new Error('No timeline event');
 
-    const eventData = lastEvent.data as { skill?: string; event?: string; outcome?: string };
+    const eventData = lastEvent.data as { skill?: string; event?: string; outcome?: string; runId?: string };
     expect(eventData.skill).toBe('vc');
     expect(eventData.event).toBe('completed');
     expect(eventData.outcome).toBe('success');
