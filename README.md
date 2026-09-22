@@ -153,7 +153,7 @@ MIA is a direct execution system.
 │                         │                               │
 │                         ├── Config                      │
 │                         ├── UnifiedStore               │
-│                         └── Host adapters               │
+│                         └── local files                 │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -179,10 +179,6 @@ The important boundaries are:
 **State**
 
 `core/state/unified-store.ts` stores learning, timeline, and checkpoint events in per-project `events.jsonl` files.
-
-**Hosts**
-
-`core/hosts/` defines adapters for Claude, Codex, Hermes, and OpenCode. These are integration boundaries, not the core execution model.
 
 ### local state
 
