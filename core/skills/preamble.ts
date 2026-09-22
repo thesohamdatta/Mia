@@ -63,10 +63,7 @@ export function formatSkillOutput(result: SkillResult): string {
   return result.output || 'Done';
 }
 
-async function recordCompletion(
-  ctx: ExecutionContext,
-  result: SkillResult
-): Promise<void> {
+async function recordCompletion(ctx: ExecutionContext, result: SkillResult): Promise<void> {
   try {
     await ctx.unifiedStore.appendTimeline(ctx.config.projectsDir, ctx.slug, {
       runId: ctx.run.id,
