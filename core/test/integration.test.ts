@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createExecutionContext } from '../context.js';
-import { getSkillExecutor, listSkills } from '../skills/index.js';
+import { getSkill, getSkillExecutor, listSkillDefinitions, listSkills } from '../skills/index.js';
 import { executeWithMiddlewares } from '../skills/preamble.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 
@@ -56,6 +56,25 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(result.ok).toBe(true);
     expect(result.output).toContain('mia vc — professional version control');
     expect(result.output).toContain('Commands:');
+  });
+
+  it('should expose executable skill definitions with explicit safety contracts', () => {
+    const definitions = listSkillDefinitions();
+    expect(definitions).toHaveLength(11);
+    expect(getSkill('vc')?.manifest.sideEffects).toBe('git-write');
+    expect(getSkill('health')?.manifest.verification).toEqual([
+      'typecheck',
+      'lint',
+      'unused-code',
+      'tests',
+      'build',
+    ]);
+  });
+
+  it('should create a unique run identity for each execution', () => {
+    const first = createExecutionContext().run.id;
+    const second = createExecutionContext().run.id;
+    expect(first).not.toBe(second);
   });
 
   it('should execute grill skill through CLI path', async () => {
@@ -124,5 +143,8 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(eventData.skill).toBe('vc');
     expect(eventData.event).toBe('completed');
     expect(eventData.outcome).toBe('success');
+    const evidence = await unifiedStore.listEvidence(projectsDir, slug, 5);
+    expect(evidence).toEqual([]);
+
   });
 });
