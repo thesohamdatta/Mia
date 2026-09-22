@@ -87,9 +87,7 @@ describe('skill execution lifecycle', () => {
     );
 
     expect(result).toEqual({ ok: false, error: 'boom' });
-    expect(store.timeline).toEqual([
-      { event: 'failed', outcome: 'failed' },
-    ]);
+    expect(store.timeline).toEqual([{ event: 'failed', outcome: 'failed' }]);
   });
 
   it('keeps skill execution alive when timeline persistence fails', async () => {
