@@ -1,6 +1,6 @@
 import { createExecutionContext } from '../context.js';
-import { getSkill, listSkills } from '../skills/index.js';
 import { executeSkillDefinition } from '../skills/executor.js';
+import { getSkill, listSkills } from '../skills/index.js';
 
 function showHelp(): void {
   console.log(`MIA (Machine Intelligence Architecture) CLI
