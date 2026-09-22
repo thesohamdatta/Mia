@@ -35,10 +35,15 @@ export const loadRecentLearnings: Middleware = async (ctx, next) => {
 export const logTimelineStart: Middleware = async (ctx, next) => {
   const skillName = (ctx as SkillExecutionContext)._skillName || 'unknown';
   const projectsDir = ctx.config.projectsDir;
-  await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
-    skill: skillName,
-    event: 'started',
-  });
+  try {
+    await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
+      skill: skillName,
+      event: 'started',
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`⚠️  Could not record timeline start: ${message}`);
+  }
   await next();
 };
 
