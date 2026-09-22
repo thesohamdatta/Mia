@@ -187,7 +187,8 @@ function checkAnchorExists(filePath: string, anchor: string): boolean {
   try {
     const content = readFileSync(filePath, 'utf-8');
     // Convert anchor to heading pattern (e.g., #some-heading -> ## Some Heading)
-    const headingPattern = new RegExp(`^#{1,6}\\\\s+\${anchor.replace(/-/g, '\\\\s+')}`, 'mi');
+    // biome-ignore lint/complexity/useRegexLiterals: the heading pattern contains a runtime anchor
+    const headingPattern = new RegExp(`^#{1,6}\\s+${anchor.replace(/-/g, '\\s+')}`, 'mi');
     return headingPattern.test(content);
   } catch {
     return false;
