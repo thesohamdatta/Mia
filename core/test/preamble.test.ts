@@ -125,8 +125,6 @@ describe('skill execution lifecycle', () => {
 
     expect(result).toEqual({ ok: true, output: 'done' });
     expect(warn).toHaveBeenCalledWith('Could not record timeline start: timeline unavailable');
-    expect(warn).toHaveBeenCalledWith(
-      'Could not record timeline completion: timeline unavailable'
-    );
+    expect(warn).toHaveBeenCalledWith('Could not record timeline completion: timeline unavailable');
   });
 });
