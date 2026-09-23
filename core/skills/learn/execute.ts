@@ -15,9 +15,14 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
         output: '📚 No learnings yet. Add one with: mia learn add <type> <key> <insight>',
       };
     }
+    interface LearningData {
+      type?: string;
+      key?: string;
+      insight?: string;
+    }
     let output = '📚 Learnings:\n\n';
     for (const l of learnings) {
-      const d = l.data as any;
+      const d = l.data as LearningData;
       output += `  • [${d.type || 'pattern'}] ${d.key || 'unnamed'}: ${d.insight || ''}\n`;
     }
     return { ok: true, output };

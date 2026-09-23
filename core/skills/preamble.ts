@@ -2,6 +2,11 @@ import type { ExecutionContext, SkillExecutor, SkillResult } from './types.js';
 
 export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
+interface ExecutionContextWithState extends ExecutionContext {
+  _skillName?: string;
+  _skillResult?: SkillResult;
+}
+
 export const requireProject: Middleware = async (ctx, next) => {
   if (ctx.slug === 'default') {
     console.warn('⚠️  Not in a git repository. Using default project.');
@@ -27,7 +32,8 @@ export const loadRecentLearnings: Middleware = async (ctx, next) => {
 };
 
 export const logTimelineStart: Middleware = async (ctx, next) => {
-  const skillName = (ctx as any)._skillName || 'unknown';
+  const stateCtx = ctx as ExecutionContextWithState;
+  const skillName = stateCtx._skillName || 'unknown';
   const projectsDir = ctx.config.projectsDir;
   await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
@@ -37,13 +43,14 @@ export const logTimelineStart: Middleware = async (ctx, next) => {
 };
 
 export const logTimelineComplete: Middleware = async (ctx, next) => {
-  const skillName = (ctx as any)._skillName || 'unknown';
-  const result = (ctx as any)._skillResult as SkillResult;
+  const stateCtx = ctx as ExecutionContextWithState;
+  const skillName = stateCtx._skillName || 'unknown';
+  const result = stateCtx._skillResult;
   const projectsDir = ctx.config.projectsDir;
   await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
     skill: skillName,
     event: 'completed',
-    outcome: result.ok ? 'success' : 'failed',
+    outcome: result?.ok ? 'success' : 'failed',
   });
   await next();
 };
@@ -84,13 +91,14 @@ export async function executeWithMiddlewares(
   skillName: string,
   middlewares: Middleware[] = defaultMiddlewares
 ): Promise<SkillResult> {
-  (ctx as any)._skillName = skillName;
+  const stateCtx = ctx as ExecutionContextWithState;
+  stateCtx._skillName = skillName;
 
   await runMiddlewares(middlewares, ctx);
 
   const result = await executor.execute(args, ctx);
 
-  (ctx as any)._skillResult = result;
+  stateCtx._skillResult = result;
   await logTimelineComplete(ctx, async () => {});
 
   return result;

@@ -14,7 +14,7 @@
     "lint:check": "biome check .",
     "lint:md": "markdownlint-cli2 \"*.md\" \"docs/**/*.md\" \"scripts/**/*.md\" \"tests/**/*.md\" --config .markdownlint-cli2.jsonc",
     "lint:md:fix": "markdownlint-cli2 \"**/*.md\" --fix --config .markdownlint-cli2.jsonc",
-    "validate:frontmatter": "bun run scripts/validate-frontmatter.ts",
+    "validate:frontmatter": "bun run scripts/sync-docs.ts",
     "typecheck": "tsc --noEmit",
     "knip": "knip",
     "validate": "bun run lint && bun run typecheck && bun run knip",
