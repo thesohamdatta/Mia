@@ -1,8 +1,9 @@
 {
-  "last_check": "2026-08-10T00:00:00Z",
+  "last_check": "2026-08-10T00:05:00Z",
   "tests": "PASS",
   "typecheck": "PASS",
   "lint": "PASS",
+  "knip": "PASS",
   "build": "PASS",
   "slop_score": 0,
   "recurring_failures": 0
