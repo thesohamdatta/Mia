@@ -1,0 +1,34 @@
+{
+  "agent": "sentry",
+  "task": "quality-control-sentry-qc",
+  "objective": "Perform quality control review across core codebase and advance state pipeline to Pulse agent",
+  "scope": [
+    ".agents/PROTOCOL.md",
+    ".agents/state.json",
+    ".agents/quality.json",
+    "package.json",
+    "core/cli/index.ts",
+    "core/skills/types.ts"
+  ],
+  "files_changed": [
+    ".agents/state.json",
+    ".agents/quality.json",
+    ".agents/handoffs/0002-sentry-qc.json"
+  ],
+  "verification": [
+    "bun test: PASS",
+    "bun run typecheck: PASS",
+    "bun run lint:check: PASS",
+    "bun run knip: PASS",
+    "bun run validate:frontmatter: PASS",
+    "bun run build: PASS"
+  ],
+  "findings": [],
+  "decisions": [
+    "Verified all test, lint, typecheck, knip, frontmatter, and compilation builds pass cleanly",
+    "Advanced multi-agent pipeline stage from sentry to pulse in .agents/state.json"
+  ],
+  "uncertainty": [],
+  "next_agent": "pulse",
+  "status": "complete"
+}
