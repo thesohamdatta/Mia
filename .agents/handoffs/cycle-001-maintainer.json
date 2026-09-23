@@ -1,15 +1,15 @@
 {
   "agent": "maintainer",
-  "source_pr": 29,
+  "source_pr": 37,
   "cycle": "cycle-001",
   "integration_branch": "master",
-  "verification_commit": "e40ef99fa6f591b3936c7282a32d3ce181ddf025",
-  "objective": "Reconcile repository health work without replaying stale branch history or unrelated deletions.",
+  "verification_commit": "baa96b73059e60af9d6c45dc68b826398ea6eab2",
+  "objective": "Maintain long-term repository health by eliminating skill documentation drift and verifying full repository checks.",
   "retained_work": [
+    "Synchronized generated skill documentation in docs/skills/ with canonical registry core/skills/index.ts.",
     "Documentation validation treats missing optional frontmatter as non-blocking.",
     "Broken internal links remain blocking.",
     "Relative documentation links resolve from the containing file.",
-    "Template-only and placeholder link patterns are ignored.",
     "Testing strategy reflects the supported CI command surface.",
     "Current benchmark and product documentation on master is preserved."
   ],

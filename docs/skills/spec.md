@@ -1,70 +1,41 @@
 ---
+type: skill
+scope: project
+status: active
+owner: runtime
+canonical: false
+audience: agent
+load: on-demand
 name: spec
-preamble-tier: 1
 version: 1.0.0
-description: Turn intent into PRD → issues
-allowed-tools:
-
-  - Bash
-
-
-  - Read
-
-
-  - Write
-
-
-  - AskUserQuestion
-
-triggers:
-
-  - spec
-
-
-  - prd
-
-
-  - specification
-
+invocation: user
+phase: specify
+side-effects: local-write
 ---
 
-## Preamble (run first)
+# spec
 
-```bash
-# MIA preamble - update check, session tracking, learnings
-_UPD=($(command -v mia-update-check >/dev/null 2>&1 && mia-update-check) || true)
-[ -n "$_UPD" ] && echo "$_UPD" || true
+Shape intent into a project specification
 
-# Session tracking
-mkdir -p ~/.mia/sessions
-touch ~/.mia/sessions/$
-SESSIONS=$(find ~/.mia/sessions -mmin -120 -type f 2>/dev/null | wc -l)
-echo "Active sessions: $SESSIONS"
+## Invocation
 
-# Load project learnings
-SLUG=$(git rev-parse --show-toplevel 2>/dev/null | xargs basename 2>/dev/null || echo "default")
-LEARN_FILE=~/.mia/projects/$SLUG/learnings.jsonl
-if [ -f "$LEARN_FILE" ]; then
-  COUNT=$(wc -l < "$LEARN_FILE")
-  echo "LEARNINGS: $COUNT entries"
-  if [ "$COUNT" -gt 5 ]; then
-    tail -3 "$LEARN_FILE" | jq -r '"  [(.type)] (.key) — (.insight)"' 2>/dev/null || true
-  fi
-fi
-```
+Explicitly invoked by the user through the MIA CLI.
 
-## When to invoke this skill
+## Contract
 
-After plan, before TDD. Convert intent to formal PRD with acceptance criteria.
+- Phase: specify
+- Invocation: user
+- Side effects: local-write
+- Verification:
+
+## Runtime authority
+
+The executable definition in `core/skills/index.ts` is authoritative. This page is generated documentation.
 
 ## Workflow
 
-1. Problem statement
-2. User stories with acceptance criteria
-3. Technical approach
-4. Risks and mitigations
-5. Break into atomic, independently-shippable issues
+Phase: specify
 
 ---
 
-*Auto-generated from skill template. Run `mia gen:skill-docs` to regenerate.*
+*Generated from the executable skill registry.*

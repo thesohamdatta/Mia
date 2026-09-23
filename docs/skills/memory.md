@@ -6,16 +6,16 @@ owner: runtime
 canonical: false
 audience: agent
 load: on-demand
-name: learn
+name: memory
 version: 1.0.0
 invocation: user
-phase: verify
+phase: review
 side-effects: local-write
 ---
 
-# learn
+# memory
 
-Store and retrieve project learnings
+Read or append long-term memory
 
 ## Invocation
 
@@ -23,7 +23,7 @@ Explicitly invoked by the user through the MIA CLI.
 
 ## Contract
 
-- Phase: verify
+- Phase: review
 - Invocation: user
 - Side effects: local-write
 - Verification:
@@ -34,7 +34,7 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: verify
+Phase: review
 
 ---
 
