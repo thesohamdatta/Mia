@@ -6,16 +6,16 @@ owner: runtime
 canonical: false
 audience: agent
 load: on-demand
-name: learn
+name: checkpoint
 version: 1.0.0
 invocation: user
-phase: verify
+phase: execute
 side-effects: local-write
 ---
 
-# learn
+# checkpoint
 
-Store and retrieve project learnings
+Save or load working state
 
 ## Invocation
 
@@ -23,7 +23,7 @@ Explicitly invoked by the user through the MIA CLI.
 
 ## Contract
 
-- Phase: verify
+- Phase: execute
 - Invocation: user
 - Side effects: local-write
 - Verification:
@@ -34,7 +34,7 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: verify
+Phase: execute
 
 ---
 
