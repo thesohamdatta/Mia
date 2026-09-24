@@ -26,7 +26,7 @@ Explicitly invoked by the user through the MIA CLI.
 - Phase: execute
 - Invocation: user
 - Side effects: git-write
-- Verification:
+- Verification: none
 
 ## Runtime authority
 

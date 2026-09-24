@@ -87,7 +87,7 @@ function skillData([_name, definition]: [string, SkillDefinition]): SkillDocData
     DESCRIPTION: manifest.description,
     ALLOWED_TOOLS: manifest.allowedTools,
     SIDE_EFFECTS: manifest.sideEffects,
-    VERIFICATION: manifest.verification,
+    VERIFICATION: manifest.verification.length > 0 ? manifest.verification : ['none'],
     PHASE: manifest.phase,
     INVOCATION: manifest.invocation ?? 'user',
     PREAMBLE: '',
