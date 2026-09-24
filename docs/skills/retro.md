@@ -9,22 +9,33 @@ load: on-demand
 name: retro
 version: 1.0.0
 invocation: user
+phase: review
+side-effects: none
 ---
 
 # retro
 
-Executable runtime contract is defined by `core/skills/index.ts`. This page is generated documentation and must not be treated as permission or command authority.
+Review recent activity and learnings
+
+## Invocation
+
+Explicitly invoked by the user through the MIA CLI.
 
 ## Contract
 
+- Phase: review
 - Invocation: user
-- Runtime source: `core/skills/index.ts`
-- Documentation source: executable skill metadata
+- Side effects: none
+- Verification:
 
-## Current role
+## Runtime authority
 
-See [the skill index](../core/skills-index.md) for the current phase, side-effect declaration, verification surface, and command mapping.
+The executable definition in `core/skills/index.ts` is authoritative. This page is generated documentation.
+
+## Workflow
+
+Phase: review
 
 ---
 
-*Generated documentation. Do not edit as a source of truth.*
+*Generated from the executable skill registry.*

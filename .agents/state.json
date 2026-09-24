@@ -1,13 +1,13 @@
 {
   "protocol_version": 1,
-  "cycle": "cycle-001",
+  "cycle": "cycle-002",
   "integration_branch": "master",
-  "stage": "orchestrator",
+  "stage": "maintainer",
   "status": "complete",
   "priority": "P3",
-  "writer": null,
+  "writer": "maintainer",
   "blocked_reason": null,
-  "verification_commit": "e40ef99fa6f591b3936c7282a32d3ce181ddf025",
+  "verification_commit": "baa96b73059e60af9d6c45dc68b826398ea6eab2",
   "stages": {
     "sentry": {
       "status": "complete",
@@ -19,13 +19,13 @@
     },
     "maintainer": {
       "status": "complete",
-      "handoff": ".agents/handoffs/cycle-001-maintainer.json"
+      "handoff": ".agents/handoffs/cycle-002-maintainer.json"
     },
     "orchestrator": {
-      "status": "complete",
-      "handoff": ".agents/handoffs/cycle-001-orchestrator.json"
+      "status": "pending",
+      "handoff": null
     }
   },
-  "last_updated_by": "orchestrator",
-  "notes": "Cycle 001 was reconciled on master before CI maintenance was consolidated in PR #32. The coordination record remains historical; current CI is authoritative on master. Human review and merge remain explicit."
+  "last_updated_by": "maintainer",
+  "notes": "Maintainer synchronized generated skill documentation with core/skills/index.ts."
 }

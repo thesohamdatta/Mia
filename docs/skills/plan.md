@@ -9,19 +9,32 @@ load: on-demand
 name: plan
 version: 1.0.0
 invocation: user
+phase: plan
+side-effects: local-write
 ---
 
 # plan
 
-This is generated skill-facing documentation. The executable definition in core/skills/index.ts is authoritative.
+Create an explicit implementation plan
 
-## Runtime contract
+## Invocation
 
-See [MIA Skills and Commands](../core/skills-index.md) for the current phase, invocation mode, side-effect declaration, and verification surface.
+Explicitly invoked by the user through the MIA CLI.
 
-## Authority
+## Contract
 
-This document does not create a command, permission, or runtime capability. Changes to executable behaviour belong in core/skills/index.ts and the corresponding skill implementation.
+- Phase: plan
+- Invocation: user
+- Side effects: local-write
+- Verification:
+
+## Runtime authority
+
+The executable definition in `core/skills/index.ts` is authoritative. This page is generated documentation.
+
+## Workflow
+
+Phase: plan
 
 ---
 
