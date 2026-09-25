@@ -6,7 +6,7 @@ export interface VerificationCheck {
   description: string;
 }
 
-export interface VerificationResult {
+interface VerificationResult {
   records: EvidenceRecord[];
   passed: boolean;
 }
