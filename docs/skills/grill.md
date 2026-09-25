@@ -26,7 +26,7 @@ Explicitly invoked by the user through the MIA CLI.
 - Phase: clarify
 - Invocation: user
 - Side effects: none
-- Verification:
+- Verification: none
 
 ## Runtime authority
 

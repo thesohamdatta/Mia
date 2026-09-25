@@ -26,7 +26,7 @@ Explicitly invoked by the user through the MIA CLI.
 - Phase: plan
 - Invocation: user
 - Side effects: local-write
-- Verification:
+- Verification: none
 
 ## Runtime authority
 
