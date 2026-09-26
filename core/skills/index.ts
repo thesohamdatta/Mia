@@ -57,7 +57,7 @@ export const skills: Record<string, SkillDefinition> = {
   ship: define(
     'ship',
     'Run repository verification before handoff',
-    'none',
+    'local-write',
     ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
     'handoff',
     { execute: shipExecute }
