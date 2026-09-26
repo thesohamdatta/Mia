@@ -20,6 +20,7 @@ describe('Markdown engineering contract', () => {
       'docs/core/context.md',
       'docs/core/principles.md',
       'docs/core/agent-engineering.md',
+      'docs/core/markdown-engineering.md',
       'docs/reference/evidence.md',
       'docs/reference/testing-strategy.md',
       'docs/reference/review-standards.md',
