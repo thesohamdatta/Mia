@@ -6,13 +6,12 @@ Thank you for contributing! This guide helps you get started quickly.
 
 ```bash
 # Clone and setup
-git clone https://github.com/yourusername/mia.git
+git clone https://github.com/thesohamdatta/Mia.git
 cd mia
 bun install
 
 # Configure git (one-time)
-git config --local include.path ../.gitconfig
-bunx husky install
+bun ci
 ```
 
 ## Git Workflow (GitHub Flow)
@@ -20,7 +19,7 @@ bunx husky install
 We use **GitHub Flow** - simple, practical, and designed for continuous deployment.
 
 ### Branching
-- **main** - always deployable, protected
+- **master** - canonical integration branch
 - **feature/*** - new features, short-lived
 - **fix/*** - bug fixes, short-lived
 - **docs/*** - documentation updates
@@ -28,13 +27,13 @@ We use **GitHub Flow** - simple, practical, and designed for continuous deployme
 - **chore/*** - maintenance tasks
 
 ### Workflow
-1. Create branch from `main`: `git checkout -b feature/my-feature`
+1. Create a branch from `master`: `git checkout -b feature/my-feature`
 2. Make changes with small, focused commits
 3. Push branch: `git push -u origin feature/my-feature`
-4. Open Pull Request against `main`
+4. Open a Pull Request against `master`
 5. CI runs (tests, lint, type-check, build)
 6. Code review (1 approval required)
-7. Squash and merge to `main`
+7. Squash and merge to `master`
 8. Delete branch locally and remotely
 
 ## Commit Messages (Conventional Commits)
@@ -88,18 +87,20 @@ All checks must pass before merge:
 
 | Check | Command | Runs On |
 |-------|---------|---------|
-| Lint & Format | `bunx biome check --apply-unsafe .` | pre-commit, CI |
-| Type Check | `bunx tsc --noEmit` | pre-commit, CI |
-| Unused Code | `bunx knip` | pre-commit, CI |
+| Lint & Format | `bun run lint:check` | pre-commit, CI |
+| Type Check | `bun run typecheck` | pre-commit, CI |
+| Unused Code | `bun run knip` | pre-commit, CI |
 | Tests | `bun test` | pre-push, CI |
 | Build | `bun run build` | pre-push, CI |
 
 ### Local Development
 ```bash
 # Run all checks manually
-bunx biome check --apply-unsafe .
-bunx tsc --noEmit
-bunx knip
+bun run lint:check
+bun run typecheck
+bun run knip
+bun run validate:frontmatter
+bun run lint:md
 bun test
 bun run build
 ```
@@ -107,7 +108,7 @@ bun run build
 ## Pull Request Guidelines
 
 ### Before Opening
-- [ ] Branch is up to date with `main`
+- [ ] Branch is up to date with `master`
 - [ ] All checks pass locally
 - [ ] Commit messages follow Conventional Commits
 - [ ] No WIP/fixup commits (squash them)
@@ -137,21 +138,17 @@ Fill out the PR template:
 ## Project Structure
 
 ```
-src/
-  cli/        # CLI commands
-  daemon/     # Background server
-  skills/     # Skill system
-  core/       # Shared utilities
-tests/        # Vitest tests
-scripts/      # Build/generation scripts
-templates/    # Handlebars templates
-docs/         # Documentation
+core/       # Runtime and executable skills
+scripts/    # Build and documentation tooling
+docs/       # Canonical and historical documentation
+.agents/    # Agent coordination state and handoffs
+.github/    # CI workflows
 ```
 
 ## Getting Help
 
 - Check existing issues and PRs
-- Read `ARCHITECTURE.md` and `PRINCIPLES.md`
+- Read `AGENTS.md`, `docs/core/architecture.md`, and `docs/core/principles.md`
 - Ask in discussions or open an issue
 
 ---
