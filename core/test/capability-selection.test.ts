@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { createRootPlan } from '../root/types.js';
 import { selectCapabilities } from '../capabilities/select.js';
+import { createRootPlan } from '../root/types.js';
 
 describe('Capability selection', () => {
   it('selects only capabilities made available to the root plan', () => {
