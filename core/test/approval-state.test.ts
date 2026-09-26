@@ -38,7 +38,7 @@ describe('Approval state', () => {
 
   it('persists and recovers the latest approval state', async () => {
     const store = createUnifiedStore();
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: 'work-1', runId: 'run-1', action: 'ship' });
     const resolved = resolveApproval(approval, 'approved');
 
     const projectsDir = '/tmp/mia-approval-test';
