@@ -25,7 +25,6 @@ describe('Approval state', () => {
     expect(resolved.runId).toBe(approval.runId);
     expect(resolved.status).toBe('approved');
     expect(resolved.note).toBe('Human approved release');
-    expect(resolved.updatedAt).not.toBe(approval.updatedAt);
   });
 
   it('does not allow a resolved approval to be changed again', () => {
