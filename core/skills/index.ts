@@ -44,9 +44,16 @@ export const skills: Record<string, SkillDefinition> = {
   spec: define('spec', 'Shape intent into a project specification', 'local-write', [], 'specify', {
     execute: specExecute,
   }),
-  setup: define('setup', 'Install MIA agent skills for supported hosts', 'local-write', [], 'execute', {
-    execute: setupExecute,
-  }),
+  setup: define(
+    'setup',
+    'Install MIA agent skills for supported hosts',
+    'local-write',
+    [],
+    'execute',
+    {
+      execute: setupExecute,
+    }
+  ),
   ship: define(
     'ship',
     'Run repository verification before handoff',
