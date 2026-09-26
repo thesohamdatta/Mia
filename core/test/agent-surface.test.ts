@@ -38,6 +38,9 @@ describe('gstack-style agent skill surface', () => {
   it('preserves an unmanaged existing skill instead of overwriting it', async () => {
     const destination = await mkdtemp(join(tmpdir(), 'mia-agent-surface-'));
     const planPath = join(destination, 'plan', 'SKILL.md');
+    await (await import('node:fs/promises')).mkdir(join(destination, 'plan'), {
+      recursive: true,
+    });
     await writeFile(
       planPath,
       '---\nname: plan\ndescription: foreign skill\n---\n\nforeign content\n',
