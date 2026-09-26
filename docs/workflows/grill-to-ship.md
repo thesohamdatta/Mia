@@ -38,6 +38,14 @@ explore → contract → write the failing test → make the smallest change →
 explore → risk assessment → explicit approval → write the failing test → make the smallest change → verify → review
 ```
 
+## Feedback loop
+
+When the work has an observable result, use:
+
+`goal → baseline → bounded change → measure → keep or revert → record`
+
+Use an acceptance signal that can be checked. Do not keep speculative changes without evidence.
+
 ## TDD rule
 
 For behaviour changes, the test is the executable contract.
