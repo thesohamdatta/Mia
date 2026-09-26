@@ -1,5 +1,5 @@
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { describe, expect, it } from 'bun:test';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { AGENT_HOSTS, setupAgentSkills } from '../agent/setup.js';
@@ -17,10 +17,7 @@ describe('MIA agent setup', () => {
 
     for (const host of AGENT_HOSTS) {
       for (const skill of ['plan', 'review', 'ship']) {
-        const file = await readFile(
-          join(projectRoot, host.skillRoot, skill, 'SKILL.md'),
-          'utf8'
-        );
+        const file = await readFile(join(projectRoot, host.skillRoot, skill, 'SKILL.md'), 'utf8');
         expect(file).toContain('managed-by: mia');
       }
     }
