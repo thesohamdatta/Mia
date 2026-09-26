@@ -92,7 +92,7 @@ describe('Review skill runtime', () => {
   it('returns Work to in_progress when verification fails', async () => {
     const ctx = context();
     const work = plannedWork();
-    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, work.id, work);
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
     const result = await execute([work.id], ctx, async () => failedVerification());
 
@@ -102,7 +102,7 @@ describe('Review skill runtime', () => {
     const restored = await loadWork(
       ctx.unifiedStore,
       ctx.config.projectsDir,
-      work.id,
+      ctx.slug,
       work.id
     );
     expect(restored?.state).toBe('in_progress');
