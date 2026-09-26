@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { loadApprovalForWork, saveApproval } from '../approval/persistence.js';
 import { createApproval, resolveApproval } from '../approval/types.js';
-import { createUnifiedStore } from '../state/unified-store.js';
 import { execute } from '../skills/ship/execute.js';
+import { createUnifiedStore } from '../state/unified-store.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 import { createWork, transitionWork } from '../work/types.js';
 
@@ -98,12 +98,7 @@ describe('Ship skill runtime', () => {
 
     expect(result.ok).toBe(true);
     expect(result.output).toContain('SHIPPED');
-    const restored = await loadWork(
-      ctx.unifiedStore,
-      ctx.config.projectsDir,
-      ctx.slug,
-      work.id
-    );
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('shipped');
   });
 
