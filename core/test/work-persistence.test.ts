@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { createUnifiedStore } from '../state/unified-store.js';
-import { createWork, transitionWork } from '../work/types.js';
+import { type Work, createWork, transitionWork } from '../work/types.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 
 describe('Work persistence', () => {

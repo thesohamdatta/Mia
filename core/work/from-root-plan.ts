@@ -1,5 +1,5 @@
 import type { RootPlan } from '../root/types.js';
-import { createWork, type Work } from './types.js';
+import { type Work, createWork } from './types.js';
 
 export function createWorkFromRootPlan(plan: RootPlan): Work {
   if (plan.ambiguities.length > 0) {
