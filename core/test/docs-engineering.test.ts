@@ -41,6 +41,15 @@ describe('Markdown engineering contract', () => {
     expect(workflow).toContain('refactor only after green');
   });
 
+  it('keeps the agent loop explicit and measurable', () => {
+    const agentEngineering = read('docs/core/agent-engineering.md');
+    const markdownEngineering = read('docs/core/markdown-engineering.md');
+    expect(agentEngineering).toContain('acceptance signal');
+    expect(agentEngineering).toContain('bounded change surface');
+    expect(markdownEngineering).toContain('feedback loop');
+    expect(markdownEngineering).toContain('keep or revert');
+  });
+
   it('keeps project context and agent instructions separate', () => {
     const context = read('CONTEXT.md');
     const agentEngineering = read('docs/core/agent-engineering.md');
