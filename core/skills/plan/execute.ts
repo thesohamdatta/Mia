@@ -1,6 +1,34 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { createRootPlan } from '../../root/types.js';
+import { createWorkFromRootPlan } from '../../work/from-root-plan.js';
+import { saveWork } from '../../work/persistence.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+
+function makePlan(request: string) {
+  return createRootPlan(
+    {
+      request,
+      projectContext: [],
+      currentWorkState: 'draft',
+      availableCapabilities: ['software'],
+      learnings: [],
+      authority: {
+        humanApprovalRequired: true,
+        allowedAutonomy: 'execute-within-scope',
+      },
+    },
+    {
+      objective: request,
+      ambiguities: [],
+      capabilities: ['software'],
+      dependencies: [],
+      nextActions: ['Implement the planned work'],
+      approvals: [],
+      expectedEvidence: ['Tests pass'],
+    }
+  );
+}
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'create';
@@ -33,32 +61,44 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     if (!objective) {
       return { ok: false, status: 'blocked', error: 'Usage: mia plan create <objective>' };
     }
+
+    const plan = makePlan(objective);
+    const work = createWorkFromRootPlan(plan);
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
     const path = join(ctx.config.projectsDir, ctx.slug, 'PLAN.md');
     const content = [
       '# MIA Plan',
       '',
       `Run: ${ctx.run.id}`,
+      `Work: ${work.id}`,
       '',
       '## Objective',
-      objective,
+      work.objective,
       '',
       '## Success Criteria',
-      '- [ ] Define observable outcomes',
-      '- [ ] Define required verification',
+      ...work.successCriteria.map((criterion) => `- [ ] ${criterion}`),
       '',
       '## Steps',
-      '1. [ ] Identify the smallest vertical slice',
-      '2. [ ] Implement the slice',
-      '3. [ ] Verify the slice',
+      ...plan.nextActions.map((action, index) => `${index + 1}. [ ] ${action}`),
       '',
-      '## Risks',
-      '- [ ] Record material risks and mitigations',
+      '## Dependencies',
+      ...(work.dependencies.length > 0
+        ? work.dependencies.map((dependency) => `- ${dependency}`)
+        : ['- None recorded']),
       '',
-      '## Out of Scope',
-      '- [ ] Record explicit exclusions',
+      '## Capabilities',
+      ...(work.capabilities.length > 0
+        ? work.capabilities.map((capability) => `- ${capability}`)
+        : ['- None recorded']),
     ].join('\n');
+
     await writeFile(path, content, 'utf8');
-    return { ok: true, status: 'success', output: `Plan written to ${path}` };
+    return {
+      ok: true,
+      status: 'success',
+      output: `Plan written to ${path}\nWork: ${work.id}`,
+    };
   }
 
   return { ok: false, status: 'blocked', error: 'Usage: mia plan [create <objective>|template]' };
