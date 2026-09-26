@@ -67,6 +67,19 @@ describe('gstack-style agent skill surface', () => {
     expect(await readFile(planPath, 'utf8')).toBe(first);
   });
 
+  it('preserves an existing unmanaged skill directory without a manifest', async () => {
+    const destination = await mkdtemp(join(tmpdir(), 'mia-agent-surface-'));
+    const planDir = join(destination, 'plan');
+    await (await import('node:fs/promises')).mkdir(planDir, { recursive: true });
+    await writeFile(join(planDir, 'notes.txt'), 'foreign directory', 'utf8');
+
+    const result = await generateAgentSkillSurface(destination);
+
+    expect(result.skipped).toEqual(['plan']);
+    expect(result.generated).toEqual(['review', 'ship']);
+    expect(await readFile(join(planDir, 'notes.txt'), 'utf8')).toBe('foreign directory');
+  });
+
   it('rejects an unknown skill name instead of generating an invalid adapter', async () => {
     const destination = await mkdtemp(join(tmpdir(), 'mia-agent-surface-'));
 
