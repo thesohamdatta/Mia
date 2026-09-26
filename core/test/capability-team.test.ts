@@ -25,9 +25,7 @@ describe('MIA capability and team contracts', () => {
     expect(team.id).toMatch(/^team_/);
     expect(team.name).toBe('product');
     expect(team.capabilities).toEqual([research]);
-    expect(team.responsibilities).toEqual([
-      'Reduce uncertainty before implementation',
-    ]);
+    expect(team.responsibilities).toEqual(['Reduce uncertainty before implementation']);
   });
 
   it('rejects blank capability and team names', () => {
