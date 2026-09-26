@@ -2,8 +2,8 @@ import { describe, expect, it } from 'bun:test';
 import {
   completeReview,
   completeVerification,
-  startWork,
   enterVerification,
+  startWork,
 } from '../work/lifecycle.js';
 import { createWork } from '../work/types.js';
 
