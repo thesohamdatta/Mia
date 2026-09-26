@@ -48,6 +48,8 @@ describe('Markdown engineering contract', () => {
     expect(agentEngineering).toContain('bounded change surface');
     expect(markdownEngineering).toContain('feedback loop');
     expect(markdownEngineering).toContain('keep or revert');
+    expect(markdownEngineering).toContain('autoresearch');
+    expect(markdownEngineering).toContain('Harness Engineering');
   });
 
   it('keeps project context and agent instructions separate', () => {
@@ -56,5 +58,6 @@ describe('Markdown engineering contract', () => {
     expect(context).toContain('Project vocabulary');
     expect(context).not.toContain('TDD');
     expect(agentEngineering).toContain('TDD');
+    expect(agentEngineering).toContain('bounded change surface');
   });
 });
