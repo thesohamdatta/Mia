@@ -53,6 +53,8 @@ describe('skill execution lifecycle', () => {
       appendCheckpoint: async () => {},
       listEvidence: async () => [],
       appendEvidence: async () => {},
+      listApprovals: async () => [],
+      appendApproval: async () => {},
       appendTimeline: async (_projectsDir, _slug, data) => {
         const event = data as { event?: string; outcome?: string };
         timeline.push({ event: event.event ?? 'unknown', outcome: event.outcome });
