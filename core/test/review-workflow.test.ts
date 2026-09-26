@@ -80,12 +80,7 @@ describe('Review skill runtime', () => {
     expect(result.ok).toBe(true);
     expect(result.output).toContain('READY_TO_SHIP');
 
-    const restored = await loadWork(
-      ctx.unifiedStore,
-      ctx.config.projectsDir,
-      ctx.slug,
-      work.id
-    );
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('ready_to_ship');
   });
 
@@ -99,12 +94,7 @@ describe('Review skill runtime', () => {
     expect(result.ok).toBe(false);
     expect(result.error).toBe('Review verification failed');
 
-    const restored = await loadWork(
-      ctx.unifiedStore,
-      ctx.config.projectsDir,
-      ctx.slug,
-      work.id
-    );
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('in_progress');
   });
 });
