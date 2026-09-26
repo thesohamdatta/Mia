@@ -15,10 +15,13 @@ describe('gstack-style agent skill surface', () => {
 
     for (const skill of AGENT_SKILLS) {
       const content = await readFile(join(destination, skill, 'SKILL.md'), 'utf8');
+      expect(content).toMatch(/^---\n/);
       expect(content).toContain('managed-by: mia');
       expect(content).toContain(`name: ${skill}`);
       expect(content).toContain('core/skills/index.ts');
-      expect(content).toContain(`mia ${skill}`);
+      expect(content).toContain(
+        skill === 'plan' ? 'mia plan create "<objective>"' : `mia ${skill}`
+      );
     }
   });
 
