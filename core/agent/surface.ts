@@ -49,11 +49,11 @@ Use MIA's **${manifest.name}** workflow for the current engineering task.
 - Use the existing MIA ${manifest.name} workflow; do not invent a parallel engineering process.
 - Invoke the command shown below with the relevant objective or context.
 - Preserve upstream decisions and artifacts when continuing an existing workflow.
+- Report what was actually verified. Do not claim completion without evidence.
 
 ## Command
 
 \`${commandForSkill(manifest.name)}\`
-- Report what was actually verified. Do not claim completion without evidence.
 
 ## Runtime authority
 
