@@ -1,3 +1,6 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'bun:test';
 import { createUnifiedStore } from '../state/unified-store.js';
 import { loadWork, saveWork } from '../work/persistence.js';
@@ -16,17 +19,26 @@ describe('Work persistence', () => {
       'specified'
     );
 
-    const projectsDir = '/tmp/mia-work-test';
-    await saveWork(store, projectsDir, 'mia', work);
-    const restored = await loadWork(store, projectsDir, 'mia', work.id);
+    const projectsDir = mkdtempSync(join(tmpdir(), 'mia-work-test-'));
+    try {
+      await saveWork(store, projectsDir, 'mia', work);
+      const restored = await loadWork(store, projectsDir, 'mia', work.id);
 
-    expect(restored).toEqual(work);
+      expect(restored).toEqual(work);
+    } finally {
+      rmSync(projectsDir, { recursive: true, force: true });
+    }
   });
 
   it('returns undefined for an unknown Work id', async () => {
     const store = createUnifiedStore();
-    const restored = await loadWork(store, '/tmp/mia-work-test', 'mia', 'work_unknown');
-    expect(restored).toBeUndefined();
+    const projectsDir = mkdtempSync(join(tmpdir(), 'mia-work-test-'));
+    try {
+      const restored = await loadWork(store, projectsDir, 'mia', 'work_unknown');
+      expect(restored).toBeUndefined();
+    } finally {
+      rmSync(projectsDir, { recursive: true, force: true });
+    }
   });
 
   it('persists each update as an event without mutating the Work object', async () => {
@@ -34,24 +46,29 @@ describe('Work persistence', () => {
     const original = createWork({ objective: 'Build X' });
     const updated = transitionWork(original, 'specified');
 
-    await saveWork(store, '/tmp/mia-work-test', 'mia', original);
-    await saveWork(store, '/tmp/mia-work-test', 'mia', updated);
+    const projectsDir = mkdtempSync(join(tmpdir(), 'mia-work-test-'));
+    try {
+      await saveWork(store, projectsDir, 'mia', original);
+      await saveWork(store, projectsDir, 'mia', updated);
 
     expect(original.state).toBe('draft');
     expect(updated.state).toBe('specified');
 
-    const events = await store.query(
-      '/tmp/mia-work-test',
-      'mia',
-      'timeline',
+      const events = await store.query(
+        projectsDir,
+        'mia',
+        'timeline',
       (event) => {
         const data = event.data as { kind?: string; workId?: string };
         return data.kind === 'work';
       },
-      10
-    );
+        10
+      );
 
-    expect(events).toHaveLength(2);
-    expect((events[0]?.data as { workId: string }).workId).toBe(updated.id);
+      expect(events).toHaveLength(2);
+      expect((events[0]?.data as { workId: string }).workId).toBe(updated.id);
+    } finally {
+      rmSync(projectsDir, { recursive: true, force: true });
+    }
   });
 });
