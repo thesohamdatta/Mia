@@ -6,6 +6,7 @@ import { createUnifiedStore } from '../state/unified-store.js';
 describe('Approval state', () => {
   it('creates a pending approval request', () => {
     const approval = createApproval({
+      workId: 'work-1',
       runId: 'run-1',
       action: 'ship',
     });
@@ -18,7 +19,7 @@ describe('Approval state', () => {
   });
 
   it('resolves an approval without changing its identity', () => {
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: 'work-1', runId: 'run-1', action: 'ship' });
     const resolved = resolveApproval(approval, 'approved', 'Human approved release');
 
     expect(resolved.id).toBe(approval.id);
