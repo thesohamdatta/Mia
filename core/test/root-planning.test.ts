@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import {
-  createRootPlan,
-  type RootPlanInput,
-  type RootPlan,
-} from '../root/types.js';
+import { createRootPlan, type RootPlanInput, type RootPlan } from '../root/types.js';
 
 describe('Root AI planning contract', () => {
   const input: RootPlanInput = {
@@ -30,9 +26,7 @@ describe('Root AI planning contract', () => {
     });
 
     expect(plan.request).toBe(input.request);
-    expect(plan.objective).toBe(
-      'Build a mobile app that summarizes meeting recordings'
-    );
+    expect(plan.objective).toBe('Build a mobile app that summarizes meeting recordings');
     expect(plan.ambiguities).toEqual(['What audio providers are supported?']);
     expect(plan.capabilities).toEqual(['mobile', 'ai', 'qa']);
     expect(plan.dependencies).toEqual(['Backend transcription API']);
