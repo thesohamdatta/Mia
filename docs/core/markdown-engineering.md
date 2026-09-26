@@ -10,7 +10,7 @@ load: on-demand
 
 # Markdown Engineering
 
-MIA uses Markdown as a small knowledge system for agents and people.
+MIA uses Markdown as a small knowledge system for agents and people. Keep it readable enough that an agent can act on it without reading the whole repository.
 
 ## Layers
 
@@ -101,7 +101,9 @@ When an agent failure repeats, first check whether the missing constraint belong
 
 ## References
 
+- [Karpathy autoresearch](https://github.com/karpathy/autoresearch)
 - [AI Engineering companion materials](https://github.com/chiphuyen/aie-book)
+- [OpenAI Harness Engineering](https://openai.com/index/harness-engineering/)
 - [GitHub Copilot custom instructions](https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions)
 - [Gemini CLI context files](https://geminicli.com/docs/cli/gemini-md/)
 - [Write the Docs software documentation guide](https://www.writethedocs.org/guide/)
