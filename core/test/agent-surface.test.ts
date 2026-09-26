@@ -2,10 +2,7 @@ import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'bun:test';
-import {
-  AGENT_SKILLS,
-  generateAgentSkillSurface,
-} from '../agent/surface.js';
+import { AGENT_SKILLS, generateAgentSkillSurface } from '../agent/surface.js';
 
 describe('gstack-style agent skill surface', () => {
   it('exposes only the small public MIA skill set by default', async () => {
