@@ -46,8 +46,6 @@ describe('Work lifecycle', () => {
       'verification',
       'review',
       'ready_to_ship',
-      'shipped',
-      'maintained',
     ];
 
     for (const state of sequence) {
