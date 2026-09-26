@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import {
-  type RootPlan,
-  type RootPlanInput,
-  createRootPlan,
-} from '../root/types.js';
+import { type RootPlan, type RootPlanInput, createRootPlan } from '../root/types.js';
 
 describe('Root AI planning contract', () => {
   const input: RootPlanInput = {
@@ -29,24 +25,14 @@ describe('Root AI planning contract', () => {
       expectedEvidence: ['Acceptance criteria recorded', 'Tests pass'],
     });
 
-    expect(plan.request).toBe(
-      'Build a mobile app that summarizes meeting recordings'
-    );
-    expect(plan.objective).toBe(
-      'Build a mobile app that summarizes meeting recordings'
-    );
+    expect(plan.request).toBe('Build a mobile app that summarizes meeting recordings');
+    expect(plan.objective).toBe('Build a mobile app that summarizes meeting recordings');
     expect(plan.ambiguities).toEqual(['What audio providers are supported?']);
     expect(plan.capabilities).toEqual(['mobile', 'ai', 'qa']);
     expect(plan.dependencies).toEqual(['Backend transcription API']);
-    expect(plan.nextActions).toEqual([
-      'Clarify audio provider',
-      'Define acceptance criteria',
-    ]);
+    expect(plan.nextActions).toEqual(['Clarify audio provider', 'Define acceptance criteria']);
     expect(plan.approvals).toEqual(['Human approval before release']);
-    expect(plan.expectedEvidence).toEqual([
-      'Acceptance criteria recorded',
-      'Tests pass',
-    ]);
+    expect(plan.expectedEvidence).toEqual(['Acceptance criteria recorded', 'Tests pass']);
   });
 
   it('preserves planning context needed by the root agent', () => {
