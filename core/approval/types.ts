@@ -2,6 +2,7 @@ export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Approval {
   id: string;
+  workId: string;
   runId: string;
   action: string;
   status: ApprovalStatus;
@@ -11,6 +12,7 @@ export interface Approval {
 }
 
 export interface CreateApprovalInput {
+  workId: string;
   runId: string;
   action: string;
 }
@@ -20,8 +22,11 @@ function makeId(): string {
 }
 
 export function createApproval(input: CreateApprovalInput): Approval {
+  const workId = input.workId.trim();
   const runId = input.runId.trim();
   const action = input.action.trim();
+
+  if (!workId) throw new Error('Approval work id is required');
 
   if (!runId) throw new Error('Approval run id is required');
   if (!action) throw new Error('Approval action is required');
@@ -30,6 +35,7 @@ export function createApproval(input: CreateApprovalInput): Approval {
 
   return {
     id: makeId(),
+    workId,
     runId,
     action,
     status: 'pending',
