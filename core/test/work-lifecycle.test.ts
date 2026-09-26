@@ -84,6 +84,26 @@ describe('Work lifecycle', () => {
     );
   });
 
+  it('does not let needs_human bypass verification or review', () => {
+    let work = createWork({ objective: 'Build X' });
+    work = transitionWork(work, 'needs_human');
+
+    expect(() => transitionWork(work, 'ready_to_ship')).toThrow(
+      /Invalid work transition: needs_human -> ready_to_ship/
+    );
+    expect(() => transitionWork(work, 'shipped')).toThrow(
+      /Invalid work transition: needs_human -> shipped/
+    );
+  });
+
+  it('returns from needs_human only to an earlier actionable stage', () => {
+    let work = createWork({ objective: 'Build X' });
+    work = transitionWork(work, 'needs_human');
+
+    const resumed = transitionWork(work, 'in_progress');
+    expect(resumed.state).toBe('in_progress');
+  });
+
   it('preserves identity and updates the modification time on transition', () => {
     const work = createWork({ objective: 'Build X' });
     const next = transitionWork(work, 'specified');
