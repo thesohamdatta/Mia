@@ -37,10 +37,6 @@ export const ConfigSchema = z.object({
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
-export type DaemonConfig = z.infer<typeof DaemonConfigSchema>;
-export type PathsConfig = z.infer<typeof PathsConfigSchema>;
-export type SkillsConfig = z.infer<typeof SkillsConfigSchema>;
-export type FeaturesConfig = z.infer<typeof FeaturesConfigSchema>;
 
 export function createDefaultConfig(builtinSkillsPath: string): Config {
   const miaDir = join(homedir(), '.mia');

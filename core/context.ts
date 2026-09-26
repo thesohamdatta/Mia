@@ -65,5 +65,3 @@ export function createExecutionContext(cwd?: string): ExecutionContext {
     config,
   };
 }
-
-export { getConfig, getMiaDir, getSlug };
