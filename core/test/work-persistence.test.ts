@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'bun:test';
 import { createUnifiedStore } from '../state/unified-store.js';
-import { createWork, transitionWork, type Work } from '../work/types.js';
+import { createWork, transitionWork } from '../work/types.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 
 describe('Work persistence', () => {
   it('round-trips a Work item through the UnifiedStore', async () => {
     const store = createUnifiedStore();
-    const work = transitionWork(createWork({
-      objective: 'Build X',
-      successCriteria: ['Tests pass'],
-      capabilities: ['software'],
-      dependencies: ['API'],
-    }), 'specified');
+    const work = transitionWork(
+      createWork({
+        objective: 'Build X',
+        successCriteria: ['Tests pass'],
+        capabilities: ['software'],
+        dependencies: ['API'],
+      }),
+      'specified'
+    );
 
     const projectsDir = '/tmp/mia-work-test';
     await saveWork(store, projectsDir, 'mia', work);
@@ -37,10 +40,16 @@ describe('Work persistence', () => {
     expect(original.state).toBe('draft');
     expect(updated.state).toBe('specified');
 
-    const events = await store.query('/tmp/mia-work-test', 'mia', 'timeline', (event) => {
-      const data = event.data as { kind?: string; workId?: string };
-      return data.kind === 'work';
-    }, 10);
+    const events = await store.query(
+      '/tmp/mia-work-test',
+      'mia',
+      'timeline',
+      (event) => {
+        const data = event.data as { kind?: string; workId?: string };
+        return data.kind === 'work';
+      },
+      10
+    );
 
     expect(events).toHaveLength(2);
     expect((events[0]?.data as { workId: string }).workId).toBe(updated.id);
