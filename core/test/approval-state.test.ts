@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { createUnifiedStore } from '../state/unified-store.js';
-import { createApproval, resolveApproval } from '../approval/types.js';
 import { loadApproval, saveApproval } from '../approval/persistence.js';
+import { createApproval, resolveApproval } from '../approval/types.js';
+import { createUnifiedStore } from '../state/unified-store.js';
 
 describe('Approval state', () => {
   it('creates a pending approval request', () => {
