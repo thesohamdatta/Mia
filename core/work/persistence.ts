@@ -1,4 +1,4 @@
-import type { UnifiedStore, StoredEvent } from '../state/unified-store.js';
+import type { StoredEvent, UnifiedStore } from '../state/unified-store.js';
 import type { Work } from './types.js';
 
 interface WorkEvent {
