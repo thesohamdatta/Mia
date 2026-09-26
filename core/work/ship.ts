@@ -1,5 +1,5 @@
 import type { Approval } from '../approval/types.js';
-import { type Work } from './types.js';
+import type { Work } from './types.js';
 
 export interface ShipWorkOptions {
   verificationPassed: boolean;
