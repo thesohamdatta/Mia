@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { shipWork } from '../work/ship.js';
 import { WORK_STATES, type WorkState, createWork, transitionWork } from '../work/types.js';
 
 describe('Work lifecycle', () => {
@@ -11,8 +12,6 @@ describe('Work lifecycle', () => {
       'verification',
       'review',
       'ready_to_ship',
-      'shipped',
-      'maintained',
       'blocked',
       'failed',
       'needs_human',
@@ -53,6 +52,12 @@ describe('Work lifecycle', () => {
       work = transitionWork(work, state);
       expect(work.state).toBe(state);
     }
+
+    work = shipWork(work, { verificationPassed: true });
+    expect(work.state).toBe('shipped');
+
+    work = transitionWork(work, 'maintained');
+    expect(work.state).toBe('maintained');
   });
 
   it('allows recovery states and deterministic return to work', () => {
