@@ -10,7 +10,7 @@ load: on-demand
 
 # Engineering Workflow
 
-MIA uses an adaptive workflow. The full loop is available when the task needs it, but small changes do not require ceremonial phases.
+MIA uses the smallest workflow that gives enough evidence. Do not add ceremony just to make a task look disciplined.
 
 ## Choose the path
 
@@ -20,17 +20,36 @@ MIA uses an adaptive workflow. The full loop is available when the task needs it
 inspect → change → verify
 ```
 
+### Behaviour change
+
+```text
+write the failing test → make the smallest change → run the focused test → refactor only after green
+```
+
 ### Multi-file / architectural / uncertain
 
 ```text
-explore → contract → plan → change → verify → review
+explore → contract → write the failing test → make the smallest change → verify → review
 ```
 
 ### High-risk / privileged
 
 ```text
-explore → risk assessment → explicit approval → change → verify → review
+explore → risk assessment → explicit approval → write the failing test → make the smallest change → verify → review
 ```
+
+## TDD rule
+
+For behaviour changes, the test is the executable contract.
+
+1. Write one focused test for the missing or broken behaviour.
+2. Run it and confirm it fails for the expected reason.
+3. Make the smallest implementation change that can make it pass.
+4. Run the focused test again.
+5. Run the wider repository checks required by the change.
+6. Refactor only while the tests stay green.
+
+Do not write large test suites before understanding the behaviour. Do not change production code first and add a test afterward just to satisfy coverage.
 
 ## Explore
 
@@ -50,7 +69,9 @@ Make the smallest coherent change. Preserve unrelated work and local state.
 
 ## Verify
 
-Run the narrowest checks that prove the changed behaviour, then the wider repository gate required for integration.
+Start with the focused test. Then run the wider gate needed for integration.
+
+Do not claim a green repository from an unrun check. Do not claim a behaviour is covered just because a nearby test exists.
 
 ## Review
 
