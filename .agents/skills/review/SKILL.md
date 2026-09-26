@@ -8,12 +8,14 @@ audience: agent
 load: on-demand
 managed-by: mia
 name: review
-description: Prepare a review surface for the current change
+description: "Prepare a review surface for the current change"
 version: 1.0.0
 invocation: model
 phase: review
 side-effects: none
 ---
+
+<!-- MIA-MANAGED-SKILL -->
 
 # review
 
@@ -23,9 +25,13 @@ Use MIA's **review** workflow for the current engineering task.
 
 - Treat the user's current objective as the input.
 - Use the existing MIA review workflow; do not invent a parallel engineering process.
-- Invoke `mia review` with the relevant objective or context.
+- Invoke the command shown below with the relevant objective or context.
 - Preserve upstream decisions and artifacts when continuing an existing workflow.
 - Report what was actually verified. Do not claim completion without evidence.
+
+## Command
+
+`mia review`
 
 ## Runtime authority
 
