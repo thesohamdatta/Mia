@@ -42,7 +42,7 @@ const TRANSITIONS: Record<WorkState, readonly WorkState[]> = {
   in_progress: ['verification', 'blocked', 'failed', 'needs_human'],
   verification: ['review', 'in_progress', 'blocked', 'failed', 'needs_human'],
   review: ['ready_to_ship', 'in_progress', 'blocked', 'failed', 'needs_human'],
-  ready_to_ship: ['shipped', 'review', 'blocked', 'needs_human'],
+  ready_to_ship: ['review', 'blocked', 'needs_human'],
   shipped: ['maintained'],
   maintained: ['in_progress'],
   blocked: ['specified', 'planned', 'in_progress', 'needs_human', 'failed'],
