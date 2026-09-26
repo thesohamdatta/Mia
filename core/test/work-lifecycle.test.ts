@@ -12,6 +12,8 @@ describe('Work lifecycle', () => {
       'verification',
       'review',
       'ready_to_ship',
+      'shipped',
+      'maintained',
       'blocked',
       'failed',
       'needs_human',
