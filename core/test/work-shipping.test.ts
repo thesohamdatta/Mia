@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { createApproval, resolveApproval } from '../approval/types.js';
-import { createWork, transitionWork } from '../work/types.js';
 import { shipWork } from '../work/ship.js';
+import { createWork, transitionWork } from '../work/types.js';
 
 describe('Work shipping gate', () => {
   function readyWork(requiresHumanApproval = false) {
