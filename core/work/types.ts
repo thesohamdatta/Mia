@@ -42,10 +42,10 @@ const TRANSITIONS: Record<WorkState, readonly WorkState[]> = {
   review: ['ready_to_ship', 'in_progress', 'blocked', 'failed', 'needs_human'],
   ready_to_ship: ['shipped', 'review', 'blocked', 'needs_human'],
   shipped: ['maintained'],
-  maintained: ['in_progress', 'maintained'],
+  maintained: ['in_progress'],
   blocked: ['specified', 'planned', 'in_progress', 'needs_human', 'failed'],
   failed: ['in_progress', 'needs_human'],
-  needs_human: ['draft', 'specified', 'planned', 'in_progress', 'verification', 'review', 'ready_to_ship', 'failed', 'blocked'],
+  needs_human: ['in_progress', 'blocked', 'failed'],
 };
 
 function makeId(): string {
