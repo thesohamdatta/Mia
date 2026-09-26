@@ -30,13 +30,7 @@ describe('MIA agent setup', () => {
   it('reports unmanaged collisions without overwriting them', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'mia-setup-'));
 
-    const collision = join(
-      projectRoot,
-      '.agents',
-      'skills',
-      'plan',
-      'SKILL.md'
-    );
+    const collision = join(projectRoot, '.agents', 'skills', 'plan', 'SKILL.md');
     await mkdir(join(projectRoot, '.agents', 'skills', 'plan'), { recursive: true });
     await writeFile(collision, 'foreign skill', 'utf8');
 
