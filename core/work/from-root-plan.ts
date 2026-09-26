@@ -1,5 +1,5 @@
-import type { RootPlan } from '../root/types.js';
 import { selectCapabilities } from '../capabilities/select.js';
+import type { RootPlan } from '../root/types.js';
 import { type Work, createWork } from './types.js';
 
 export function createWorkFromRootPlan(plan: RootPlan): Work {
