@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getSkill } from '../skills/index.js';
 import type { SkillDefinition } from '../skills/types.js';
@@ -12,12 +12,14 @@ export interface AgentSurfaceResult {
   skipped: string[];
 }
 
-const MANAGED_MARKER = 'managed-by: mia';
+const MANAGED_MARKER = '<!-- MIA-MANAGED-SKILL -->';
 
 function renderSkill(definition: SkillDefinition): string {
   const { manifest } = definition;
 
-  return `---
+  return `<!-- MIA-MANAGED-SKILL -->
+
+---
 type: skill
 scope: project
 status: active
@@ -77,8 +79,24 @@ export async function generateAgentSkillSurface(
     let existing: string | null = null;
     try {
       existing = await readFile(skillPath, 'utf8');
-    } catch {
-      // The adapter does not exist yet.
+    } catch (error) {
+      if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT') {
+        throw error;
+      }
+
+      try {
+        await stat(skillDir);
+        skipped.push(skillName);
+        continue;
+      } catch (directoryError) {
+        if (
+          !(directoryError instanceof Error) ||
+          !('code' in directoryError) ||
+          directoryError.code !== 'ENOENT'
+        ) {
+          throw directoryError;
+        }
+      }
     }
 
     if (existing !== null && !existing.includes(MANAGED_MARKER)) {
