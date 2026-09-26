@@ -2,10 +2,7 @@ import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'bun:test';
-import {
-  AGENT_HOSTS,
-  setupAgentSkills,
-} from '../agent/setup.js';
+import { AGENT_HOSTS, setupAgentSkills } from '../agent/setup.js';
 
 describe('MIA agent setup', () => {
   it('installs the public skill surface for the supported hosts', async () => {
