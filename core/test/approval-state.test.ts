@@ -30,7 +30,7 @@ describe('Approval state', () => {
   });
 
   it('does not allow a resolved approval to be changed again', () => {
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: 'work-1', runId: 'run-1', action: 'ship' });
     const resolved = resolveApproval(approval, 'rejected');
 
     expect(() => resolveApproval(resolved, 'approved')).toThrow(/already resolved/);
