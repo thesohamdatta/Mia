@@ -57,12 +57,12 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(result.ok).toBe(true);
     expect(result.output).toContain('claude: generated plan, review, ship');
     expect(result.output).toContain('codex: generated plan, review, ship');
-    expect(
-      await Bun.file(join(ctx.cwd, '.agents', 'skills', 'plan', 'SKILL.md')).exists()
-    ).toBe(true);
-    expect(
-      await Bun.file(join(ctx.cwd, '.claude', 'skills', 'ship', 'SKILL.md')).exists()
-    ).toBe(true);
+    expect(await Bun.file(join(ctx.cwd, '.agents', 'skills', 'plan', 'SKILL.md')).exists()).toBe(
+      true
+    );
+    expect(await Bun.file(join(ctx.cwd, '.claude', 'skills', 'ship', 'SKILL.md')).exists()).toBe(
+      true
+    );
   });
 
   it('should execute vc skill through validated CLI path', async () => {
