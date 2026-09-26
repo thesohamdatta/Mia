@@ -15,6 +15,8 @@ MIA engineers the environment around AI agents without making the environment co
 ## Rules
 
 - **Small first:** use the smallest instruction, file, tool, and abstraction that solves the task.
+- **Bounded change surface:** know which files and responsibilities may change before editing.
+- **Acceptance signal:** define how success will be observed before implementation.
 - **Explicit contracts:** make inputs, outputs, side effects, and verification visible.
 - **Progressive disclosure:** keep entry context small and load depth only when needed.
 - **One owner:** one responsibility has one canonical source of truth.
@@ -32,6 +34,12 @@ Use:
 `failing test → smallest change → focused green → wider verification`
 
 For Markdown-only changes, add a deterministic test when the rule can be expressed as a stable repository invariant. Keep the invariant small enough that future documentation changes do not require rewriting the validator.
+
+For iterative engineering work, use a tight feedback loop:
+
+`goal → baseline → bounded change → measure → keep or revert → record`
+
+The baseline can be an existing test, metric, snapshot, or observed behaviour. Do not keep a change because it feels better. Keep it because the acceptance signal improved or the contract became clearer without breaking existing evidence.
 
 ## Markdown shape
 
