@@ -1,3 +1,4 @@
+import { selectCapabilities } from '../capabilities/select.js';
 import type { RootPlan } from '../root/types.js';
 import { type Work, createWork } from './types.js';
 
@@ -10,7 +11,7 @@ export function createWorkFromRootPlan(plan: RootPlan): Work {
     ...createWork({
       objective: plan.objective,
       successCriteria: plan.expectedEvidence,
-      capabilities: plan.capabilities,
+      capabilities: selectCapabilities(plan),
       dependencies: plan.dependencies,
     }),
     state: 'planned',
