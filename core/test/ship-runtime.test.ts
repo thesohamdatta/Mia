@@ -94,7 +94,7 @@ describe('Ship skill runtime', () => {
     );
     await saveApproval(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, approval);
 
-    const result = await execute([${JSON.stringify(work.id)}], ctx, async () => passedVerification());
+    const result = await execute([work.id], ctx, async () => passedVerification());
 
     expect(result.ok).toBe(true);
     expect(result.output).toContain('SHIPPED');
