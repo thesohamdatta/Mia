@@ -13,6 +13,7 @@ export function createWorkFromRootPlan(plan: RootPlan): Work {
       successCriteria: plan.expectedEvidence,
       capabilities: selectCapabilities(plan),
       dependencies: plan.dependencies,
+      requiresHumanApproval: plan.authority.humanApprovalRequired,
     }),
     state: 'planned',
   };
