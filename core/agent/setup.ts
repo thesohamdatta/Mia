@@ -1,9 +1,5 @@
 import { join } from 'node:path';
-import {
-  AGENT_SKILLS,
-  generateAgentSkillSurface,
-  type AgentSurfaceResult,
-} from './surface.js';
+import { AGENT_SKILLS, generateAgentSkillSurface, type AgentSurfaceResult } from './surface.js';
 
 export const AGENT_HOSTS = {
   claude: { skillRoot: join('.claude', 'skills') },
