@@ -1,6 +1,11 @@
 import { runVerification } from '../../verification/run-checks.js';
 import { repositoryChecks } from '../../verification/suite.js';
-import { completeReview, completeVerification, enterVerification, startWork } from '../../work/lifecycle.js';
+import {
+  completeReview,
+  completeVerification,
+  enterVerification,
+  startWork,
+} from '../../work/lifecycle.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
