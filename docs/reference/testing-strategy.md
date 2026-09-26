@@ -2,8 +2,6 @@
 
 MIA uses testing as evidence for claims about the repository.
 
-This document describes the verification stack and the test structure that currently exists in the repository.
-
 ## Current checks
 
 The main repository checks are:
@@ -22,28 +20,23 @@ GitHub Actions runs the supported repository checks on the `master` integration 
 
 ## Current test organisation
 
-The repository keeps focused regression and integration coverage under `core/test/`.
+Focused regression and integration coverage lives under `core/test/`.
 
-Current test files include:
+Keep tests close to the behaviour they prove. Prefer one focused test over a broad fixture that proves several unrelated rules.
+
+The suite currently covers agent surfaces, capability metadata, the CLI → skill → store path, JSONL state, preamble lifecycle, RootPlan/Work planning, Work lifecycle, and Work persistence.
+
+## TDD
+
+For a behaviour change:
 
 ```text
-core/test/
-├── agent-setup.test.ts
-├── agent-surface.test.ts
-├── capability-team.test.ts
-├── integration.test.ts
-├── jsonl-store.test.ts
-├── plan-work.integration.test.ts
-├── preamble.test.ts
-├── root-plan-work.test.ts
-├── root-planning.test.ts
-├── work-lifecycle.test.ts
-└── work-persistence.test.ts
+failing test → smallest change → focused green → wider verification
 ```
 
-The directory also contains small legacy support modules such as `analyzer.ts`, `judge.ts`, `index.ts`, and `types.ts`. They are not themselves the current test suite.
+The failing test should demonstrate the missing behaviour. The implementation should be the smallest change that satisfies that contract. Refactor only after the focused test is green.
 
-When new behaviour is added, add focused unit or integration coverage where it gives useful evidence.
+For a documentation contract, use a deterministic repository test when the rule is stable and important enough to protect. Avoid turning every prose preference into a test.
 
 ## What matters most
 
@@ -59,7 +52,7 @@ Test the important path:
 CLI → skill → UnifiedStore
 ```
 
-The Work system also has direct coverage for:
+The Work system has direct coverage for:
 
 ```text
 RootPlan → Work → persistence → recovery
@@ -68,8 +61,6 @@ RootPlan → Work → persistence → recovery
 ### Configuration
 
 Test default paths and environment-variable behaviour when changing configuration.
-
-The current CLI runtime derives its active configuration from `MIA_DIR`. The broader `core/config/ConfigLoader` remains compatibility/transition code and is not the active `createExecutionContext()` path.
 
 ### Git helpers
 
@@ -83,7 +74,7 @@ Test generated Codex and Claude skill adapters without overwriting unmanaged use
 
 MIA has host adapters and skill metadata that can support deeper model evaluation, but the current package scripts do not expose a dedicated `eval:*` command family.
 
-Keep future model evaluation separate from deterministic repository gates so model variability does not obscure ordinary code regressions.
+Keep future model evaluation separate from deterministic repository gates.
 
 ## CI principle
 
