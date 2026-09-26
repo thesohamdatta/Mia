@@ -37,7 +37,7 @@ describe('Work shipping gate', () => {
 
   it('blocks shipping when approval is not approved', () => {
     const work = readyWork(true);
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: work.id, runId: 'run-1', action: 'ship' });
     expect(() => shipWork(work, { verificationPassed: true, approval })).toThrow(
       /approval is not approved/
     );
@@ -46,7 +46,7 @@ describe('Work shipping gate', () => {
   it('ships only after verification and required approval are satisfied', () => {
     const work = readyWork(true);
     const approval = resolveApproval(
-      createApproval({ runId: 'run-1', action: 'ship' }),
+      createApproval({ workId: work.id, runId: 'run-1', action: 'ship' }),
       'approved'
     );
 

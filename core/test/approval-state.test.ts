@@ -6,11 +6,13 @@ import { createUnifiedStore } from '../state/unified-store.js';
 describe('Approval state', () => {
   it('creates a pending approval request', () => {
     const approval = createApproval({
+      workId: 'work-1',
       runId: 'run-1',
       action: 'ship',
     });
 
     expect(approval.id).toMatch(/^approval_/);
+    expect(approval.workId).toBe('work-1');
     expect(approval.runId).toBe('run-1');
     expect(approval.action).toBe('ship');
     expect(approval.status).toBe('pending');
@@ -18,7 +20,7 @@ describe('Approval state', () => {
   });
 
   it('resolves an approval without changing its identity', () => {
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: 'work-1', runId: 'run-1', action: 'ship' });
     const resolved = resolveApproval(approval, 'approved', 'Human approved release');
 
     expect(resolved.id).toBe(approval.id);
@@ -28,7 +30,7 @@ describe('Approval state', () => {
   });
 
   it('does not allow a resolved approval to be changed again', () => {
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: 'work-1', runId: 'run-1', action: 'ship' });
     const resolved = resolveApproval(approval, 'rejected');
 
     expect(() => resolveApproval(resolved, 'approved')).toThrow(/already resolved/);
@@ -36,7 +38,7 @@ describe('Approval state', () => {
 
   it('persists and recovers the latest approval state', async () => {
     const store = createUnifiedStore();
-    const approval = createApproval({ runId: 'run-1', action: 'ship' });
+    const approval = createApproval({ workId: 'work-1', runId: 'run-1', action: 'ship' });
     const resolved = resolveApproval(approval, 'approved');
 
     const projectsDir = '/tmp/mia-approval-test';
