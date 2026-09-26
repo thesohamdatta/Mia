@@ -39,6 +39,8 @@ phase: ${manifest.phase}
 side-effects: ${manifest.sideEffects}
 ---
 
+<!-- MIA-MANAGED-SKILL -->
+
 # ${manifest.name}
 
 Use MIA's **${manifest.name}** workflow for the current engineering task.
