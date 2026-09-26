@@ -8,6 +8,7 @@ import { execute as retroExecute } from './retro/execute.js';
 import { execute as reviewExecute } from './review/execute.js';
 import { execute as shipExecute } from './ship/execute.js';
 import { execute as specExecute } from './spec/execute.js';
+import { execute as setupExecute } from './setup/execute.js';
 import type { SkillDefinition, SkillExecutor } from './types.js';
 import { execute as vcExecute } from './vc/execute.js';
 
@@ -42,6 +43,9 @@ export const skills: Record<string, SkillDefinition> = {
   }),
   spec: define('spec', 'Shape intent into a project specification', 'local-write', [], 'specify', {
     execute: specExecute,
+  }),
+  setup: define('setup', 'Install MIA agent skills for supported hosts', 'local-write', [], 'execute', {
+    execute: setupExecute,
   }),
   ship: define(
     'ship',
