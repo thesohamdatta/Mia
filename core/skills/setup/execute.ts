@@ -6,8 +6,9 @@ export const execute: SkillExecutor['execute'] = async (
   ctx: ExecutionContext
 ): Promise<SkillResult> => {
   const result = await setupAgentSkills(ctx.cwd);
-  const lines = Object.entries(result).map(([host, surface]) =>
-    `${host}: generated ${surface.generated.join(', ') || 'none'}${surface.skipped.length > 0 ? `; skipped ${surface.skipped.join(', ')}` : ''}`
+  const lines = Object.entries(result).map(
+    ([host, surface]) =>
+      `${host}: generated ${surface.generated.join(', ') || 'none'}${surface.skipped.length > 0 ? `; skipped ${surface.skipped.join(', ')}` : ''}`
   );
 
   return {
