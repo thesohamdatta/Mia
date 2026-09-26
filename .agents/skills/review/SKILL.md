@@ -8,11 +8,11 @@ audience: agent
 load: on-demand
 managed-by: mia
 name: review
-description: "Prepare a review surface for the current change"
+description: "Advance a Work item through verification and review"
 version: 1.0.0
 invocation: model
 phase: review
-side-effects: none
+side-effects: local-write
 ---
 
 <!-- MIA-MANAGED-SKILL -->
@@ -31,7 +31,7 @@ Use MIA's **review** workflow for the current engineering task.
 
 ## Command
 
-`mia review`
+`mia review "<workId>"`
 
 ## Runtime authority
 
@@ -40,5 +40,5 @@ The executable definition in `core/skills/index.ts` is authoritative. This file 
 ## Contract
 
 - Phase: review
-- Side effects: none
-- Verification: none
+- Side effects: local-write
+- Verification: typecheck, lint, unused-code, tests
