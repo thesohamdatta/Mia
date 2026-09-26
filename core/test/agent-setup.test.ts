@@ -17,10 +17,7 @@ describe('MIA agent setup', () => {
 
     for (const [hostName, host] of Object.entries(AGENT_HOSTS)) {
       for (const skill of ['plan', 'review', 'ship']) {
-        const file = await readFile(
-          join(projectRoot, host.skillRoot, skill, 'SKILL.md'),
-          'utf8'
-        );
+        const file = await readFile(join(projectRoot, host.skillRoot, skill, 'SKILL.md'), 'utf8');
         expect(file).toContain('managed-by: mia');
         expect(result[hostName as keyof typeof result].generated).toContain(skill);
       }
