@@ -10,7 +10,7 @@ name: ship
 version: 1.0.0
 invocation: user
 phase: handoff
-side-effects: none
+side-effects: local-write
 ---
 
 # ship
@@ -25,7 +25,7 @@ Explicitly invoked by the user through the MIA CLI.
 
 - Phase: handoff
 - Invocation: user
-- Side effects: none
+- Side effects: local-write
 - Verification: typecheck
 lint
 unused-code
