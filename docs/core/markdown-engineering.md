@@ -63,6 +63,16 @@ A useful project document should make these clear:
 
 Prefer small documents with strong links over one large handbook.
 
+## Feedback loop
+
+For work that can be measured, keep the loop tight:
+
+`goal → baseline → bounded change → measure → keep or revert → record`
+
+Use a real acceptance signal: a test, metric, snapshot, log, or other observable result. Smaller loops make failures easier to explain and changes easier to review.
+
+The editable surface should stay bounded. Prefer one clear owner and one small diff over changes spread across unrelated documents.
+
 ## TDD for documentation
 
 When a documentation rule is important and deterministic:
