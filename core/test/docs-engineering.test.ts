@@ -20,8 +20,10 @@ describe('Markdown engineering contract', () => {
       'docs/core/context.md',
       'docs/core/principles.md',
       'docs/core/agent-engineering.md',
+      'docs/core/markdown-engineering.md',
       'docs/reference/evidence.md',
       'docs/reference/testing-strategy.md',
+      'docs/reference/claude-codex-engineering.md',
       'docs/reference/review-standards.md',
       'docs/workflows/grill-to-ship.md',
     ];
@@ -40,11 +42,24 @@ describe('Markdown engineering contract', () => {
     expect(workflow).toContain('refactor only after green');
   });
 
+  it('keeps the agent loop explicit and measurable', () => {
+    const agentEngineering = read('docs/core/agent-engineering.md');
+    const markdownEngineering = read('docs/core/markdown-engineering.md');
+    expect(agentEngineering).toContain('acceptance signal');
+    expect(agentEngineering).toContain('bounded change surface');
+    expect(markdownEngineering).toContain('feedback loop');
+    expect(markdownEngineering).toContain('keep or revert');
+    expect(markdownEngineering).toContain('autoresearch');
+    expect(markdownEngineering).toContain('Harness Engineering');
+    expect(markdownEngineering).toContain('What evidence would prove this change is wrong?');
+  });
+
   it('keeps project context and agent instructions separate', () => {
     const context = read('CONTEXT.md');
     const agentEngineering = read('docs/core/agent-engineering.md');
     expect(context).toContain('Project vocabulary');
     expect(context).not.toContain('TDD');
     expect(agentEngineering).toContain('TDD');
+    expect(agentEngineering).toContain('bounded change surface');
   });
 });

@@ -32,6 +32,7 @@ Do not read the whole documentation tree by default. Context is a budget.
 | Runtime architecture | `docs/core/architecture.md` |
 | Engineering principles | `docs/core/principles.md` |
 | Agent engineering guidance | `docs/core/agent-engineering.md` |
+| Markdown engineering | `docs/core/markdown-engineering.md` |
 | Context engineering | `docs/core/context.md` |
 | Executable skills | `core/skills/index.ts` and `core/skills/*` |
 | Skill documentation | `docs/skills/` from canonical skill metadata |
