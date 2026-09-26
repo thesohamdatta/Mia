@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { WORK_STATES, createWork, transitionWork, type WorkState } from '../work/types.js';
+import { WORK_STATES, type WorkState, createWork, transitionWork } from '../work/types.js';
 
 describe('Work lifecycle', () => {
   it('defines the v0.4 lifecycle states', () => {
