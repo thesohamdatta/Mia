@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
-import { createApproval, resolveApproval } from '../approval/types.js';
 import { loadApprovalForWork, saveApproval } from '../approval/persistence.js';
+import { createApproval, resolveApproval } from '../approval/types.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 import { execute } from '../skills/ship/execute.js';
-import { createWork, transitionWork } from '../work/types.js';
 import { loadWork, saveWork } from '../work/persistence.js';
+import { createWork, transitionWork } from '../work/types.js';
 
 describe('Ship skill runtime', () => {
   function readyWork(requiresHumanApproval = false) {
