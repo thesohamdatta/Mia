@@ -30,15 +30,9 @@ describe('Root AI planning contract', () => {
     expect(plan.ambiguities).toEqual(['What audio providers are supported?']);
     expect(plan.capabilities).toEqual(['mobile', 'ai', 'qa']);
     expect(plan.dependencies).toEqual(['Backend transcription API']);
-    expect(plan.nextActions).toEqual([
-      'Clarify audio provider',
-      'Define acceptance criteria',
-    ]);
+    expect(plan.nextActions).toEqual(['Clarify audio provider', 'Define acceptance criteria']);
     expect(plan.approvals).toEqual(['Human approval before release']);
-    expect(plan.expectedEvidence).toEqual([
-      'Acceptance criteria recorded',
-      'Tests pass',
-    ]);
+    expect(plan.expectedEvidence).toEqual(['Acceptance criteria recorded', 'Tests pass']);
   });
 
   it('preserves planning context needed by the root agent', () => {
@@ -61,15 +55,18 @@ describe('Root AI planning contract', () => {
 
   it('rejects empty human requests and root objectives', () => {
     expect(() =>
-      createRootPlan({ ...input, request: '   ' }, {
-        objective: 'Build X',
-        ambiguities: [],
-        capabilities: [],
-        dependencies: [],
-        nextActions: [],
-        approvals: [],
-        expectedEvidence: [],
-      })
+      createRootPlan(
+        { ...input, request: '   ' },
+        {
+          objective: 'Build X',
+          ambiguities: [],
+          capabilities: [],
+          dependencies: [],
+          nextActions: [],
+          approvals: [],
+          expectedEvidence: [],
+        }
+      )
     ).toThrow(/Root request is required/);
 
     expect(() =>
