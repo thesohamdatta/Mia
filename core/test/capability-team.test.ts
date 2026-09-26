@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import {
-  createCapability,
-  createTeam,
-  type Capability,
-  type Team,
-} from '../capabilities/types.js';
+import { createCapability, createTeam, type Capability, type Team } from '../capabilities/types.js';
 
 describe('MIA capability and team contracts', () => {
   const research: Capability = createCapability({
