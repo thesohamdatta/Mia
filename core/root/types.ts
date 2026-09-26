@@ -1,9 +1,6 @@
 import type { WorkState } from '../work/types.js';
 
-export type AutonomyLevel =
-  | 'suggest-only'
-  | 'execute-within-scope'
-  | 'execute-and-verify';
+export type AutonomyLevel = 'suggest-only' | 'execute-within-scope' | 'execute-and-verify';
 
 export interface RootAuthority {
   humanApprovalRequired: boolean;
@@ -45,10 +42,7 @@ export interface RootPlanProposal {
   expectedEvidence: string[];
 }
 
-export function createRootPlan(
-  input: RootPlanInput,
-  proposal: RootPlanProposal
-): RootPlan {
+export function createRootPlan(input: RootPlanInput, proposal: RootPlanProposal): RootPlan {
   const request = input.request.trim();
   if (!request) {
     throw new Error('Root request is required');
