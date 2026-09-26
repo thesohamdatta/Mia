@@ -23,6 +23,7 @@ describe('Markdown engineering contract', () => {
       'docs/core/markdown-engineering.md',
       'docs/reference/evidence.md',
       'docs/reference/testing-strategy.md',
+      'docs/reference/claude-codex-engineering.md',
       'docs/reference/review-standards.md',
       'docs/workflows/grill-to-ship.md',
     ];
@@ -50,6 +51,7 @@ describe('Markdown engineering contract', () => {
     expect(markdownEngineering).toContain('keep or revert');
     expect(markdownEngineering).toContain('autoresearch');
     expect(markdownEngineering).toContain('Harness Engineering');
+    expect(markdownEngineering).toContain('What evidence would prove this change is wrong?');
   });
 
   it('keeps project context and agent instructions separate', () => {
