@@ -80,8 +80,8 @@ describe('gstack-style agent skill surface', () => {
   it('rejects an unknown skill name instead of generating an invalid adapter', async () => {
     const destination = await mkdtemp(join(tmpdir(), 'mia-agent-surface-'));
 
-    await expect(
-      generateAgentSkillSurface(destination, ['does-not-exist'])
-    ).rejects.toThrow(/Unknown MIA skill: does-not-exist/);
+    await expect(generateAgentSkillSurface(destination, ['does-not-exist'])).rejects.toThrow(
+      /Unknown MIA skill: does-not-exist/
+    );
   });
 });
