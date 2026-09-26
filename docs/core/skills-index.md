@@ -13,6 +13,7 @@ Skills are registered explicitly in `core/skills/index.ts`. The registry is a di
 | `spec` | `mia spec` | Shape intent into a project specification |
 | `review` | `mia review` | Run deterministic pre-landing verification |
 | `health` | `mia health` | Run the repository verification suite |
+| `setup` | `mia setup` | Install MIA agent skills for supported hosts |
 | `ship` | `mia ship` | Gate handoff on repository verification |
 
 ## Learning and state
