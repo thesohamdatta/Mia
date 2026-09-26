@@ -14,12 +14,15 @@ export interface AgentSurfaceResult {
 
 const MANAGED_MARKER = '<!-- MIA-MANAGED-SKILL -->';
 
+function commandForSkill(name: string): string {
+  if (name === 'plan') return 'mia plan create "<objective>"';
+  return `mia ${name}`;
+}
+
 function renderSkill(definition: SkillDefinition): string {
   const { manifest } = definition;
 
-  return `<!-- MIA-MANAGED-SKILL -->
-
----
+  return `---
 type: skill
 scope: project
 status: active
@@ -29,7 +32,7 @@ audience: agent
 load: on-demand
 managed-by: mia
 name: ${manifest.name}
-description: ${manifest.description}
+description: "${manifest.description.replace(/"/g, '\\"')}"
 version: ${manifest.version}
 invocation: model
 phase: ${manifest.phase}
@@ -44,8 +47,12 @@ Use MIA's **${manifest.name}** workflow for the current engineering task.
 
 - Treat the user's current objective as the input.
 - Use the existing MIA ${manifest.name} workflow; do not invent a parallel engineering process.
-- Invoke \`mia ${manifest.name}\` with the relevant objective or context.
+- Invoke the command shown below with the relevant objective or context.
 - Preserve upstream decisions and artifacts when continuing an existing workflow.
+
+## Command
+
+\`${commandForSkill(manifest.name)}\`
 - Report what was actually verified. Do not claim completion without evidence.
 
 ## Runtime authority
