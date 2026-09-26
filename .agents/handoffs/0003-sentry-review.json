@@ -1,0 +1,36 @@
+{
+  "agent": "sentry",
+  "task": "quality-control-sentry-review",
+  "objective": "Perform Sentry adversarial review, unslop cleanup of loose root test scripts, and update agent state",
+  "scope": [
+    ".agents/",
+    "test-path.mjs",
+    "test_ask_user.ts",
+    "test_child.ts",
+    "test_stdin.ts",
+    "test_tools.ts",
+    "test_tools2.ts"
+  ],
+  "files_changed": [
+    ".agents/state.json",
+    ".agents/quality.json",
+    ".agents/handoffs/0003-sentry-review.json"
+  ],
+  "verification": [
+    "bun test: PASS",
+    "bun run typecheck: PASS",
+    "bun run lint:check: PASS",
+    "bun run knip: PASS",
+    "bun run validate:frontmatter: PASS",
+    "bun run lint:md: PASS",
+    "bun run build: PASS"
+  ],
+  "findings": [],
+  "decisions": [
+    "Removed 6 loose test/experiment scripts from root directory as part of unslop pass",
+    "Verified all core system tests, type safety, linting, and build pass cleanly"
+  ],
+  "uncertainty": [],
+  "next_agent": "pulse",
+  "status": "complete"
+}
