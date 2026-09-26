@@ -22,6 +22,7 @@ export interface Work {
   successCriteria: string[];
   capabilities: string[];
   dependencies: string[];
+  requiresHumanApproval: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +32,7 @@ export interface CreateWorkInput {
   successCriteria?: string[];
   capabilities?: string[];
   dependencies?: string[];
+  requiresHumanApproval?: boolean;
 }
 
 const TRANSITIONS: Record<WorkState, readonly WorkState[]> = {
@@ -67,6 +69,7 @@ export function createWork(input: CreateWorkInput): Work {
     successCriteria: [...(input.successCriteria ?? [])],
     capabilities: [...(input.capabilities ?? [])],
     dependencies: [...(input.dependencies ?? [])],
+    requiresHumanApproval: input.requiresHumanApproval ?? false,
     createdAt: now,
     updatedAt: now,
   };
