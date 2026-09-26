@@ -30,7 +30,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should list all registered skills', () => {
     const skills = listSkills();
-    expect(skills.length).toBeGreaterThanOrEqual(10);
+    expect(skills.length).toBeGreaterThanOrEqual(11);
     expect(skills).toContain('grill');
     expect(skills).toContain('plan');
     expect(skills).toContain('spec');
@@ -42,6 +42,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(skills).toContain('checkpoint');
     expect(skills).toContain('review');
     expect(skills).toContain('vc');
+    expect(skills).toContain('setup');
   });
 
   it('should execute vc skill through validated CLI path', async () => {
@@ -60,8 +61,9 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should expose executable skill definitions with explicit safety contracts', () => {
     const definitions = listSkillDefinitions();
-    expect(definitions).toHaveLength(11);
+    expect(definitions).toHaveLength(12);
     expect(getSkill('vc')?.manifest.sideEffects).toBe('git-write');
+    expect(getSkill('setup')?.manifest.sideEffects).toBe('local-write');
     expect(getSkill('health')?.manifest.verification).toEqual([
       'typecheck',
       'lint',
