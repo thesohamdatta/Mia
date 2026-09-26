@@ -14,9 +14,10 @@ Core skills:
   grill       Start a clarification interview (golden rule enforcement)
   plan        Create a verifiable plan with success criteria
   spec        Turn intent into PRD → issues
-  ship        Test → review → push → PR
+  ship        Run shipping verification and handoff
   review      Pre-landing PR review
   health      Code quality dashboard
+  setup       Install MIA agent skills for supported hosts
 
 Learning skills:
   learn       Manage project learnings (list, add)

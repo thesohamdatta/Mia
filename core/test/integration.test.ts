@@ -30,7 +30,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should list all registered skills', () => {
     const skills = listSkills();
-    expect(skills.length).toBeGreaterThanOrEqual(10);
+    expect(skills.length).toBeGreaterThanOrEqual(11);
     expect(skills).toContain('grill');
     expect(skills).toContain('plan');
     expect(skills).toContain('spec');
@@ -42,6 +42,27 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(skills).toContain('checkpoint');
     expect(skills).toContain('review');
     expect(skills).toContain('vc');
+    expect(skills).toContain('setup');
+  });
+
+  it('should execute setup skill through the normal skill path', async () => {
+    const ctx = createExecutionContext();
+    const definition = getSkill('setup');
+
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('setup definition not found');
+
+    const result = await executeSkillDefinition(definition, [], ctx);
+
+    expect(result.ok).toBe(true);
+    expect(result.output).toContain('claude: generated plan, review, ship');
+    expect(result.output).toContain('codex: generated plan, review, ship');
+    expect(await Bun.file(join(ctx.cwd, '.agents', 'skills', 'plan', 'SKILL.md')).exists()).toBe(
+      true
+    );
+    expect(await Bun.file(join(ctx.cwd, '.claude', 'skills', 'ship', 'SKILL.md')).exists()).toBe(
+      true
+    );
   });
 
   it('should execute vc skill through validated CLI path', async () => {
@@ -60,8 +81,9 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should expose executable skill definitions with explicit safety contracts', () => {
     const definitions = listSkillDefinitions();
-    expect(definitions).toHaveLength(11);
+    expect(definitions).toHaveLength(12);
     expect(getSkill('vc')?.manifest.sideEffects).toBe('git-write');
+    expect(getSkill('setup')?.manifest.sideEffects).toBe('local-write');
     expect(getSkill('health')?.manifest.verification).toEqual([
       'typecheck',
       'lint',

@@ -91,6 +91,8 @@ I can turn the intent into a PRD-shaped specification and break the work into sm
 
 Skills run directly in the CLI process. There is no daemon sitting between the command and the skill executor.
 
+`mia setup` installs the small agent-facing `/plan`, `/review`, and `/ship` surface for the supported local agent hosts without replacing unmanaged skills.
+
 ### review
 
 The review skill is the deterministic pre-landing verification step. It reports executable evidence; human review remains responsible for architecture, security, maintainability, and product decisions.

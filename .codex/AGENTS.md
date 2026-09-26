@@ -1,26 +1,17 @@
-# ECC for Codex CLI
+# MIA Agent Entry for Codex
 
-This supplements the root `AGENTS.md` with a repo-local ECC baseline.
+MIA exposes a small project-local agent skill surface under `.agents/skills/`.
 
-## Repo Skill
+## MIA skills
 
-- Repo-generated Codex skill: `.agents/skills/Mia/SKILL.md`
-- Claude-facing companion skill: `.claude/skills/Mia/SKILL.md`
-- Keep user-specific credentials and private MCPs in `~/.codex/config.toml`, not in this repo.
+- `/plan` — structured engineering planning
+- `/review` — pre-landing review
+- `/ship` — shipping verification and handoff
 
-## MCP Baseline
+These files are generated adapters. The executable source of truth is `core/skills/index.ts`.
 
-Treat `.codex/config.toml` as the default ECC-safe baseline for work in this repository.
-The generated baseline enables GitHub, Context7, Exa, Memory, Playwright, and Sequential Thinking.
+Run `mia setup` from the project root to install or refresh the MIA skill surface for supported coding agents.
 
-## Multi-Agent Support
+## Engineering rule
 
-- Explorer: read-only evidence gathering
-- Reviewer: correctness, security, and regression review
-- Docs researcher: API and release-note verification
-
-## Workflow Files
-
-- No dedicated workflow command files were generated for this repo.
-
-Use these workflow files as reusable task scaffolds when the detected repository workflows recur.
+Use MIA's workflow rather than inventing a parallel process. Preserve upstream artifacts, verify claims with evidence, and keep consequential human approval explicit.
