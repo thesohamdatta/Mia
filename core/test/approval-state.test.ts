@@ -12,6 +12,7 @@ describe('Approval state', () => {
     });
 
     expect(approval.id).toMatch(/^approval_/);
+    expect(approval.workId).toBe('work-1');
     expect(approval.runId).toBe('run-1');
     expect(approval.action).toBe('ship');
     expect(approval.status).toBe('pending');
