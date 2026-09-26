@@ -84,9 +84,9 @@ export const skills: Record<string, SkillDefinition> = {
   }),
   review: define(
     'review',
-    'Prepare a review surface for the current change',
-    'none',
-    [],
+    'Advance a Work item through verification and review',
+    'local-write',
+    ['typecheck', 'lint', 'unused-code', 'tests'],
     'review',
     { execute: reviewExecute }
   ),
