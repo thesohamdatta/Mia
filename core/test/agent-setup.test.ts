@@ -1,7 +1,7 @@
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { describe, expect, it } from 'bun:test';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'bun:test';
 import { AGENT_HOSTS, setupAgentSkills } from '../agent/setup.js';
 
 describe('MIA agent setup', () => {
@@ -36,11 +36,8 @@ describe('MIA agent setup', () => {
       'plan',
       'SKILL.md'
     );
-    await import('node:fs/promises').then(({ mkdir, writeFile }) =>
-      mkdir(join(projectRoot, '.agents', 'skills', 'plan'), { recursive: true }).then(() =>
-        writeFile(collision, 'foreign skill', 'utf8')
-      )
-    );
+    await mkdir(join(projectRoot, '.agents', 'skills', 'plan'), { recursive: true });
+    await writeFile(collision, 'foreign skill', 'utf8');
 
     const result = await setupAgentSkills(projectRoot);
 
