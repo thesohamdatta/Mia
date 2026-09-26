@@ -111,6 +111,8 @@ describe('skill execution lifecycle', () => {
       appendCheckpoint: async () => {},
       listEvidence: async () => [],
       appendEvidence: async () => {},
+      listApprovals: async () => [],
+      appendApproval: async () => {},
       appendTimeline: async () => {
         throw new Error('timeline unavailable');
       },
