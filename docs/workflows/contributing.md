@@ -7,16 +7,13 @@ Thank you for contributing! This guide helps you get started quickly.
 ```bash
 # Clone and setup
 git clone https://github.com/thesohamdatta/Mia.git
-cd mia
-bun install
-
-# Configure git (one-time)
+cd Mia
 bun ci
 ```
 
-## Git Workflow (GitHub Flow)
+## Git Workflow
 
-We use **GitHub Flow** - simple, practical, and designed for continuous deployment.
+We use a lightweight GitHub Flow: short-lived branches, Pull Requests into `master`, CI before merge, and squash merges.
 
 ### Branching
 - **master** - canonical integration branch
@@ -32,7 +29,7 @@ We use **GitHub Flow** - simple, practical, and designed for continuous deployme
 3. Push branch: `git push -u origin feature/my-feature`
 4. Open a Pull Request against `master`
 5. CI runs (tests, lint, type-check, build)
-6. Code review (1 approval required)
+6. Code review
 7. Squash and merge to `master`
 8. Delete branch locally and remotely
 
@@ -114,7 +111,7 @@ bun run build
 - [ ] No WIP/fixup commits (squash them)
 
 ### PR Template
-Fill out the PR template:
+Fill out the PR template when one is provided:
 - Clear description of changes
 - Link related issues
 - List testing done
