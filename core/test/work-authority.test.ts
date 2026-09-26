@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { createRootPlan } from '../root/types.js';
-import { createWork } from '../work/types.js';
 import { createWorkFromRootPlan } from '../work/from-root-plan.js';
+import { createWork } from '../work/types.js';
 
 describe('Work authority', () => {
   it('defaults standalone Work to no required human approval', () => {
