@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { createRootPlan, type RootPlanInput, type RootPlan } from '../root/types.js';
+import { type RootPlan, type RootPlanInput, createRootPlan } from '../root/types.js';
 
 describe('Root AI planning contract', () => {
   const input: RootPlanInput = {
