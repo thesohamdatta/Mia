@@ -6,9 +6,9 @@ import { execute as memoryExecute } from './memory/execute.js';
 import { execute as planExecute } from './plan/execute.js';
 import { execute as retroExecute } from './retro/execute.js';
 import { execute as reviewExecute } from './review/execute.js';
+import { execute as setupExecute } from './setup/execute.js';
 import { execute as shipExecute } from './ship/execute.js';
 import { execute as specExecute } from './spec/execute.js';
-import { execute as setupExecute } from './setup/execute.js';
 import type { SkillDefinition, SkillExecutor } from './types.js';
 import { execute as vcExecute } from './vc/execute.js';
 
