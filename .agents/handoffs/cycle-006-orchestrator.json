@@ -1,0 +1,43 @@
+{
+  "cycle": "cycle-006",
+  "integration_branch": "master",
+  "verification_commit": "dd765a81c459fbbc817957381ce3054eb69b7591",
+  "objective": "Reconcile documentation contract test assertions, format handoff artifacts, and advance agent coordination pipeline state.",
+  "scope": [
+    "core/test/docs-engineering.test.ts",
+    ".agents/handoffs/cycle-005-orchestrator.json",
+    ".agents/handoffs/cycle-006-maintainer.json",
+    ".agents/handoffs/cycle-006-orchestrator.json",
+    ".agents/state.json"
+  ],
+  "findings": [
+    "Docs engineering contract test assertions were outdated relative to canonical docs.",
+    "Cycle-005 orchestrator handoff file formatting triggered a Biome lint check error."
+  ],
+  "changes": [
+    "Updated core/test/docs-engineering.test.ts assertions to match CONTEXT.md and docs/workflows/grill-to-ship.md.",
+    "Formatted .agents handoff files with Biome and updated shared state.json to complete cycle-006."
+  ],
+  "checks": [
+    {
+      "name": "typecheck",
+      "result": "pass"
+    },
+    {
+      "name": "lint",
+      "result": "pass"
+    },
+    {
+      "name": "tests",
+      "result": "pass"
+    },
+    {
+      "name": "build",
+      "result": "pass"
+    }
+  ],
+  "blocking_issues": [],
+  "remaining_uncertainty": "None.",
+  "recommended_next_action": "Proceed with normal feature work on cycle-007.",
+  "status": "COMPLETE"
+}
