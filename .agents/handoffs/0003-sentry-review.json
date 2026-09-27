@@ -1,0 +1,43 @@
+{
+  "agent": "sentry",
+  "task": "sentry-quality-control",
+  "objective": "Verify repository correctness, repair vitest configuration, eliminate uncommitted/unnecessary test scripts, and perform Sentry review",
+  "scope": [
+    "vitest.config.ts",
+    "knip.json",
+    ".agents/",
+    "test-path.mjs",
+    "test_ask_user.ts",
+    "test_child.ts",
+    "test_stdin.ts",
+    "test_tools.ts",
+    "test_tools2.ts"
+  ],
+  "files_changed": [
+    "vitest.config.ts",
+    "knip.json",
+    ".agents/state.json",
+    ".agents/quality.json",
+    ".agents/handoffs/0003-sentry-review.json"
+  ],
+  "verification": [
+    "bun test: PASS",
+    "bun run test: PASS (5/5 tests passed in fork pool)",
+    "bun run typecheck: PASS",
+    "bun run lint:check: PASS",
+    "bun run knip: PASS",
+    "bun run validate:frontmatter: PASS",
+    "bun run lint:md: PASS",
+    "bun run build: PASS"
+  ],
+  "findings": [],
+  "decisions": [
+    "Added pool: 'forks' to vitest.config.ts to support tests using process.chdir()",
+    "Removed stray/unnecessary root test scripts (test-path.mjs, test_*.ts)",
+    "Cleaned up redundant knip.json entry patterns",
+    "Advanced state.json active_agent to pulse"
+  ],
+  "uncertainty": [],
+  "next_agent": "pulse",
+  "status": "complete"
+}

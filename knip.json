@@ -1,7 +1,6 @@
 {
   "$schema": "https://knip.dev/schema.json",
   "entry": [
-    "core/cli/index.ts",
     "core/context.ts",
     "core/config/index.ts",
     "core/hosts/index.ts",
