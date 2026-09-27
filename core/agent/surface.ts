@@ -5,8 +5,6 @@ import type { SkillDefinition } from '../skills/types.js';
 
 export const AGENT_SKILLS = ['plan', 'review', 'ship'] as const;
 
-export type AgentSkillName = (typeof AGENT_SKILLS)[number];
-
 export interface AgentSurfaceResult {
   generated: string[];
   skipped: string[];

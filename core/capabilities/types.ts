@@ -5,7 +5,7 @@ export interface Capability {
   skills: string[];
 }
 
-export interface CreateCapabilityInput {
+interface CreateCapabilityInput {
   name: string;
   description: string;
   skills?: string[];
@@ -18,7 +18,7 @@ export interface Team {
   responsibilities: string[];
 }
 
-export interface CreateTeamInput {
+interface CreateTeamInput {
   name: string;
   capabilities?: Capability[];
   responsibilities?: string[];

@@ -1,6 +1,6 @@
 import type { WorkState } from '../work/types.js';
 
-export type AutonomyLevel = 'suggest-only' | 'execute-within-scope' | 'execute-and-verify';
+type AutonomyLevel = 'suggest-only' | 'execute-within-scope' | 'execute-and-verify';
 
 export interface RootAuthority {
   humanApprovalRequired: boolean;
@@ -32,7 +32,7 @@ export interface RootPlan {
   expectedEvidence: string[];
 }
 
-export interface RootPlanProposal {
+interface RootPlanProposal {
   objective: string;
   ambiguities: string[];
   capabilities: string[];

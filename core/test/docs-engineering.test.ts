@@ -23,7 +23,7 @@ describe('Markdown engineering contract', () => {
       'docs/reference/evidence.md',
       'docs/reference/testing-strategy.md',
       'docs/reference/review-standards.md',
-      'docs/workflows/grill-to-ship.md',
+      'docs/workflows/',
     ];
 
     for (const path of canonicalDocs) {
@@ -32,19 +32,17 @@ describe('Markdown engineering contract', () => {
     }
   });
 
-  it('keeps the engineering workflow TDD-first for behaviour changes', () => {
+  it('keeps the engineering workflow adaptive based on risk', () => {
     const workflow = read('docs/workflows/grill-to-ship.md');
-    expect(workflow).toContain('write the failing test');
-    expect(workflow).toContain('make the smallest change');
-    expect(workflow).toContain('run the focused test');
-    expect(workflow).toContain('refactor only after green');
+    expect(workflow).toContain('Small / low-risk');
+    expect(workflow).toContain('inspect → change → verify');
+    expect(workflow).toContain('explore → contract → plan → change → verify → review');
   });
 
   it('keeps project context and agent instructions separate', () => {
     const context = read('CONTEXT.md');
     const agentEngineering = read('docs/core/agent-engineering.md');
-    expect(context).toContain('Project vocabulary');
-    expect(context).not.toContain('TDD');
-    expect(agentEngineering).toContain('TDD');
+    expect(context).toContain('Core vocabulary');
+    expect(agentEngineering).toContain('Agent Engineering');
   });
 });
