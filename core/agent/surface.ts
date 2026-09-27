@@ -16,7 +16,7 @@ const MANAGED_MARKER = '<!-- MIA-MANAGED-SKILL -->';
 
 function commandForSkill(name: string): string {
   if (name === 'plan') return 'mia plan create "<objective>"';
-  return `mia ${name}`;
+  return `mia ${name} "<workId>"`;
 }
 
 function renderSkill(definition: SkillDefinition): string {

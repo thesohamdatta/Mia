@@ -20,7 +20,7 @@ describe('gstack-style agent skill surface', () => {
       expect(content).toContain(`name: ${skill}`);
       expect(content).toContain('core/skills/index.ts');
       expect(content).toContain(
-        skill === 'plan' ? 'mia plan create "<objective>"' : `mia ${skill}`
+        skill === 'plan' ? 'mia plan create "<objective>"' : `mia ${skill} "<workId>"`
       );
     }
   });

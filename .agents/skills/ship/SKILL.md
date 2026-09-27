@@ -12,7 +12,7 @@ description: "Run repository verification before handoff"
 version: 1.0.0
 invocation: model
 phase: handoff
-side-effects: none
+side-effects: local-write
 ---
 
 <!-- MIA-MANAGED-SKILL -->
@@ -31,7 +31,7 @@ Use MIA's **ship** workflow for the current engineering task.
 
 ## Command
 
-`mia ship`
+`mia ship "<workId>"`
 
 ## Runtime authority
 
@@ -40,5 +40,5 @@ The executable definition in `core/skills/index.ts` is authoritative. This file 
 ## Contract
 
 - Phase: handoff
-- Side effects: none
+- Side effects: local-write
 - Verification: typecheck, lint, unused-code, tests, build

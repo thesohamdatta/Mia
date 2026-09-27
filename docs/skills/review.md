@@ -10,7 +10,7 @@ name: review
 version: 1.0.0
 invocation: user
 phase: review
-side-effects: none
+side-effects: local-write
 ---
 
 # review
@@ -25,8 +25,8 @@ Explicitly invoked by the user through the MIA CLI.
 
 - Phase: review
 - Invocation: user
-- Side effects: none
-- Verification: none
+- Side effects: local-write
+- Verification: typecheck, lint, unused-code, tests
 
 ## Runtime authority
 

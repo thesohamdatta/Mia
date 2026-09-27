@@ -1,38 +1,99 @@
 import { runVerification } from '../../verification/run-checks.js';
 import { repositoryChecks } from '../../verification/suite.js';
+import {
+  completeReview,
+  completeVerification,
+  enterVerification,
+  startWork,
+} from '../../work/lifecycle.js';
+import { loadWork, saveWork } from '../../work/persistence.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
-export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
-  const verification = await runVerification(ctx, repositoryChecks.slice(0, 4));
+export async function execute(
+  args: string[],
+  ctx: ExecutionContext,
+  verify: typeof runVerification = runVerification
+): Promise<SkillResult> {
+  const workId = args[0]?.trim();
+
+  if (!workId) {
+    return {
+      ok: false,
+      status: 'blocked',
+      error: 'Usage: mia review <workId>',
+    };
+  }
+
+  let work = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, workId);
+  if (!work) {
+    return {
+      ok: false,
+      status: 'blocked',
+      error: `Work not found: ${workId}`,
+    };
+  }
+
+  if (work.state === 'planned') {
+    work = startWork(work);
+  }
+
+  if (work.state !== 'in_progress') {
+    return {
+      ok: false,
+      status: 'blocked',
+      error: `Work is not reviewable from state: ${work.state}`,
+    };
+  }
+
+  work = enterVerification(work);
+
+  const verification = await verify(ctx, repositoryChecks.slice(0, 4));
 
   for (const record of verification.records) {
     await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);
   }
 
-  const failed = verification.records.filter((record) => record.status !== 'passed');
-  const output = [
-    'MIA review preflight',
-    '',
-    `Run: ${ctx.run.id}`,
-    `Checks: ${verification.records.length}`,
-    '',
-    ...verification.records.map(
-      (record) =>
-        `${record.status === 'passed' ? 'PASS' : 'FAIL'} ${record.name} (${record.durationMs}ms)`
-    ),
-    '',
-    failed.length === 0
-      ? 'READY FOR HUMAN OR INDEPENDENT REVIEW: deterministic checks passed.'
-      : 'REVIEW REQUIRED: one or more deterministic checks failed.',
-    '',
-    'This command does not make an architectural or security verdict. It reports executable evidence.',
-  ].join('\n');
+  if (!verification.passed) {
+    work = completeVerification(work, { passed: false });
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+    return {
+      ok: false,
+      status: 'blocked',
+      output: [
+        'MIA review gate',
+        '',
+        `Work: ${work.id}`,
+        '',
+        ...verification.records.map(
+          (record) =>
+            `${record.status === 'passed' ? 'PASS' : 'FAIL'} ${record.name} (${record.durationMs}ms)`
+        ),
+        '',
+        'BLOCKED: verification failed. Work returned to in_progress.',
+      ].join('\n'),
+      error: 'Review verification failed',
+    };
+  }
+
+  work = completeVerification(work, { passed: true });
+  work = completeReview(work, { passed: true });
+  await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
   return {
-    ok: failed.length === 0,
-    status: failed.length === 0 ? 'success' : 'blocked',
-    output,
-    error: failed.length === 0 ? undefined : 'Review preflight failed',
+    ok: true,
+    status: 'success',
+    output: [
+      'MIA review gate',
+      '',
+      `Work: ${work.id}`,
+      '',
+      ...verification.records.map(
+        (record) => `PASS ${record.name} (${record.durationMs}ms)`
+      ),
+      '',
+      `READY_TO_SHIP: ${work.id}`,
+    ].join('\n'),
   };
 }
 
