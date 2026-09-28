@@ -3,9 +3,13 @@ import type { EvidenceRecord } from '../skills/types.js';
 import type { Work } from './types.js';
 import { transitionWork } from './types.js';
 
-interface VerificationOutcome {
+interface VerificationRecordOutcome {
   runId: string;
   records: readonly EvidenceRecord[];
+  passed: boolean;
+}
+
+interface VerificationOutcome {
   passed: boolean;
 }
 
@@ -21,7 +25,7 @@ export function enterVerification(work: Work): Work {
   return transitionWork(work, 'verification');
 }
 
-export function recordVerification(work: Work, outcome: VerificationOutcome): Work {
+export function recordVerification(work: Work, outcome: VerificationRecordOutcome): Work {
   for (const record of outcome.records) {
     if (record.runId !== outcome.runId) {
       throw new Error(`Verification evidence belongs to another run: ${record.runId}`);
