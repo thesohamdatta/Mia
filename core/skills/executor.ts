@@ -58,6 +58,22 @@ function validateStringList(
   }
 }
 
+export function enforceSkillCapabilities(
+  manifest: SkillManifest,
+  grantedTools: readonly string[]
+): void {
+  const grants = new Set(grantedTools.map((tool) => tool.trim()).filter(Boolean));
+  const missing = manifest.allowedTools
+    .map((tool) => tool.trim())
+    .filter((tool) => !grants.has(tool));
+
+  if (missing.length > 0) {
+    throw new SkillContractError(
+      `Skill "${manifest.name}" requires unavailable tool capabilities: ${missing.join(', ')}`
+    );
+  }
+}
+
 export function validateSkillDefinition(definition: SkillDefinition): void {
   const { manifest } = definition;
 
@@ -104,6 +120,7 @@ export async function executeSkillDefinition(
 ): Promise<SkillResult> {
   try {
     validateSkillDefinition(definition);
+    enforceSkillCapabilities(definition.manifest, context.grantedTools);
   } catch (error) {
     return {
       ok: false,
