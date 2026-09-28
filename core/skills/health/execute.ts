@@ -3,9 +3,7 @@ import { repositoryChecks, resolveVerificationChecks } from '../../verification/
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
 export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
-  const checks = ctx.skill
-    ? resolveVerificationChecks(ctx.skill.verification)
-    : repositoryChecks;
+  const checks = ctx.skill ? resolveVerificationChecks(ctx.skill.verification) : repositoryChecks;
   const verification = await runVerification(ctx, checks);
 
   for (const record of verification.records) {
