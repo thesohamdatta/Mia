@@ -28,7 +28,7 @@ There is no current daemon in this architecture. The old CLI → HTTP → daemon
 | Component | Current implementation | Purpose |
 | :--- | :--- | :--- |
 | **CLI** | `core/cli/index.ts` | Parses `mia <skill> [args...]` and dispatches directly |
-| **Context** | `core/context.ts` | Carries cwd, project slug, config, and shared store |
+| **Context** | `core/context.ts` | Carries cwd, project slug, config, granted tool capabilities, and shared store |
 | **Skills** | `core/skills/` | Small executable use-case modules |
 | **Middleware** | `core/skills/preamble.ts` | Project checks, recent learnings, timeline logging |
 | **State** | `core/state/` | JSONL storage interfaces and `UnifiedStore` |
@@ -46,6 +46,8 @@ mia <skill> [args]
 core/cli/index.ts
  ↓
 createExecutionContext()
+ ↓
+skill capability admission
  ↓
 executeWithMiddlewares()
  ↓
