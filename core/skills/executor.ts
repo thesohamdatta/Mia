@@ -22,8 +22,7 @@ const sideEffects = new Set<SkillManifest['sideEffects']>([
   'git-write',
   'external',
 ]);
-const versionPattern =
-  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$/;
+const versionPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$/;
 
 const phases = new Set<SkillDefinition['manifest']['phase']>([
   'clarify',
