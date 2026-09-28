@@ -24,6 +24,8 @@ export interface ExecutionContext {
   run: SkillRun;
   unifiedStore: UnifiedStore;
   config: AppConfig;
+  /** The contract for the skill currently being executed. */
+  skill?: SkillManifest;
 }
 
 export interface StoredEvent<T = unknown> {
