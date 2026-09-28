@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
+import { saveApproval } from '../approval/persistence.js';
 import { createApproval, resolveApproval } from '../approval/types.js';
 import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
 import { getSkill } from '../skills/index.js';
 import { execute as executeReview } from '../skills/review/execute.js';
 import { execute as executeShip } from '../skills/ship/execute.js';
-import { saveApproval } from '../approval/persistence.js';
 import { loadWork } from '../work/persistence.js';
 
 function testContext(testDir: string) {
@@ -27,20 +27,35 @@ describe('Work lifecycle journey', () => {
       expect(plan).toBeDefined();
       if (!plan) throw new Error('plan definition not found');
 
-      const planResult = await executeSkillDefinition(plan, ['create', 'Ship', 'a', 'release'], planCtx);
+      const planResult = await executeSkillDefinition(
+        plan,
+        ['create', 'Ship', 'a', 'release'],
+        planCtx
+      );
       expect(planResult.ok).toBe(true);
 
       const workId = planResult.output?.match(/Work: (work_\S+)/)?.[1];
       expect(workId).toMatch(/^work_/);
 
       const reviewCtx = testContext(testDir);
-      const reviewResult = await executeReview([workId as string], reviewCtx, async () => ({
-        records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
-        passed: true,
-      }));
+      const reviewResult = await executeReview(
+        [workId as string],
+        reviewCtx,
+        async () => ({
+          records: [
+            { runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const },
+          ],
+          passed: true,
+        })
+      );
       expect(reviewResult.ok).toBe(true);
 
-      const ready = await loadWork(reviewCtx.unifiedStore, reviewCtx.config.projectsDir, reviewCtx.slug, workId as string);
+      const ready = await loadWork(
+        reviewCtx.unifiedStore,
+        reviewCtx.config.projectsDir,
+        reviewCtx.slug,
+        workId as string
+      );
       expect(ready?.state).toBe('ready_to_ship');
       expect(ready?.verification).toEqual({
         runId: reviewCtx.run.id,
@@ -60,13 +75,24 @@ describe('Work lifecycle journey', () => {
       );
 
       const shipCtx = testContext(testDir);
-      const shipResult = await executeShip([workId as string], shipCtx, async () => ({
-        records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
-        passed: true,
-      }));
+      const shipResult = await executeShip(
+        [workId as string],
+        shipCtx,
+        async () => ({
+          records: [
+            { runId: shipCtx.run.id, name: 'tests', status: 'passed' as const },
+          ],
+          passed: true,
+        })
+      );
       expect(shipResult.ok).toBe(true);
 
-      const shipped = await loadWork(shipCtx.unifiedStore, shipCtx.config.projectsDir, shipCtx.slug, workId as string);
+      const shipped = await loadWork(
+        shipCtx.unifiedStore,
+        shipCtx.config.projectsDir,
+        shipCtx.slug,
+        workId as string
+      );
       expect(shipped?.state).toBe('shipped');
       expect(shipped?.verification?.runId).toBe(shipCtx.run.id);
       expect(shipped?.approval).toEqual({
