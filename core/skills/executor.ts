@@ -47,11 +47,15 @@ function validateStringList(
       throw new SkillContractError(`Skill "${skillName}" has an empty ${field} entry`);
     }
 
-    if (seen.has(value)) {
-      throw new SkillContractError(`Skill "${skillName}" declares duplicate ${field} "${value}"`);
+    const normalized = value.trim();
+
+    if (seen.has(normalized)) {
+      throw new SkillContractError(
+        `Skill "${skillName}" declares duplicate ${field} "${normalized}"`
+      );
     }
 
-    seen.add(value);
+    seen.add(normalized);
   }
 }
 
@@ -109,7 +113,14 @@ export async function executeSkillDefinition(
     };
   }
 
-  return executeWithMiddlewares(definition.executor, args, context, definition.manifest.name);
+  return executeWithMiddlewares(
+    definition.executor,
+    args,
+    context,
+    definition.manifest.name,
+    undefined,
+    definition.manifest
+  );
 }
 
 export async function executeSkill(
