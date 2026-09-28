@@ -1,5 +1,8 @@
 import { runVerification } from '../../verification/run-checks.js';
-import { repositoryChecks } from '../../verification/suite.js';
+import {
+  repositoryChecks,
+  resolveVerificationChecks,
+} from '../../verification/suite.js';
 import {
   completeReview,
   completeVerification,
@@ -47,7 +50,10 @@ export async function execute(
 
   work = enterVerification(work);
 
-  const verification = await verify(ctx, repositoryChecks.slice(0, 4));
+  const checks = ctx.skill
+    ? resolveVerificationChecks(ctx.skill.verification)
+    : repositoryChecks.slice(0, 4);
+  const verification = await verify(ctx, checks);
 
   for (const record of verification.records) {
     await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);
