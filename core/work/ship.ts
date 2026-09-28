@@ -9,7 +9,10 @@ export function shipWork(work: Work): Work {
     throw new Error('Work verification evidence is missing');
   }
 
-  if (!work.verification.passed || work.verification.evidence.some((evidence) => evidence.status !== 'passed')) {
+  if (
+    !work.verification.passed ||
+    work.verification.evidence.some((evidence) => evidence.status !== 'passed')
+  ) {
     throw new Error('Work verification has not passed');
   }
 
