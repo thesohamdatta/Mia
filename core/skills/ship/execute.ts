@@ -74,8 +74,6 @@ export async function execute(
     };
   }
 
-
-
   try {
     const shipped = shipWork(work);
 
