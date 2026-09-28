@@ -37,6 +37,7 @@ core/test/
 ├── preamble.test.ts
 ├── root-plan-work.test.ts
 ├── root-planning.test.ts
+├── skill-capability.test.ts
 ├── work-lifecycle.test.ts
 └── work-persistence.test.ts
 ```
