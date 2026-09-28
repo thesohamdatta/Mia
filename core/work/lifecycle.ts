@@ -1,11 +1,11 @@
 import type { Work } from './types.js';
 import { transitionWork } from './types.js';
 
-export interface VerificationOutcome {
+interface VerificationOutcome {
   passed: boolean;
 }
 
-export interface ReviewOutcome {
+interface ReviewOutcome {
   passed: boolean;
 }
 

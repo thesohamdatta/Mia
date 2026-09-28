@@ -6,9 +6,9 @@ export const AGENT_HOSTS = {
   codex: { skillRoot: join('.agents', 'skills') },
 } as const;
 
-export type AgentHost = keyof typeof AGENT_HOSTS;
+type AgentHost = keyof typeof AGENT_HOSTS;
 
-export type AgentSetupResult = Record<AgentHost, AgentSurfaceResult>;
+type AgentSetupResult = Record<AgentHost, AgentSurfaceResult>;
 
 export async function setupAgentSkills(
   projectRoot: string,

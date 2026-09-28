@@ -27,7 +27,7 @@ export interface Work {
   updatedAt: string;
 }
 
-export interface CreateWorkInput {
+interface CreateWorkInput {
   objective: string;
   successCriteria?: string[];
   capabilities?: string[];

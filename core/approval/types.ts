@@ -11,7 +11,7 @@ export interface Approval {
   note?: string;
 }
 
-export interface CreateApprovalInput {
+interface CreateApprovalInput {
   workId: string;
   runId: string;
   action: string;

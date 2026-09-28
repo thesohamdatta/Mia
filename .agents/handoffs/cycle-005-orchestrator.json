@@ -3,10 +3,7 @@
   "integration_branch": "master",
   "verification_commit": "a3203073f23e366faf5954634708b9023c4b2f23",
   "objective": "Reconcile stale coordination metadata and documentation drift after recent Work persistence changes.",
-  "scope": [
-    "docs/reference/testing-strategy.md",
-    ".agents/state.json"
-  ],
+  "scope": ["docs/reference/testing-strategy.md", ".agents/state.json"],
   "findings": [
     "Testing strategy listed an obsolete test directory snapshot.",
     "Shared coordination state still described cycle-004 as current and left orchestrator pending despite subsequent master changes."

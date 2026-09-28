@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { execute } from '../skills/review/execute.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 import { loadWork, saveWork } from '../work/persistence.js';
-import { createWork } from '../work/types.js';
+import { createWork, transitionWork } from '../work/types.js';
 
 describe('Review skill runtime', () => {
   function context() {
@@ -28,7 +28,8 @@ describe('Review skill runtime', () => {
   }
 
   function plannedWork() {
-    return createWork({ objective: 'Build X' });
+    const work = createWork({ objective: 'Build X' });
+    return transitionWork(transitionWork(work, 'specified'), 'planned');
   }
 
   function passedVerification() {
