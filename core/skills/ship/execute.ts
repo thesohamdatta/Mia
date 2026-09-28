@@ -1,6 +1,6 @@
 import { loadApprovalForWork } from '../../approval/persistence.js';
 import { runVerification } from '../../verification/run-checks.js';
-import { repositoryChecks } from '../../verification/suite.js';
+import { repositoryChecks, resolveVerificationChecks } from '../../verification/suite.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
 import { shipWork } from '../../work/ship.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
@@ -29,7 +29,8 @@ export async function execute(
     };
   }
 
-  const verification = await verify(ctx, repositoryChecks);
+  const checks = ctx.skill ? resolveVerificationChecks(ctx.skill.verification) : repositoryChecks;
+  const verification = await verify(ctx, checks);
 
   for (const record of verification.records) {
     await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);

@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 import { execute } from '../skills/review/execute.js';
+import type { ExecutionContext } from '../skills/types.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 import { createWork, transitionWork } from '../work/types.js';
 
 describe('Review skill runtime', () => {
-  function context() {
+  function context(): ExecutionContext {
     const projectsDir = '/tmp/mia-review-workflow';
     return {
       cwd: process.cwd(),
@@ -24,6 +25,7 @@ describe('Review skill runtime', () => {
         memoryFile: '/tmp/mia/memory.md',
         sessionsDir: '/tmp/mia/sessions',
       },
+      skill: undefined,
     };
   }
 
@@ -69,6 +71,31 @@ describe('Review skill runtime', () => {
 
     expect(result.ok).toBe(false);
     expect(result.error).toMatch(/Usage: mia review <workId>/);
+  });
+
+  it('uses verification checks declared by the skill contract', async () => {
+    const ctx = context();
+    ctx.skill = {
+      name: 'review',
+      version: '1.0.0',
+      description: 'Review work',
+      allowedTools: [],
+      sideEffects: 'local-write',
+      verification: ['tests'],
+      phase: 'review',
+      invocation: 'user',
+    };
+    const work = plannedWork();
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+    let checks: string[] = [];
+    const result = await execute([work.id], ctx, async (_ctx, selected) => {
+      checks = selected.map((check) => check.name);
+      return passedVerification();
+    });
+
+    expect(result.ok).toBe(true);
+    expect(checks).toEqual(['tests']);
   });
 
   it('moves planned Work to ready_to_ship when verification passes', async () => {

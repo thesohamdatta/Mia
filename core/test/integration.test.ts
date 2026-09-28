@@ -93,6 +93,34 @@ describe('Integration: CLI -> Skill -> Store', () => {
     ]);
   });
 
+  it('should pass the registered skill contract into the executor context', async () => {
+    const ctx = createExecutionContext();
+    let observedName = '';
+
+    const definition = {
+      manifest: {
+        name: 'contract-probe',
+        version: '1.0.0',
+        description: 'Probe execution context',
+        allowedTools: [],
+        sideEffects: 'none' as const,
+        verification: [],
+        phase: 'execute' as const,
+      },
+      executor: {
+        execute: async (_args: string[], executionContext: typeof ctx) => {
+          observedName = executionContext.skill?.name ?? '';
+          return { ok: true, status: 'success' as const };
+        },
+      },
+    };
+
+    const result = await executeSkillDefinition(definition, [], ctx);
+
+    expect(result.ok).toBe(true);
+    expect(observedName).toBe('contract-probe');
+  });
+
   it('should create a unique run identity for each execution', () => {
     const first = createExecutionContext().run.id;
     const second = createExecutionContext().run.id;
@@ -229,7 +257,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
     expect(result.ok).toBe(false);
     expect(result.status).toBe('blocked');
-    expect(result.error).toContain('must declare a version');
+    expect(result.error).toContain('must declare a semantic version');
     expect(executed).toBe(false);
   });
 });

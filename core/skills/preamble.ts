@@ -1,4 +1,4 @@
-import type { ExecutionContext, SkillExecutor, SkillResult } from './types.js';
+import type { ExecutionContext, SkillExecutor, SkillManifest, SkillResult } from './types.js';
 
 export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
@@ -83,14 +83,19 @@ export async function executeWithMiddlewares(
   args: string[],
   ctx: ExecutionContext,
   skillName: string,
-  middlewares: readonly Middleware[] = defaultMiddlewares
+  middlewares: readonly Middleware[] = defaultMiddlewares,
+  skillManifest?: SkillManifest
 ): Promise<SkillResult> {
   const run: ExecutionContext['run'] = {
     ...ctx.run,
     skill: skillName,
     status: 'running',
   };
-  const executionContext: ExecutionContext = { ...ctx, run };
+  const executionContext: ExecutionContext = {
+    ...ctx,
+    run,
+    skill: skillManifest,
+  };
 
   let result: SkillResult = {
     ok: false,

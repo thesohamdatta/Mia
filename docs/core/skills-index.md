@@ -60,7 +60,7 @@ Executable verification is implemented in `core/verification/`.
 
 `health` and `ship` run the configured repository checks and persist their `EvidenceRecord` results through `UnifiedStore`. `review` runs the deterministic pre-landing subset.
 
-The manifest's `verification` field is currently declarative metadata. The runtime does not yet expose a generic tool/permission engine or a generic verification resolver. Keeping that machinery out of the core is intentional until a second concrete implementation requires it.
+The manifest's `verification` field is executable contract metadata. `health`, `review`, and `ship` resolve the declared names against the canonical repository verification catalog before running checks. The runtime still does not expose a generic tool/permission engine; `allowedTools` remains descriptive until MIA has a concrete tool boundary that can enforce it.
 
 ## Source of truth
 
