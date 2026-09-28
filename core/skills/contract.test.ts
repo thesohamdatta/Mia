@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import {
-  VerificationContractError,
-  resolveVerificationChecks,
-} from '../verification/suite.js';
+import { VerificationContractError, resolveVerificationChecks } from '../verification/suite.js';
 import { validateSkillDefinition } from './executor.js';
 import type { SkillDefinition } from './types.js';
 
