@@ -1,0 +1,54 @@
+{
+  "cycle": "cycle-006",
+  "integration_branch": "master",
+  "verification_commit": "3271f624ab0a96edd2d9db71e896dbc93a1d26bb",
+  "objective": "Resolve test regressions and code formatting issues across the repository.",
+  "scope": [
+    "core/test/review-workflow.test.ts",
+    "core/test/docs-engineering.test.ts",
+    "core/skills/review/execute.ts",
+    ".agents/handoffs/cycle-006-sentry.json",
+    ".agents/handoffs/cycle-006-orchestrator.json",
+    ".agents/state.json"
+  ],
+  "findings": [
+    "Tests in review-workflow.test.ts were failing because plannedWork() returned work in draft state instead of planned state.",
+    "Tests in docs-engineering.test.ts were asserting outdated doc string contracts.",
+    "Biome check reported formatting issues in core/skills/review/execute.ts and cycle-005-orchestrator.json."
+  ],
+  "changes": [
+    "Updated plannedWork fixture in review-workflow.test.ts to set state to planned.",
+    "Updated doc engineering contract assertions to match active documentation.",
+    "Formatted review/execute.ts and handoffs with Biome."
+  ],
+  "checks": [
+    {
+      "name": "bun test",
+      "result": "pass"
+    },
+    {
+      "name": "bun run typecheck",
+      "result": "pass"
+    },
+    {
+      "name": "bun run lint:check",
+      "result": "pass"
+    },
+    {
+      "name": "bun run knip",
+      "result": "pass"
+    },
+    {
+      "name": "bun run validate:frontmatter",
+      "result": "pass"
+    },
+    {
+      "name": "bun run build",
+      "result": "pass"
+    }
+  ],
+  "blocking_issues": [],
+  "remaining_uncertainty": null,
+  "recommended_next_action": "Merge cycle-006 branch to master after PR review.",
+  "status": "COMPLETE"
+}

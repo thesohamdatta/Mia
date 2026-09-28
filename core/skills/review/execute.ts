@@ -88,9 +88,7 @@ export async function execute(
       '',
       `Work: ${work.id}`,
       '',
-      ...verification.records.map(
-        (record) => `PASS ${record.name} (${record.durationMs}ms)`
-      ),
+      ...verification.records.map((record) => `PASS ${record.name} (${record.durationMs}ms)`),
       '',
       `READY_TO_SHIP: ${work.id}`,
     ].join('\n'),

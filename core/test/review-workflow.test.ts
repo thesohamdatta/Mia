@@ -28,7 +28,10 @@ describe('Review skill runtime', () => {
   }
 
   function plannedWork() {
-    return createWork({ objective: 'Build X' });
+    return {
+      ...createWork({ objective: 'Build X' }),
+      state: 'planned' as const,
+    };
   }
 
   function passedVerification() {
