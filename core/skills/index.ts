@@ -1,4 +1,5 @@
 import { execute as checkpointExecute } from './checkpoint/execute.js';
+import { validateSkillDefinition } from './executor.js';
 import { execute as grillExecute } from './grill/execute.js';
 import { execute as healthExecute } from './health/execute.js';
 import { execute as learnExecute } from './learn/execute.js';
@@ -9,7 +10,6 @@ import { execute as reviewExecute } from './review/execute.js';
 import { execute as setupExecute } from './setup/execute.js';
 import { execute as shipExecute } from './ship/execute.js';
 import { execute as specExecute } from './spec/execute.js';
-import { validateSkillDefinition } from './executor.js';
 import type { SkillDefinition, SkillExecutor } from './types.js';
 import { execute as vcExecute } from './vc/execute.js';
 
