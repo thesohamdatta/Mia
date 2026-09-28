@@ -36,6 +36,22 @@ describe('Ship skill runtime', () => {
     };
   }
 
+  function failedVerification() {
+    return {
+      records: [
+        {
+          runId: 'run-ship',
+          name: 'tests',
+          status: 'failed' as const,
+          command: 'bun test',
+          durationMs: 1,
+          detail: 'failed',
+        },
+      ],
+      passed: false,
+    };
+  }
+
   function context() {
     const projectsDir = '/tmp/mia-ship-runtime';
     return {
