@@ -30,6 +30,7 @@ describe('skill execution lifecycle', () => {
         status: 'running',
       },
       unifiedStore: store,
+      grantedTools: [],
       config: {
         miaDir: join(testDir, '.mia'),
         skillsDir: join(testDir, '.mia', 'skills'),

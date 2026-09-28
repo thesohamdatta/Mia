@@ -17,7 +17,7 @@ MIA means **Machine Intelligence Architecture**. It is a local-first AI engineer
 | Term | Meaning in MIA |
 | :--- | :--- |
 | **Run** | One invocation with one stable execution identity (`run.id`). |
-| **ExecutionContext** | Per-run context carrying cwd, project slug, configuration, run identity, and the shared `UnifiedStore`. |
+| **ExecutionContext** | Per-run context carrying cwd, project slug, configuration, run identity, granted tool capabilities, and the shared `UnifiedStore`. |
 | **Skill** | A registered executable use case exposed through the CLI. |
 | **SkillDefinition** | The runtime contract pairing a skill manifest with its executor. |
 | **SkillManifest** | Executable metadata describing identity, phase, declared side effects, tools, and verification names. |
@@ -25,7 +25,7 @@ MIA means **Machine Intelligence Architecture**. It is a local-first AI engineer
 | **UnifiedStore** | The current owner of project event persistence for learnings, timeline activity, checkpoints, and verification evidence. |
 | **Evidence** | A recorded result that supports a specific claim about repository or runtime behaviour. |
 | **Verification** | An executable check performed to establish evidence. |
-| **Capability** | An operation a skill may legitimately use. MIA currently models declared tools/side effects in skill metadata but does not yet expose a generic capability engine. |
+| **Capability** | A tool operation a skill may legitimately use. `SkillManifest.allowedTools` declares requirements and `ExecutionContext.grantedTools` supplies runtime grants; MIA blocks unmet requirements before execution. |
 | **Workflow** | A repeatable engineering procedure describing how work moves from intent to verified outcome. |
 | **Checkpoint** | Persisted working state associated with an execution identity so work can resume with explicit context. |
 | **Recovery** | Re-establishing a coherent run or repository state after interruption or failure. |

@@ -27,9 +27,13 @@ MIA engineers the environment around AI agents instead of relying on model cleve
 
 A skill should have a concise entry document describing purpose, when to use it, inputs, preconditions, procedure, stop conditions, side effects, verification, output, and references. Deep material belongs in focused references or scripts.
 
+## Capability admission
+
+`SkillManifest.allowedTools` declares the tool capabilities a skill requires. `ExecutionContext.grantedTools` carries the grants for the current run. The skill boundary blocks execution when a required tool is not granted. This is an admission check only; MIA does not yet own the underlying tool execution runtime.
+
 ## Invocation
 
-MIA may eventually distinguish `user`, `model`, and `both` invocation modes. Until the runtime enforces those states, documentation must not imply that model-triggering or permission semantics are executable guarantees.
+MIA may eventually distinguish `user`, `model`, and `both` invocation modes. Until the runtime enforces those states, documentation must not imply that model-triggering semantics are executable guarantees.
 
 ## External influences
 

@@ -48,6 +48,7 @@ describe('Ship skill runtime', () => {
         status: 'running' as const,
       },
       unifiedStore: createUnifiedStore(),
+      grantedTools: [],
       config: {
         miaDir: '/tmp/mia',
         skillsDir: '/tmp/mia/skills',

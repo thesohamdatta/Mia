@@ -49,7 +49,10 @@ function getSlug(cwd?: string): string {
   }
 }
 
-export function createExecutionContext(cwd?: string): ExecutionContext {
+export function createExecutionContext(
+  cwd?: string,
+  grantedTools: readonly string[] = []
+): ExecutionContext {
   const targetCwd = cwd || process.cwd();
   const config = getConfig();
   return {
@@ -63,5 +66,6 @@ export function createExecutionContext(cwd?: string): ExecutionContext {
     },
     unifiedStore: createUnifiedStore(),
     config,
+    grantedTools: [...grantedTools],
   };
 }
