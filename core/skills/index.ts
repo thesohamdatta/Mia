@@ -21,19 +21,24 @@ const define = (
   phase: SkillDefinition['manifest']['phase'],
   executor: SkillExecutor,
   invocation: SkillDefinition['manifest']['invocation'] = 'user'
-): SkillDefinition => ({
-  manifest: {
-    name,
-    version: '1.0.0',
-    description,
-    allowedTools: [],
-    sideEffects,
-    verification,
-    phase,
-    invocation,
-  },
-  executor,
-});
+): SkillDefinition => {
+  const definition: SkillDefinition = {
+    manifest: {
+      name,
+      version: '1.0.0',
+      description,
+      allowedTools: [],
+      sideEffects,
+      verification,
+      phase,
+      invocation,
+    },
+    executor,
+  };
+
+  validateSkillDefinition(definition);
+  return definition;
+};
 
 export const skills: Record<string, SkillDefinition> = {
   grill: define('grill', 'Clarify intent before non-trivial work', 'none', [], 'clarify', {
