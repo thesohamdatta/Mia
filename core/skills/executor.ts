@@ -4,6 +4,7 @@ import type {
   SkillDefinition,
   SkillExecutor,
   SkillInvocation,
+  SkillManifest,
   SkillResult,
 } from './types.js';
 
@@ -15,6 +16,14 @@ export class SkillContractError extends Error {
 }
 
 const invocations = new Set<SkillInvocation>(['user', 'model', 'both']);
+const sideEffects = new Set<SkillManifest['sideEffects']>([
+  'none',
+  'local-write',
+  'git-write',
+  'external',
+]);
+const versionPattern =
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$/;
 
 const phases = new Set<SkillDefinition['manifest']['phase']>([
   'clarify',
@@ -26,6 +35,26 @@ const phases = new Set<SkillDefinition['manifest']['phase']>([
   'handoff',
 ]);
 
+function validateStringList(
+  values: readonly string[],
+  field: 'allowedTools' | 'verification',
+  skillName: string
+): void {
+  const seen = new Set<string>();
+
+  for (const value of values) {
+    if (!value.trim()) {
+      throw new SkillContractError(`Skill "${skillName}" has an empty ${field} entry`);
+    }
+
+    if (seen.has(value)) {
+      throw new SkillContractError(`Skill "${skillName}" declares duplicate ${field} "${value}"`);
+    }
+
+    seen.add(value);
+  }
+}
+
 export function validateSkillDefinition(definition: SkillDefinition): void {
   const { manifest } = definition;
 
@@ -33,12 +62,20 @@ export function validateSkillDefinition(definition: SkillDefinition): void {
     throw new SkillContractError('Skill manifest name must not be empty');
   }
 
-  if (!manifest.version.trim()) {
-    throw new SkillContractError(`Skill "${manifest.name}" must declare a version`);
+  if (!versionPattern.test(manifest.version.trim())) {
+    throw new SkillContractError(
+      `Skill "${manifest.name}" must declare a semantic version (x.y.z)`
+    );
   }
 
   if (!manifest.description.trim()) {
     throw new SkillContractError(`Skill "${manifest.name}" must declare a description`);
+  }
+
+  if (!sideEffects.has(manifest.sideEffects)) {
+    throw new SkillContractError(
+      `Skill "${manifest.name}" has an unsupported side-effect class "${manifest.sideEffects}"`
+    );
   }
 
   if (!phases.has(manifest.phase)) {
@@ -52,6 +89,9 @@ export function validateSkillDefinition(definition: SkillDefinition): void {
       `Skill "${manifest.name}" has an unsupported invocation "${manifest.invocation}"`
     );
   }
+
+  validateStringList(manifest.allowedTools, 'allowedTools', manifest.name);
+  validateStringList(manifest.verification, 'verification', manifest.name);
 }
 
 export async function executeSkillDefinition(
