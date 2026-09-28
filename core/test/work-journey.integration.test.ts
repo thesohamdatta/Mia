@@ -38,14 +38,10 @@ describe('Work lifecycle journey', () => {
       expect(workId).toMatch(/^work_/);
 
       const reviewCtx = testContext(testDir);
-      const reviewResult = await executeReview(
-        [workId as string],
-        reviewCtx,
-        async () => ({
-          records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
-          passed: true,
-        })
-      );
+      const reviewResult = await executeReview([workId as string], reviewCtx, async () => ({
+        records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
+        passed: true,
+      }));
       expect(reviewResult.ok).toBe(true);
 
       const ready = await loadWork(
@@ -73,14 +69,10 @@ describe('Work lifecycle journey', () => {
       );
 
       const shipCtx = testContext(testDir);
-      const shipResult = await executeShip(
-        [workId as string],
-        shipCtx,
-        async () => ({
-          records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
-          passed: true,
-        })
-      );
+      const shipResult = await executeShip([workId as string], shipCtx, async () => ({
+        records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
+        passed: true,
+      }));
       expect(shipResult.ok).toBe(true);
 
       const shipped = await loadWork(
