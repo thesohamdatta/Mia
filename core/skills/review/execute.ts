@@ -4,6 +4,7 @@ import {
   completeReview,
   completeVerification,
   enterVerification,
+  recordVerification,
   startWork,
 } from '../../work/lifecycle.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
@@ -51,6 +52,11 @@ export async function execute(
     ? resolveVerificationChecks(ctx.skill.verification)
     : repositoryChecks.slice(0, 4);
   const verification = await verify(ctx, checks);
+  work = recordVerification(work, {
+    runId: ctx.run.id,
+    records: verification.records,
+    passed: verification.passed,
+  });
 
   for (const record of verification.records) {
     await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);
