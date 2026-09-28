@@ -58,7 +58,6 @@ describe('Work lifecycle operations', () => {
 
     expect(completeReview(work, { passed: true }).state).toBe('ready_to_ship');
   });
-});
 
   it('records a lightweight verification projection on Work', () => {
     const work = createWork({ objective: 'Build X' });
@@ -103,3 +102,4 @@ describe('Work lifecycle operations', () => {
     });
     expect(recorded).not.toBe(work);
   });
+});
