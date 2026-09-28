@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'bun:test';
+import { createApproval, resolveApproval } from '../approval/types.js';
 import {
   completeReview,
   completeVerification,
   enterVerification,
+  recordApproval,
+  recordVerification,
   startWork,
 } from '../work/lifecycle.js';
 import { createWork } from '../work/types.js';
@@ -54,5 +57,49 @@ describe('Work lifecycle operations', () => {
     work = { ...work, state: 'review' };
 
     expect(completeReview(work, { passed: true }).state).toBe('ready_to_ship');
+  });
+
+  it('records a lightweight verification projection on Work', () => {
+    const work = createWork({ objective: 'Build X' });
+
+    const recorded = recordVerification(work, {
+      runId: 'run-1',
+      passed: true,
+      records: [
+        {
+          runId: 'run-1',
+          name: 'tests',
+          status: 'passed',
+          command: 'bun test',
+          durationMs: 10,
+          detail: 'full output stays in UnifiedStore',
+        },
+      ],
+    });
+
+    expect(recorded.verification).toEqual({
+      runId: 'run-1',
+      passed: true,
+      evidence: [{ runId: 'run-1', name: 'tests', status: 'passed' }],
+    });
+    expect(recorded).not.toBe(work);
+  });
+
+  it('records a lightweight approval projection on Work', () => {
+    const work = createWork({ objective: 'Release X' });
+    const approval = resolveApproval(
+      createApproval({ workId: work.id, runId: 'run-2', action: 'ship' }),
+      'approved'
+    );
+
+    const recorded = recordApproval(work, approval);
+
+    expect(recorded.approval).toEqual({
+      id: approval.id,
+      runId: 'run-2',
+      action: 'ship',
+      status: 'approved',
+    });
+    expect(recorded).not.toBe(work);
   });
 });

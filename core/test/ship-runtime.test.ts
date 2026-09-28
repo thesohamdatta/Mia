@@ -36,6 +36,22 @@ describe('Ship skill runtime', () => {
     };
   }
 
+  function failedVerification() {
+    return {
+      records: [
+        {
+          runId: 'run-ship',
+          name: 'tests',
+          status: 'failed' as const,
+          command: 'bun test',
+          durationMs: 1,
+          detail: 'failed',
+        },
+      ],
+      passed: false,
+    };
+  }
+
   function context() {
     const projectsDir = '/tmp/mia-ship-runtime';
     return {
@@ -101,6 +117,35 @@ describe('Ship skill runtime', () => {
     expect(result.output).toContain('SHIPPED');
     const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('shipped');
+    expect(restored?.verification).toEqual({
+      runId: 'run-ship',
+      passed: true,
+      evidence: [{ runId: 'run-ship', name: 'tests', status: 'passed' }],
+    });
+    expect(restored?.approval).toEqual({
+      id: approval.id,
+      runId: 'run-approval',
+      action: 'ship',
+      status: 'approved',
+    });
+  });
+
+  it('persists failed verification so the Work can resume with the latest result', async () => {
+    const ctx = context();
+    const work = readyWork();
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+    const result = await execute([work.id], ctx, async () => failedVerification());
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe('Ship verification failed');
+
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
+    expect(restored?.verification).toEqual({
+      runId: 'run-ship',
+      passed: false,
+      evidence: [{ runId: 'run-ship', name: 'tests', status: 'failed' }],
+    });
   });
 
   it('blocks required approval when none exists', async () => {
@@ -112,6 +157,10 @@ describe('Ship skill runtime', () => {
 
     expect(result.ok).toBe(false);
     expect(result.error).toMatch(/human approval is required/);
+
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
+    expect(restored?.verification?.passed).toBe(true);
+    expect(restored?.approval).toBeUndefined();
   });
 
   it('can recover the latest approval for a Work item', async () => {

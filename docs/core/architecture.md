@@ -60,6 +60,10 @@ timeline / learning / checkpoint persistence
 
 The normal command path is in-process. There is no HTTP hop and no second MIA process to start.
 
+## Harness boundary
+
+Claude Code, Codex, or another host may run the agent loop around MIA. MIA does not duplicate that loop or build a second tool broker. The host supplies granted capabilities; MIA admits skills against those grants and persists the Work, verification, approval, and evidence state that the engineering loop must preserve.
+
 ## Project state
 
 By default:
@@ -85,6 +89,8 @@ Project slugs come from the git repository root name. When no git repository is 
 The append/query surface is exposed by `UnifiedStore`.
 
 ## Skills
+
+Work evidence and approval projections live on the durable Work record; full Evidence and Approval records remain owned by UnifiedStore and their dedicated persistence modules.
 
 The current executable map in `core/skills/index.ts` contains:
 

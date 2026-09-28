@@ -31,6 +31,10 @@ A skill should have a concise entry document describing purpose, when to use it,
 
 `SkillManifest.allowedTools` declares the tool capabilities a skill requires. `ExecutionContext.grantedTools` carries the grants for the current run. The skill boundary blocks execution when a required tool is not granted. This is an admission check only; MIA does not yet own the underlying tool execution runtime.
 
+## Harness boundary
+
+MIA is the engineering contract and state layer around an agent, not another provider-specific agent harness. The host harness owns the model loop, tool routing, sandbox or session lifecycle, and provider-specific subagent orchestration. MIA owns the durable Work lifecycle, skills, capability requirements, verification contracts, and evidence needed to judge the result.
+
 ## Invocation
 
 MIA may eventually distinguish `user`, `model`, and `both` invocation modes. Until the runtime enforces those states, documentation must not imply that model-triggering semantics are executable guarantees.

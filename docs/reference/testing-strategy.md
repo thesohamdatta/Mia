@@ -37,6 +37,7 @@ core/test/
 ├── preamble.test.ts
 ├── root-plan-work.test.ts
 ├── root-planning.test.ts
+├── work-journey.integration.test.ts
 ├── skill-capability.test.ts
 ├── work-lifecycle.test.ts
 └── work-persistence.test.ts
@@ -101,3 +102,13 @@ A passing test suite is evidence for tested behaviour, not proof that the entire
 ---
 
 *Test the behaviour that matters. Keep the evidence close to the claim.*
+
+## Durable lifecycle journey
+
+The critical resumability path is covered by `work-journey.integration.test.ts`:
+
+```text
+Plan → Work persistence → Review verification → Approval persistence → Ship → Work recovery
+```
+
+The test uses real skill/state boundaries with injected verification results, so it proves lifecycle and persistence without making the repository test suite depend on an external model provider.
