@@ -1,3 +1,6 @@
+import type { ApprovalStatus } from '../approval/types.js';
+import type { EvidenceRecord } from '../skills/types.js';
+
 export const WORK_STATES = [
   'draft',
   'specified',
@@ -15,6 +18,25 @@ export const WORK_STATES = [
 
 export type WorkState = (typeof WORK_STATES)[number];
 
+export interface WorkEvidenceRef {
+  runId: string;
+  name: string;
+  status: EvidenceRecord['status'];
+}
+
+export interface WorkVerification {
+  runId: string;
+  passed: boolean;
+  evidence: WorkEvidenceRef[];
+}
+
+export interface WorkApprovalRef {
+  id: string;
+  runId: string;
+  action: string;
+  status: ApprovalStatus;
+}
+
 export interface Work {
   id: string;
   objective: string;
@@ -23,6 +45,8 @@ export interface Work {
   capabilities: string[];
   dependencies: string[];
   requiresHumanApproval: boolean;
+  verification?: WorkVerification;
+  approval?: WorkApprovalRef;
   createdAt: string;
   updatedAt: string;
 }
