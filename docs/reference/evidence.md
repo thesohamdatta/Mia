@@ -44,3 +44,13 @@ A green check proves the scope of that check, not the entire system.
 ## Documentation claims
 
 Important claims may reference the source, test, command, CI run, generated artifact, or runtime observation that supports them. Do not fabricate proof links or use prose confidence as evidence.
+
+
+## Work projections
+
+Work keeps only the state needed to resume and enforce lifecycle gates:
+
+- verification status, run identity, and lightweight evidence references
+- the latest approval identity, action, and status when an approval exists
+
+The full verification output remains an Evidence event in UnifiedStore. The full Approval remains an Approval event in UnifiedStore. Work references these outcomes without becoming a second evidence or approval store.
