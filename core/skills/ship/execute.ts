@@ -47,6 +47,16 @@ export async function execute(
       `${record.status === 'passed' ? 'PASS' : 'FAIL'} ${record.name} (${record.durationMs}ms)`
   );
 
+  const approval = work.requiresHumanApproval
+    ? await loadApprovalForWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id, 'ship')
+    : undefined;
+
+  if (approval) {
+    work = recordApproval(work, approval);
+  }
+
+  await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
   if (!verification.passed) {
     return {
       ok: false,
@@ -64,15 +74,7 @@ export async function execute(
     };
   }
 
-  const approval = work.requiresHumanApproval
-    ? await loadApprovalForWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id, 'ship')
-    : undefined;
 
-  if (approval) {
-    work = recordApproval(work, approval);
-  }
-
-  await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
   try {
     const shipped = shipWork(work);
