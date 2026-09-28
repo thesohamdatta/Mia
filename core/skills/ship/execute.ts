@@ -1,9 +1,6 @@
 import { loadApprovalForWork } from '../../approval/persistence.js';
 import { runVerification } from '../../verification/run-checks.js';
-import {
-  repositoryChecks,
-  resolveVerificationChecks,
-} from '../../verification/suite.js';
+import { repositoryChecks, resolveVerificationChecks } from '../../verification/suite.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
 import { shipWork } from '../../work/ship.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
