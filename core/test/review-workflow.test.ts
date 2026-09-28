@@ -18,7 +18,6 @@ describe('Review skill runtime', () => {
         status: 'running' as const,
       },
       unifiedStore: createUnifiedStore(),
-      grantedTools: [],
       config: {
         miaDir: '/tmp/mia',
         skillsDir: '/tmp/mia/skills',
@@ -111,6 +110,11 @@ describe('Review skill runtime', () => {
 
     const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('ready_to_ship');
+    expect(restored?.verification).toEqual({
+      runId: 'run-review',
+      passed: true,
+      evidence: [{ runId: 'run-review', name: 'tests', status: 'passed' }],
+    });
   });
 
   it('returns Work to in_progress when verification fails', async () => {
@@ -125,5 +129,10 @@ describe('Review skill runtime', () => {
 
     const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('in_progress');
+    expect(restored?.verification).toEqual({
+      runId: 'run-review',
+      passed: false,
+      evidence: [{ runId: 'run-review', name: 'tests', status: 'failed' }],
+    });
   });
 });
