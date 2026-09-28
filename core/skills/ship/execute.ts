@@ -21,7 +21,7 @@ export async function execute(
     };
   }
 
-  const work = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, workId);
+  let work = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, workId);
   if (!work) {
     return {
       ok: false,
