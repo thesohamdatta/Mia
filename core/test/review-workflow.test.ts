@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 import { execute } from '../skills/review/execute.js';
+import type { ExecutionContext } from '../skills/types.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 import { createWork, transitionWork } from '../work/types.js';
 
 describe('Review skill runtime', () => {
-  function context() {
+  function context(): ExecutionContext {
     const projectsDir = '/tmp/mia-review-workflow';
     return {
       cwd: process.cwd(),
