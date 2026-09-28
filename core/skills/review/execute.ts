@@ -1,8 +1,5 @@
 import { runVerification } from '../../verification/run-checks.js';
-import {
-  repositoryChecks,
-  resolveVerificationChecks,
-} from '../../verification/suite.js';
+import { repositoryChecks, resolveVerificationChecks } from '../../verification/suite.js';
 import {
   completeReview,
   completeVerification,
