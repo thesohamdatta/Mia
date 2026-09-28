@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { join, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 import { createApproval, resolveApproval } from '../approval/types.js';
 import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
