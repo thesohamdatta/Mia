@@ -257,7 +257,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
     expect(result.ok).toBe(false);
     expect(result.status).toBe('blocked');
-    expect(result.error).toContain('must declare a version');
+    expect(result.error).toContain('must declare a semantic version');
     expect(executed).toBe(false);
   });
 });
