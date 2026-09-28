@@ -129,6 +129,24 @@ describe('Ship skill runtime', () => {
     });
   });
 
+  it('persists failed verification so the Work can resume with the latest result', async () => {
+    const ctx = context();
+    const work = readyWork();
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+    const result = await execute([work.id], ctx, async () => failedVerification());
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe('Ship verification failed');
+
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
+    expect(restored?.verification).toEqual({
+      runId: 'run-ship',
+      passed: false,
+      evidence: [{ runId: 'run-ship', name: 'tests', status: 'failed' }],
+    });
+  });
+
   it('blocks required approval when none exists', async () => {
     const ctx = context();
     const work = readyWork(true);
