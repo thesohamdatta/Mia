@@ -3,7 +3,10 @@ import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
 import type { SkillDefinition } from '../skills/types.js';
 
-function skill(allowedTools: readonly string[], execute: () => Promise<{ ok: true }>): SkillDefinition {
+function skill(
+  allowedTools: readonly string[],
+  execute: () => Promise<{ ok: true }>
+): SkillDefinition {
   return {
     manifest: {
       name: 'capability-probe',
