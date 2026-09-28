@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { recordVerification } from '../work/lifecycle.js';
 import { shipWork } from '../work/ship.js';
 import { WORK_STATES, type WorkState, createWork, transitionWork } from '../work/types.js';
 
@@ -53,7 +54,21 @@ describe('Work lifecycle', () => {
       expect(work.state).toBe(state);
     }
 
-    work = shipWork(work, { verificationPassed: true });
+    work = recordVerification(work, {
+      runId: 'run-1',
+      passed: true,
+      records: [
+        {
+          runId: 'run-1',
+          name: 'tests',
+          status: 'passed',
+          command: 'bun test',
+          durationMs: 1,
+          detail: 'passed',
+        },
+      ],
+    });
+    work = shipWork(work);
     expect(work.state).toBe('shipped');
 
     work = transitionWork(work, 'maintained');
