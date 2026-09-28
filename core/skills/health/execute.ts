@@ -1,9 +1,15 @@
 import { runVerification } from '../../verification/run-checks.js';
-import { repositoryChecks } from '../../verification/suite.js';
+import {
+  repositoryChecks,
+  resolveVerificationChecks,
+} from '../../verification/suite.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
 export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
-  const verification = await runVerification(ctx, repositoryChecks);
+  const checks = ctx.skill
+    ? resolveVerificationChecks(ctx.skill.verification)
+    : repositoryChecks;
+  const verification = await runVerification(ctx, checks);
 
   for (const record of verification.records) {
     await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);
