@@ -100,6 +100,17 @@ describe('Ship skill runtime', () => {
     expect(result.output).toContain('SHIPPED');
     const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
     expect(restored?.state).toBe('shipped');
+    expect(restored?.verification).toEqual({
+      runId: 'run-ship',
+      passed: true,
+      evidence: [{ runId: 'run-ship', name: 'tests', status: 'passed' }],
+    });
+    expect(restored?.approval).toEqual({
+      id: approval.id,
+      runId: 'run-approval',
+      action: 'ship',
+      status: 'approved',
+    });
   });
 
   it('blocks required approval when none exists', async () => {
@@ -111,6 +122,10 @@ describe('Ship skill runtime', () => {
 
     expect(result.ok).toBe(false);
     expect(result.error).toMatch(/human approval is required/);
+
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
+    expect(restored?.verification?.passed).toBe(true);
+    expect(restored?.approval).toBeUndefined();
   });
 
   it('can recover the latest approval for a Work item', async () => {
