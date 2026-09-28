@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { validateSkillDefinition } from './executor.js';
 import {
   VerificationContractError,
   resolveVerificationChecks,
 } from '../verification/suite.js';
+import { validateSkillDefinition } from './executor.js';
 import type { SkillDefinition } from './types.js';
 
 const definition: SkillDefinition = {
@@ -60,7 +60,6 @@ describe('skill contract', () => {
     expect(() => validateSkillDefinition(invalid)).toThrow(/unsupported invocation/);
   });
 });
-
 
 describe('verification resolution', () => {
   it('resolves named checks in declared order', () => {
