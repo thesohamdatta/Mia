@@ -28,7 +28,6 @@ export const repositoryChecks: readonly VerificationCheck[] = [
   },
 ];
 
-
 export class VerificationContractError extends Error {
   constructor(message: string) {
     super(message);
