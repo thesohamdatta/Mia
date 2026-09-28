@@ -42,9 +42,7 @@ describe('Work lifecycle journey', () => {
         [workId as string],
         reviewCtx,
         async () => ({
-          records: [
-            { runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const },
-          ],
+          records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
           passed: true,
         })
       );
@@ -79,9 +77,7 @@ describe('Work lifecycle journey', () => {
         [workId as string],
         shipCtx,
         async () => ({
-          records: [
-            { runId: shipCtx.run.id, name: 'tests', status: 'passed' as const },
-          ],
+          records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
           passed: true,
         })
       );
