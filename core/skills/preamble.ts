@@ -1,9 +1,4 @@
-import type {
-  ExecutionContext,
-  SkillExecutor,
-  SkillManifest,
-  SkillResult,
-} from './types.js';
+import type { ExecutionContext, SkillExecutor, SkillManifest, SkillResult } from './types.js';
 
 export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
