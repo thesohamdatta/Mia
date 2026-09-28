@@ -29,9 +29,7 @@ export async function execute(
     };
   }
 
-  const checks = ctx.skill
-    ? resolveVerificationChecks(ctx.skill.verification)
-    : repositoryChecks;
+  const checks = ctx.skill ? resolveVerificationChecks(ctx.skill.verification) : repositoryChecks;
   const verification = await verify(ctx, checks);
 
   for (const record of verification.records) {
