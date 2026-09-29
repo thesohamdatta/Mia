@@ -2,10 +2,10 @@
   "protocol_version": 1,
   "cycle": "cycle-006",
   "integration_branch": "master",
-  "stage": "maintainer",
+  "stage": "orchestrator",
   "status": "complete",
   "priority": "P3",
-  "writer": "maintainer",
+  "writer": "orchestrator",
   "blocked_reason": null,
   "verification_commit": "3271f624ab0a96edd2d9db71e896dbc93a1d26bb",
   "stages": {
@@ -22,10 +22,10 @@
       "handoff": ".agents/handoffs/cycle-006-maintainer.json"
     },
     "orchestrator": {
-      "status": "pending",
-      "handoff": null
+      "status": "complete",
+      "handoff": ".agents/handoffs/cycle-006-orchestrator.json"
     }
   },
-  "last_updated_by": "maintainer",
-  "notes": "Resolved broken test assertions, unexported Knip unused symbols, and formatted code with Biome."
+  "last_updated_by": "orchestrator",
+  "notes": "Completed cycle-006 orchestrator coordination after maintainer resolved broken tests, unexported Knip symbols, and formatted code with Biome."
 }
