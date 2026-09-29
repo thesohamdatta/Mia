@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -24,7 +24,7 @@ function assertContains(output: string, value: string): void {
 }
 
 try {
-  mkdirProject();
+  mkdirSync(project, { recursive: true });
   runGit('init');
   runGit('config', 'user.email', 'mia@example.com');
   runGit('config', 'user.name', 'MIA Smoke Test');
@@ -67,10 +67,6 @@ try {
   rmSync(root, { recursive: true, force: true });
 }
 
-function mkdirProject(): void {
-  const fs = require('node:fs') as typeof import('node:fs');
-  fs.mkdirSync(project, { recursive: true });
-}
 
 function runGit(...args: string[]): void {
   execFileSync('git', args, {
