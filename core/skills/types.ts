@@ -37,6 +37,14 @@ export interface StoredEvent<T = unknown> {
   data: T;
 }
 
+export interface LearningRecord {
+  scope: 'project';
+  type: string;
+  key: string;
+  insight: string;
+  sourceRunId: string;
+}
+
 export interface EvidenceRecord {
   runId: string;
   name: string;
