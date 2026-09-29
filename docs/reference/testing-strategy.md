@@ -38,6 +38,7 @@ core/test/
 ├── root-plan-work.test.ts
 ├── root-planning.test.ts
 ├── work-journey.integration.test.ts
+├── intent-to-verified-work.e2e.test.ts
 ├── skill-capability.test.ts
 ├── work-lifecycle.test.ts
 └── work-persistence.test.ts
@@ -102,6 +103,16 @@ A passing test suite is evidence for tested behaviour, not proof that the entire
 ---
 
 *Test the behaviour that matters. Keep the evidence close to the claim.*
+
+## Intent-to-verified E2E
+
+`intent-to-verified-work.e2e.test.ts` proves the v0.4 acceptance path with deterministic repository doubles:
+
+```text
+Human intent → Root plan → capability selection → Work → review verification → human approval → ship → recovery
+```
+
+It uses the real root, capability, Work, review, approval, and ship boundaries without requiring a model provider.
 
 ## Durable lifecycle journey
 
