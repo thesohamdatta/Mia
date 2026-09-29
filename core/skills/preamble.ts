@@ -84,7 +84,7 @@ export async function executeWithMiddlewares(
   ctx: ExecutionContext,
   skillName: string,
   middlewares: readonly Middleware[] = defaultMiddlewares,
-  skillManifest?: SkillManifest
+  skillManifest: SkillManifest
 ): Promise<SkillResult> {
   const run: ExecutionContext['run'] = {
     ...ctx.run,
