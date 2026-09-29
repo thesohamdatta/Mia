@@ -62,7 +62,11 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       return { ok: false, status: 'blocked', error: 'Usage: mia plan create <objective>' };
     }
 
-    const learningEvents = await ctx.unifiedStore.listLearnings(ctx.config.projectsDir, ctx.slug, 5);
+    const learningEvents = await ctx.unifiedStore.listLearnings(
+      ctx.config.projectsDir,
+      ctx.slug,
+      5
+    );
     const learnings = learningEvents
       .map((event) => (event.data as Partial<LearningRecord>).insight)
       .filter((insight): insight is string => Boolean(insight?.trim()));
@@ -93,7 +97,9 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
         : ['- None recorded']),
       '',
       '## Learnings Applied',
-      ...(plan.learnings.length > 0 ? plan.learnings.map((learning) => `- ${learning}`) : ['- None recorded']),
+      ...(plan.learnings.length > 0
+        ? plan.learnings.map((learning) => `- ${learning}`)
+        : ['- None recorded']),
       '',
       '## Capabilities',
       ...(work.capabilities.length > 0
