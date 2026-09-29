@@ -20,11 +20,10 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "types": ["vitest/globals", "@types/bun"],
-    "baseUrl": ".",
     "paths": {
-      "@core/*": ["core/*"]
+      "@core/*": ["./core/*"]
     }
   },
-  "include": ["core/**/*", "src/**/*", "scripts/**/*", "tests/**/*"],
+  "include": ["core/**/*", "scripts/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "build", "bin", "*.exe"]
 }
