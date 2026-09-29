@@ -1,13 +1,13 @@
 {
   "protocol_version": 1,
-  "cycle": "cycle-007",
+  "cycle": "cycle-008",
   "integration_branch": "master",
   "stage": "maintainer",
   "status": "complete",
   "priority": "P3",
   "writer": "maintainer",
   "blocked_reason": null,
-  "verification_commit": "a0365fe75a24ca47edf0cf1ccba749254c99d5dc",
+  "verification_commit": "f0a24827546fdf1ab25f4219d08902a018754f30",
   "stages": {
     "sentry": {
       "status": "complete",
@@ -19,7 +19,7 @@
     },
     "maintainer": {
       "status": "complete",
-      "handoff": ".agents/handoffs/cycle-007-maintainer.json"
+      "handoff": ".agents/handoffs/cycle-008-maintainer.json"
     },
     "orchestrator": {
       "status": "pending",
@@ -27,5 +27,5 @@
     }
   },
   "last_updated_by": "maintainer",
-  "notes": "Completed v0.4 intent-to-verified Work E2E acceptance and verified repository health gates."
+  "notes": "Completed cycle-008 maintainer run: unexported unused types in core/work/maintenance.ts and verified all repo health gates."
 }
