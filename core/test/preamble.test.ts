@@ -31,6 +31,16 @@ describe('skill execution lifecycle', () => {
       },
       unifiedStore: store,
       grantedTools: [],
+      skill: {
+        name: 'test',
+        version: '1.0.0',
+        description: 'Test skill',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: [],
+        phase: 'execute',
+        invocation: 'both',
+      },
       config: {
         miaDir: join(testDir, '.mia'),
         skillsDir: join(testDir, '.mia', 'skills'),
@@ -75,7 +85,17 @@ describe('skill execution lifecycle', () => {
       [],
       ctx,
       'review',
-      []
+      [],
+      {
+        name: 'review',
+        version: '1.0.0',
+        description: 'Review work',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: [],
+        phase: 'review',
+        invocation: 'both',
+      }
     );
 
     expect(result).toEqual({ ok: false, error: 'verification failed' });
@@ -95,7 +115,17 @@ describe('skill execution lifecycle', () => {
       [],
       ctx,
       'ship',
-      []
+      [],
+      {
+        name: 'ship',
+        version: '1.0.0',
+        description: 'Ship work',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: [],
+        phase: 'handoff',
+        invocation: 'both',
+      }
     );
 
     expect(result).toEqual({ ok: false, status: 'failed', error: 'boom' });
