@@ -37,7 +37,7 @@ MIA is the engineering contract and state layer around an agent, not another pro
 
 ## Invocation
 
-MIA may eventually distinguish `user`, `model`, and `both` invocation modes. Until the runtime enforces those states, documentation must not imply that model-triggering semantics are executable guarantees.
+MIA distinguishes `user`, `model`, and `both` invocation modes in skill metadata. Generated host adapters carry the canonical value; the host remains responsible for deciding when to invoke a model-triggered skill.
 
 ## External influences
 
