@@ -7,7 +7,7 @@
   "priority": "P3",
   "writer": "maintainer",
   "blocked_reason": null,
-  "verification_commit": "aaa31a497220fbed8e91c40b8f2c5c42f0c79758",
+  "verification_commit": "a0365fe75a24ca47edf0cf1ccba749254c99d5dc",
   "stages": {
     "sentry": {
       "status": "complete",
@@ -27,5 +27,5 @@
     }
   },
   "last_updated_by": "maintainer",
-  "notes": "Unexported unused WorkEvidenceRef interface and verified repository health gates."
+  "notes": "Completed v0.4 intent-to-verified Work E2E acceptance and verified repository health gates."
 }
