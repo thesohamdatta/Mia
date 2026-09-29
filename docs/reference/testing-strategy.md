@@ -133,3 +133,14 @@ Operational observation → maintenance Work → verification/review → ship �
 ```
 
 work-maintenance.test.ts proves this seam using the existing Work lifecycle and UnifiedStore timeline. It does not require monitoring infrastructure or a background service.
+
+
+## Evidence-driven learning
+
+`learning-loop.test.ts` proves the smallest v0.4 learning contract:
+
+```text
+run N → record scoped learning + source run → fresh run N+1 → apply learning during planning
+```
+
+This is deliberately not model training or a second memory system. The shared `UnifiedStore` remains the persistence boundary.
