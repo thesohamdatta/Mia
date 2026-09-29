@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const root = mkdtempSync(join(tmpdir(), 'mia-binary-'));
 const project = join(root, 'project');
@@ -37,13 +37,7 @@ try {
 
   assertContains(run(['plan', 'create', 'Verify compiled MIA']), 'Work: work_');
   assertContains(
-    run([
-      'learn',
-      'add',
-      'workflow',
-      'binary-smoke',
-      'Compiled binary can persist project state',
-    ]),
+    run(['learn', 'add', 'workflow', 'binary-smoke', 'Compiled binary can persist project state']),
     'Learning saved: binary-smoke'
   );
   assertContains(
@@ -66,7 +60,6 @@ try {
 } finally {
   rmSync(root, { recursive: true, force: true });
 }
-
 
 function runGit(...args: string[]): void {
   execFileSync('git', args, {
