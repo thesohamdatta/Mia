@@ -23,6 +23,40 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     return { ok: true, output };
   }
 
+  if (subcmd === 'apply') {
+    const [, key] = args;
+    if (!key) {
+      return { ok: false, status: 'blocked', error: 'Usage: mia learn apply <key>' };
+    }
+
+    const learnings = await ctx.unifiedStore.listLearnings(projectsDir, ctx.slug, 50);
+    const match = learnings
+      .map((event) => event.data as LearningRecord)
+      .find((learning) => learning.key === key);
+
+    if (!match) {
+      return { ok: false, status: 'blocked', error: `Learning not found: ${key}` };
+    }
+
+    await ctx.unifiedStore.appendTimeline(projectsDir, ctx.slug, {
+      kind: 'learning-applied',
+      key: match.key,
+      runId: ctx.run.id,
+      sourceRunId: match.sourceRunId,
+    });
+
+    await ctx.unifiedStore.appendLearning(projectsDir, ctx.slug, {
+      ...match,
+      appliedInRunIds: [...(match.appliedInRunIds ?? []), ctx.run.id],
+    });
+
+    return {
+      ok: true,
+      status: 'success',
+      output: `Learning applied: ${key}`,
+    };
+  }
+
   if (subcmd === 'add') {
     const [, type, key, ...insightParts] = args;
     const insight = insightParts.join(' ');
@@ -38,7 +72,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     return { ok: true, output: `✓ Learning saved: ${key}\n  [${type}] ${insight}` };
   }
 
-  return { ok: true, output: 'Usage: mia learn [list|add <type> <key> <insight>]' };
+  return { ok: true, output: 'Usage: mia learn [list|add <type> <key> <insight>|apply <key>]' };
 }
 
 export const executor: SkillExecutor = { execute };
