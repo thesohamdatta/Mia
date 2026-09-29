@@ -8,8 +8,8 @@ import { createExecutionContext } from '../context.js';
 import { createRootPlan } from '../root/types.js';
 import { execute as executeReview } from '../skills/review/execute.js';
 import { execute as executeShip } from '../skills/ship/execute.js';
-import { loadWork, saveWork } from '../work/persistence.js';
 import { createWorkFromRootPlan } from '../work/from-root-plan.js';
+import { loadWork, saveWork } from '../work/persistence.js';
 
 function context(testDir: string) {
   const ctx = createExecutionContext(testDir);
@@ -62,9 +62,7 @@ describe('Intent to verified Work', () => {
 
       const reviewCtx = context(testDir);
       const reviewResult = await executeReview([planned.id], reviewCtx, async () => ({
-        records: [
-          { runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const },
-        ],
+        records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
         passed: true,
       }));
 
@@ -98,9 +96,7 @@ describe('Intent to verified Work', () => {
 
       const shipCtx = context(testDir);
       const shipResult = await executeShip([planned.id], shipCtx, async () => ({
-        records: [
-          { runId: shipCtx.run.id, name: 'tests', status: 'passed' as const },
-        ],
+        records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
         passed: true,
       }));
 
