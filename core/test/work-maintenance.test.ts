@@ -3,6 +3,12 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { createUnifiedStore } from '../state/unified-store.js';
 import {
+  completeReview,
+  completeVerification,
+  recordVerification,
+  startWork,
+} from '../work/lifecycle.js';
+import {
   createMaintenanceWork,
   createOperationalObservation,
   listOperationalObservations,
@@ -79,9 +85,3 @@ describe('maintenance seam', () => {
   });
 });
 
-import {
-  completeReview,
-  completeVerification,
-  recordVerification,
-  startWork,
-} from '../work/lifecycle.js';
