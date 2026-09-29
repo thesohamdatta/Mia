@@ -1,5 +1,5 @@
 import type { StoredEvent, UnifiedStore } from '../state/unified-store.js';
-import { createWork, type Work } from './types.js';
+import { type Work, createWork } from './types.js';
 
 export type ObservationSeverity = 'info' | 'warning' | 'incident';
 
