@@ -18,7 +18,7 @@ export const WORK_STATES = [
 
 export type WorkState = (typeof WORK_STATES)[number];
 
-export interface WorkEvidenceRef {
+interface WorkEvidenceRef {
   runId: string;
   name: string;
   status: EvidenceRecord['status'];
