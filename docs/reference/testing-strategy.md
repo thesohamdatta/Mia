@@ -39,6 +39,7 @@ core/test/
 ├── root-planning.test.ts
 ├── work-journey.integration.test.ts
 ├── intent-to-verified-work.e2e.test.ts
+├── work-maintenance.test.ts
 ├── skill-capability.test.ts
 ├── work-lifecycle.test.ts
 └── work-persistence.test.ts
@@ -123,3 +124,12 @@ Plan → Work persistence → Review verification → Approval persistence → S
 ```
 
 The test uses real skill/state boundaries with injected verification results, so it proves lifecycle and persistence without making the repository test suite depend on an external model provider.
+
+
+## Operate and maintain
+
+```text
+Operational observation → maintenance Work → verification/review → ship → maintained
+```
+
+work-maintenance.test.ts proves this seam using the existing Work lifecycle and UnifiedStore timeline. It does not require monitoring infrastructure or a background service.
