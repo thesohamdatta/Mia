@@ -8,12 +8,6 @@ import {
   listOperationalObservations,
   saveOperationalObservation,
 } from '../work/maintenance.js';
-import {
-  completeReview,
-  completeVerification,
-  recordVerification,
-  startWork,
-} from '../work/lifecycle.js';
 import { shipWork } from '../work/ship.js';
 import { transitionWork } from '../work/types.js';
 
@@ -84,3 +78,10 @@ describe('maintenance seam', () => {
     expect(work.maintenance?.observationId).toBe(observation.id);
   });
 });
+
+import {
+  completeReview,
+  completeVerification,
+  recordVerification,
+  startWork,
+} from '../work/lifecycle.js';
