@@ -44,9 +44,15 @@ export const skills: Record<string, SkillDefinition> = {
   grill: define('grill', 'Clarify intent before non-trivial work', 'none', [], 'clarify', {
     execute: grillExecute,
   }),
-  plan: define('plan', 'Create an explicit implementation plan', 'local-write', [], 'plan', {
-    execute: planExecute,
-  }),
+  plan: define(
+    'plan',
+    'Create an explicit implementation plan',
+    'local-write',
+    [],
+    'plan',
+    { execute: planExecute },
+    'both'
+  ),
   spec: define('spec', 'Shape intent into a project specification', 'local-write', [], 'specify', {
     execute: specExecute,
   }),
@@ -66,7 +72,8 @@ export const skills: Record<string, SkillDefinition> = {
     'local-write',
     ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
     'handoff',
-    { execute: shipExecute }
+    { execute: shipExecute },
+    'both'
   ),
   health: define(
     'health',
@@ -94,7 +101,8 @@ export const skills: Record<string, SkillDefinition> = {
     'local-write',
     ['typecheck', 'lint', 'unused-code', 'tests'],
     'review',
-    { execute: reviewExecute }
+    { execute: reviewExecute },
+    'both'
   ),
   vc: define('vc', 'Inspect and deliberately mutate Git state', 'git-write', [], 'execute', {
     execute: vcExecute,

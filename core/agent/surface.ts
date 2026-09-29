@@ -32,7 +32,7 @@ managed-by: mia
 name: ${manifest.name}
 description: "${manifest.description.replace(/"/g, '\\"')}"
 version: ${manifest.version}
-invocation: model
+invocation: ${manifest.invocation ?? 'user'}
 phase: ${manifest.phase}
 side-effects: ${manifest.sideEffects}
 ---
