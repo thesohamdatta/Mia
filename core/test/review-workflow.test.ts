@@ -26,7 +26,16 @@ describe('Review skill runtime', () => {
         memoryFile: '/tmp/mia/memory.md',
         sessionsDir: '/tmp/mia/sessions',
       },
-      skill: undefined,
+      skill: {
+        name: 'review',
+        version: '1.0.0',
+        description: 'Review work',
+        allowedTools: [],
+        sideEffects: 'local-write',
+        verification: ['typecheck', 'lint', 'unused-code', 'tests'],
+        phase: 'review',
+        invocation: 'both',
+      },
     };
   }
 
