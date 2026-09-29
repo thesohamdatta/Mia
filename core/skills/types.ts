@@ -27,7 +27,7 @@ export interface ExecutionContext {
   /** Tool capabilities granted to this execution. */
   grantedTools: readonly string[];
   /** The contract for the skill currently being executed. */
-  skill?: SkillManifest;
+  skill: SkillManifest;
 }
 
 export interface LearningRecord {
