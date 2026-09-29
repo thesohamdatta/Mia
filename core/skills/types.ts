@@ -30,13 +30,6 @@ export interface ExecutionContext {
   skill?: SkillManifest;
 }
 
-export interface StoredEvent<T = unknown> {
-  type: 'learning' | 'timeline' | 'checkpoint' | 'evidence';
-  ts: string;
-  slug: string;
-  data: T;
-}
-
 export interface LearningRecord {
   scope: 'project';
   type: string;
