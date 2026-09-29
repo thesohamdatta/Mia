@@ -27,7 +27,12 @@ describe('evidence-driven learning loop', () => {
 
       const learningResult = await executeSkillDefinition(
         learn,
-        ['add', 'workflow', 'verification-order', 'Run focused checks before the full repository gate'],
+        [
+          'add',
+          'workflow',
+          'verification-order',
+          'Run focused checks before the full repository gate',
+        ],
         runN
       );
       expect(learningResult.ok).toBe(true);
@@ -54,17 +59,11 @@ describe('evidence-driven learning loop', () => {
       );
       expect(planResult.ok).toBe(true);
 
-      const planPath = join(
-        runNPlus1.config.projectsDir,
-        runNPlus1.slug,
-        'PLAN.md'
-      );
+      const planPath = join(runNPlus1.config.projectsDir, runNPlus1.slug, 'PLAN.md');
       const planText = await Bun.file(planPath).text();
 
       expect(planText).toContain('## Learnings Applied');
-      expect(planText).toContain(
-        '- Run focused checks before the full repository gate'
-      );
+      expect(planText).toContain('- Run focused checks before the full repository gate');
     } finally {
       rmSync(testDir, { recursive: true, force: true });
     }
