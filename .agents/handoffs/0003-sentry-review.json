@@ -2,11 +2,7 @@
   "agent": "sentry",
   "task": "quality-control-sentry-review",
   "objective": "Conduct Sentry adversarial review pass, eliminate tsconfig/knip warnings, and advance agent coordination state",
-  "scope": [
-    "tsconfig.json",
-    "knip.json",
-    ".agents/"
-  ],
+  "scope": ["tsconfig.json", "knip.json", ".agents/"],
   "files_changed": [
     "tsconfig.json",
     "knip.json",
