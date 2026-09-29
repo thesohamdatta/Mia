@@ -12,12 +12,12 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     if (learnings.length === 0) {
       return {
         ok: true,
-        output: '📚 No learnings yet. Add one with: mia learn add <type> <key> <insight>',
+        output: '📚 No learnings yet. Add one with: mia learn [list|add <type> <key> <insight>|apply <key>]',
       };
     }
     let output = '📚 Learnings:\n\n';
     for (const l of learnings) {
-      const d = l.data as { type?: string; key?: string; insight?: string };
+      const d = l.data as Partial<LearningRecord>;
       output += `  • [${d.type || 'pattern'}] ${d.key || 'unnamed'}: ${d.insight || ''}\n`;
     }
     return { ok: true, output };
