@@ -3,16 +3,16 @@ import { join } from 'node:path';
 import { createRootPlan } from '../../root/types.js';
 import { createWorkFromRootPlan } from '../../work/from-root-plan.js';
 import { saveWork } from '../../work/persistence.js';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, LearningRecord, SkillExecutor, SkillResult } from '../types.js';
 
-function makePlan(request: string) {
+function makePlan(request: string, learnings: string[]) {
   return createRootPlan(
     {
       request,
       projectContext: [],
       currentWorkState: 'draft',
       availableCapabilities: ['software'],
-      learnings: [],
+      learnings,
       authority: {
         humanApprovalRequired: true,
         allowedAutonomy: 'execute-within-scope',
@@ -62,7 +62,12 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       return { ok: false, status: 'blocked', error: 'Usage: mia plan create <objective>' };
     }
 
-    const plan = makePlan(objective);
+    const learningEvents = await ctx.unifiedStore.listLearnings(ctx.config.projectsDir, ctx.slug, 5);
+    const learnings = learningEvents
+      .map((event) => (event.data as Partial<LearningRecord>).insight)
+      .filter((insight): insight is string => Boolean(insight?.trim()));
+
+    const plan = makePlan(objective, learnings);
     const work = createWorkFromRootPlan(plan);
     await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
@@ -86,6 +91,9 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       ...(work.dependencies.length > 0
         ? work.dependencies.map((dependency) => `- ${dependency}`)
         : ['- None recorded']),
+      '',
+      '## Learnings Applied',
+      ...(plan.learnings.length > 0 ? plan.learnings.map((learning) => `- ${learning}`) : ['- None recorded']),
       '',
       '## Capabilities',
       ...(work.capabilities.length > 0
