@@ -1,7 +1,7 @@
 // Learn Skill Executor - Manage project learnings
 // Runs: mia learn
 
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, LearningRecord, SkillExecutor, SkillResult } from '../types.js';
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'list';
@@ -17,7 +17,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     }
     let output = '📚 Learnings:\n\n';
     for (const l of learnings) {
-      const d = l.data as { type?: string; key?: string; insight?: string };
+      const d = l.data as Partial<LearningRecord>;
       output += `  • [${d.type || 'pattern'}] ${d.key || 'unnamed'}: ${d.insight || ''}\n`;
     }
     return { ok: true, output };
@@ -29,12 +29,15 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     if (!type || !key || !insight) {
       return { ok: false, error: 'Usage: mia learn add <type> <key> <insight>' };
     }
-    await ctx.unifiedStore.appendLearning(projectsDir, ctx.slug, {
+    const learning: LearningRecord = {
+      scope: 'project',
       type,
       key,
       insight,
-      ts: new Date().toISOString(),
-    });
+      sourceRunId: ctx.run.id,
+    };
+
+    await ctx.unifiedStore.appendLearning(projectsDir, ctx.slug, learning);
     return { ok: true, output: `✓ Learning saved: ${key}\n  [${type}] ${insight}` };
   }
 
