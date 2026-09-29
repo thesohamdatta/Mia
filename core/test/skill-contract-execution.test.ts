@@ -5,6 +5,7 @@ import { getSkill } from '../skills/index.js';
 describe('execution contract', () => {
   it('requires an explicit active skill manifest at the execution boundary', () => {
     const ctx = createExecutionContext();
+    expect(ctx.skill).toBeUndefined();
     const definition = getSkill('plan');
 
     if (!definition) throw new Error('plan skill is not registered');
@@ -16,5 +17,6 @@ describe('execution contract', () => {
 
     expect(executionContext.skill.name).toBe('plan');
     expect(executionContext.skill.invocation).toBe('both');
+    expect(ctx.skill).toBeUndefined();
   });
 });
