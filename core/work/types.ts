@@ -37,6 +37,11 @@ export interface WorkApprovalRef {
   status: ApprovalStatus;
 }
 
+export interface WorkMaintenanceContext {
+  observationId: string;
+  sourceWorkId?: string;
+}
+
 export interface Work {
   id: string;
   objective: string;
@@ -47,6 +52,7 @@ export interface Work {
   requiresHumanApproval: boolean;
   verification?: WorkVerification;
   approval?: WorkApprovalRef;
+  maintenance?: WorkMaintenanceContext;
   createdAt: string;
   updatedAt: string;
 }
