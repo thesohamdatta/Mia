@@ -1,7 +1,6 @@
 {
   "$schema": "https://knip.dev/schema.json",
   "entry": [
-    "core/cli/index.ts",
     "core/context.ts",
     "core/config/index.ts",
     "core/hosts/index.ts",
@@ -27,18 +26,6 @@
     "core/test/types.ts"
   ],
   "project": ["core/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"],
-  "ignoreDependencies": [
-    "typescript",
-    "@biomejs/biome",
-    "vitest",
-    "husky",
-    "markdownlint-cli2",
-    "gray-matter",
-    "zod",
-    "lychee",
-    "typos-cli",
-    "knip"
-  ],
   "rules": {
     "dependencies": "error",
     "devDependencies": "error",
