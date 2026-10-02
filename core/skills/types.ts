@@ -26,15 +26,8 @@ export interface ExecutionContext {
   config: AppConfig;
   /** Tool capabilities granted to this execution. */
   grantedTools: readonly string[];
-  /** The contract for the skill currently being executed. */
+  /** The active skill contract. Set by executeSkillDefinition before execution. */
   skill?: SkillManifest;
-}
-
-export interface StoredEvent<T = unknown> {
-  type: 'learning' | 'timeline' | 'checkpoint' | 'evidence';
-  ts: string;
-  slug: string;
-  data: T;
 }
 
 export interface LearningRecord {

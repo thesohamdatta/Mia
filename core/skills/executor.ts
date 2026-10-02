@@ -134,18 +134,9 @@ export async function executeSkillDefinition(
     args,
     context,
     definition.manifest.name,
-    undefined,
-    definition.manifest
+    definition.manifest,
+    undefined
   );
-}
-
-export async function executeSkill(
-  executor: SkillExecutor,
-  args: string[],
-  context: ExecutionContext,
-  skillName: string
-): Promise<SkillResult> {
-  return executeWithMiddlewares(executor, args, context, skillName);
 }
 
 export function createExecutor(

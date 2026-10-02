@@ -31,6 +31,16 @@ describe('skill execution lifecycle', () => {
       },
       unifiedStore: store,
       grantedTools: [],
+      skill: {
+        name: 'test',
+        version: '1.0.0',
+        description: 'Test skill',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: [],
+        phase: 'execute',
+        invocation: 'both',
+      },
       config: {
         miaDir: join(testDir, '.mia'),
         skillsDir: join(testDir, '.mia', 'skills'),
@@ -75,6 +85,16 @@ describe('skill execution lifecycle', () => {
       [],
       ctx,
       'review',
+      {
+        name: 'review',
+        version: '1.0.0',
+        description: 'Review work',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: [],
+        phase: 'review',
+        invocation: 'both',
+      },
       []
     );
 
@@ -95,6 +115,16 @@ describe('skill execution lifecycle', () => {
       [],
       ctx,
       'ship',
+      {
+        name: 'ship',
+        version: '1.0.0',
+        description: 'Ship work',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: [],
+        phase: 'handoff',
+        invocation: 'both',
+      },
       []
     );
 
@@ -125,7 +155,17 @@ describe('skill execution lifecycle', () => {
       { execute: async () => ({ ok: true, output: 'done' }) },
       [],
       ctx,
-      'health'
+      'health',
+      {
+        name: 'health',
+        version: '1.0.0',
+        description: 'Run the repository verification suite',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
+        phase: 'verify',
+        invocation: 'user',
+      }
     );
 
     expect(result).toEqual({ ok: true, output: 'done' });
