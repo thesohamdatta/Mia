@@ -85,7 +85,6 @@ describe('skill execution lifecycle', () => {
       [],
       ctx,
       'review',
-      [],
       {
         name: 'review',
         version: '1.0.0',
@@ -95,7 +94,8 @@ describe('skill execution lifecycle', () => {
         verification: [],
         phase: 'review',
         invocation: 'both',
-      }
+      },
+      []
     );
 
     expect(result).toEqual({ ok: false, error: 'verification failed' });
@@ -115,7 +115,6 @@ describe('skill execution lifecycle', () => {
       [],
       ctx,
       'ship',
-      [],
       {
         name: 'ship',
         version: '1.0.0',
@@ -125,7 +124,8 @@ describe('skill execution lifecycle', () => {
         verification: [],
         phase: 'handoff',
         invocation: 'both',
-      }
+      },
+      []
     );
 
     expect(result).toEqual({ ok: false, status: 'failed', error: 'boom' });
@@ -155,7 +155,17 @@ describe('skill execution lifecycle', () => {
       { execute: async () => ({ ok: true, output: 'done' }) },
       [],
       ctx,
-      'health'
+      'health',
+      {
+        name: 'health',
+        version: '1.0.0',
+        description: 'Run the repository verification suite',
+        allowedTools: [],
+        sideEffects: 'none',
+        verification: ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
+        phase: 'verify',
+        invocation: 'user',
+      }
     );
 
     expect(result).toEqual({ ok: true, output: 'done' });
