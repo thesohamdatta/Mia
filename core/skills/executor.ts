@@ -134,8 +134,8 @@ export async function executeSkillDefinition(
     args,
     context,
     definition.manifest.name,
-    undefined,
-    definition.manifest
+    definition.manifest,
+    undefined
   );
 }
 
