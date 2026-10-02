@@ -1,12 +1,13 @@
 import type { Approval } from '../approval/types.js';
 import type { EvidenceRecord } from '../skills/types.js';
-import type { Work } from './types.js';
+import type { CriterionEvidence, Work } from './types.js';
 import { transitionWork } from './types.js';
 
 interface VerificationRecordOutcome {
   runId: string;
   records: readonly EvidenceRecord[];
   passed: boolean;
+  criteria?: readonly CriterionEvidence[];
 }
 
 interface VerificationOutcome {
@@ -42,6 +43,7 @@ export function recordVerification(work: Work, outcome: VerificationRecordOutcom
         name: record.name,
         status: record.status,
       })),
+      ...(outcome.criteria ? { criteria: [...outcome.criteria] } : {}),
     },
     updatedAt: new Date().toISOString(),
   };

@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import { recordVerification } from '../work/lifecycle.js';
 import { shipWork } from '../work/ship.js';
-import { WORK_STATES, type WorkState, createWork, transitionWork } from '../work/types.js';
+import {
+  WORK_STATES,
+  type WorkState,
+  type CriterionEvidence,
+  createWork,
+  transitionWork,
+} from '../work/types.js';
 
 describe('Work lifecycle', () => {
   it('defines the v0.4 lifecycle states', () => {
@@ -126,5 +132,39 @@ describe('Work lifecycle', () => {
     expect(next.id).toBe(work.id);
     expect(next.createdAt).toBe(work.createdAt);
     expect(next.updatedAt).not.toBe('');
+  });
+
+  it('supports attaching criterion-level outcome evidence to verification', () => {
+    let work = createWork({
+      objective: 'Verify feature',
+      successCriteria: ['Feature launches', 'Handles errors'],
+    });
+    work = transitionWork(work, 'specified');
+    work = transitionWork(work, 'planned');
+    work = transitionWork(work, 'in_progress');
+    work = transitionWork(work, 'verification');
+
+    const criteria: CriterionEvidence[] = [
+      { criterion: 'Feature launches', status: 'passed', evidenceRef: 'test-1' },
+      { criterion: 'Handles errors', status: 'passed', note: 'Error tests pass' },
+    ];
+
+    work = recordVerification(work, {
+      runId: 'run-crit',
+      passed: true,
+      records: [
+        {
+          runId: 'run-crit',
+          name: 'tests',
+          status: 'passed',
+          command: 'bun test',
+          durationMs: 5,
+          detail: 'passed',
+        },
+      ],
+      criteria,
+    });
+
+    expect(work.verification?.criteria).toEqual(criteria);
   });
 });

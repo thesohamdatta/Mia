@@ -24,10 +24,18 @@ interface WorkEvidenceRef {
   status: EvidenceRecord['status'];
 }
 
+export interface CriterionEvidence {
+  criterion: string;
+  status: 'passed' | 'failed';
+  evidenceRef?: string;
+  note?: string;
+}
+
 export interface WorkVerification {
   runId: string;
   passed: boolean;
   evidence: WorkEvidenceRef[];
+  criteria?: CriterionEvidence[];
 }
 
 export interface WorkApprovalRef {
