@@ -88,7 +88,7 @@ Commands:
   sync                Pull then push current branch
   tag <version>       Create annotated tag (v1.2.3)
   release <type>      Bump version (major|minor|patch), commit, tag, push
-  clean               Remove untracked build artifacts (node_modules, *.exe)
+  clean               Remove known generated build artifacts (bin, dist, build, *.exe)
   ignore              Show/edit .gitignore
   hooks               Install git hooks (commit-msg validation)
 
@@ -219,8 +219,8 @@ Conventional commits enforced. Clean history = happy maintainers.`,
     }
 
     case 'clean': {
-      const res = await runGit(['clean', '-fd', '-X'], cwd);
-      return { ok: res.ok, output: res.output || 'Cleaned untracked build artifacts' };
+      const res = await runGit(['clean', '-fdX', '--', 'bin', 'dist', 'build', '*.exe'], cwd);
+      return { ok: res.ok, output: res.output || 'Cleaned known generated build artifacts' };
     }
 
     case 'ignore': {
