@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AGENT_SKILLS } from '../agent/surface.js';
@@ -9,7 +10,8 @@ import { hasInjection, sanitizeForStorage } from '../state/jsonl-store.js';
 import { skills } from '../skills/index.js';
 import { execute as checkpointExecute } from '../skills/checkpoint/execute.js';
 import { execute as vcExecute } from '../skills/vc/execute.js';
-import { resolveVerificationChecks, runVerification } from '../verification/suite.js';
+import { resolveVerificationChecks } from '../verification/suite.js';
+import { runVerification } from '../verification/run-checks.js';
 
 describe('MIA project QA contract', () => {
   it('keeps one canonical registered skill definition per command', () => {
@@ -80,35 +82,45 @@ describe('MIA project QA contract', () => {
       },
     };
 
-    const result = await checkpointExecute(
-      ['save', '../../../escaped', 'should not escape the checkpoint directory'],
-      ctx
-    );
+    try {
+      const result = await checkpointExecute(
+        ['save', '../../../escaped', 'should not escape the checkpoint directory'],
+        ctx
+      );
 
-    expect(result.ok).toBe(false);
-    expect(resolve(root, 'escaped.md')).not.toBeTruthy();
+      expect(result.ok).toBe(false);
+      expect(existsSync(resolve(root, '..', 'escaped.md'))).toBe(false);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
   });
 
   it('preserves ignored local state when vc clean runs', async () => {
     const project = await mkdtemp(join(tmpdir(), 'mia-qa-vc-'));
-    const stateFile = join(project, '.mia', 'important-state.json');
+    const stateDir = join(project, '.mia');
+    const stateFile = join(stateDir, 'important-state.json');
+    await mkdir(stateDir, { recursive: true });
     await writeFile(join(project, '.gitignore'), '.mia/\nnode_modules/\nbin/\ndist/\n');
     await writeFile(stateFile, '{"keep":true}\n');
-    await execFileSync('git', ['init'], { cwd: project });
-    await execFileSync('git', ['config', 'user.email', 'qa@example.com'], { cwd: project });
-    await execFileSync('git', ['config', 'user.name', 'MIA QA'], { cwd: project });
-    await execFileSync('git', ['add', '.gitignore'], { cwd: project });
-    await execFileSync('git', ['commit', '-m', 'test: initialize qa fixture'], { cwd: project });
+    execFileSync('git', ['init'], { cwd: project });
+    execFileSync('git', ['config', 'user.email', 'qa@example.com'], { cwd: project });
+    execFileSync('git', ['config', 'user.name', 'MIA QA'], { cwd: project });
+    execFileSync('git', ['add', '.gitignore'], { cwd: project });
+    execFileSync('git', ['commit', '-m', 'test: initialize qa fixture'], { cwd: project });
 
-    const ctx = {
-      ...createExecutionContext(project),
-      cwd: project,
-      slug: 'qa-vc',
-    };
+    try {
+      const ctx = {
+        ...createExecutionContext(project),
+        cwd: project,
+        slug: 'qa-vc',
+      };
 
-    const result = await vcExecute(['clean'], ctx);
+      const result = await vcExecute(['clean'], ctx);
 
-    expect(result.ok).toBe(true);
-    expect(await readFile(stateFile, 'utf8')).toBe('{"keep":true}\n');
+      expect(result.ok).toBe(true);
+      expect(await readFile(stateFile, 'utf8')).toBe('{"keep":true}\n');
+    } finally {
+      await rm(project, { recursive: true, force: true });
+    }
   });
 });
