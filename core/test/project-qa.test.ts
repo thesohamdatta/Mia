@@ -49,6 +49,79 @@ describe('MIA project QA contract', () => {
     }
   });
 
+  it('keeps the package manifest aligned with the shipped Bun CLI', async () => {
+    const pkg = JSON.parse(await readFile(join(process.cwd(), 'package.json'), 'utf8')) as {
+      main: string;
+      version: string;
+      packageManager?: string;
+      dependencies?: Record<string, string>;
+      scripts: Record<string, string>;
+    };
+
+    expect(pkg.main).toBe('core/cli/index.ts');
+    expect(pkg.packageManager).toMatch(/^bun@/);
+    expect(pkg.dependencies ?? {}).toEqual({});
+    expect(pkg.scripts.build).toBeDefined();
+    expect(pkg.scripts.test).toBeDefined();
+    expect(pkg.scripts.typecheck).toBeDefined();
+    expect(pkg.scripts['lint:check']).toBeDefined();
+    expect(pkg.scripts.knip).toBeDefined();
+    expect(pkg.scripts['validate:frontmatter']).toBeDefined();
+    expect(pkg.version).toMatch(/^0\\.\\d+\\.\\d+$/);
+    expect(existsSync(join(process.cwd(), 'package-lock.json'))).toBe(false);
+  });
+
+  it('exercises the real CLI help, version, and invalid-command contracts', () => {
+    const help = execFileSync('bun', ['run', 'core/cli/index.ts', '--help'], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+    });
+
+    for (const command of [
+      'grill',
+      'plan',
+      'spec',
+      'review',
+      'ship',
+      'health',
+      'setup',
+      'learn',
+      'retro',
+      'memory',
+      'checkpoint',
+      'vc',
+    ]) {
+      expect(help).toContain(command);
+    }
+
+    const version = execFileSync('bun', ['run', 'core/cli/index.ts', '--version'], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+    });
+    expect(version).toContain('MIA v');
+
+    expect(() =>
+      execFileSync('bun', ['run', 'core/cli/index.ts', 'definitely-not-a-command'], {
+        cwd: process.cwd(),
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+    ).toThrow();
+  });
+
+  it('keeps active documentation free of removed runtime path claims', async () => {
+    for (const path of [
+      'README.md',
+      'docs/core/architecture.md',
+      'docs/reference/testing-strategy.md',
+      'docs/reference/review-standards.md',
+    ]) {
+      const content = await readFile(join(process.cwd(), path), 'utf8');
+      expect(content).not.toContain('core/daemon/');
+      expect(content).not.toContain('core/hosts/');
+    }
+  });
+
   it('resolves every declared repository verification check', () => {
     for (const name of ['typecheck', 'lint', 'unused-code', 'tests', 'build']) {
       expect(resolveVerificationChecks([name])).toHaveLength(1);
