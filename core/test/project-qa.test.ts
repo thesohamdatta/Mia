@@ -6,8 +6,8 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AGENT_SKILLS } from '../agent/surface.js';
 import { createExecutionContext } from '../context.js';
-import { skills } from '../skills/index.js';
 import { execute as checkpointExecute } from '../skills/checkpoint/execute.js';
+import { skills } from '../skills/index.js';
 import { execute as vcExecute } from '../skills/vc/execute.js';
 import { hasInjection, sanitizeForStorage } from '../state/jsonl-store.js';
 import { runVerification } from '../verification/run-checks.js';
@@ -133,7 +133,9 @@ describe('MIA project QA contract', () => {
       cwd: ROOT,
       encoding: 'utf8',
     });
-    expect(version).toContain(`MIA v${JSON.parse(readFileSync(resolve(ROOT, 'package.json'), 'utf8')).version}`);
+    expect(version).toContain(
+      `MIA v${JSON.parse(readFileSync(resolve(ROOT, 'package.json'), 'utf8')).version}`
+    );
 
     expect(() =>
       execFileSync('bun', ['run', 'core/cli/index.ts', 'definitely-not-a-command'], {
@@ -223,7 +225,10 @@ describe('MIA project QA contract', () => {
     await writeFile(generatedFile, 'generated');
 
     execFileSync('git', ['init'], { cwd: project, stdio: 'ignore' });
-    execFileSync('git', ['config', 'user.email', 'qa@example.com'], { cwd: project, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'qa@example.com'], {
+      cwd: project,
+      stdio: 'ignore',
+    });
     execFileSync('git', ['config', 'user.name', 'MIA QA'], { cwd: project, stdio: 'ignore' });
     execFileSync('git', ['add', '.gitignore'], { cwd: project, stdio: 'ignore' });
     execFileSync('git', ['commit', '-m', 'test: initialize qa fixture'], {
