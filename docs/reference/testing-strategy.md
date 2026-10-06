@@ -16,6 +16,7 @@ bun run knip
 bun run lint:md
 bun run validate:frontmatter
 bun run build
+bun run verify:binary
 ```
 
 GitHub Actions runs the supported repository checks on the `master` integration branch.
@@ -24,30 +25,21 @@ GitHub Actions runs the supported repository checks on the `master` integration 
 
 The repository keeps focused regression and integration coverage under `core/test/`.
 
-Current test files include:
+The suite covers:
 
-```text
-core/test/
-├── agent-setup.test.ts
-├── agent-surface.test.ts
-├── capability-team.test.ts
-├── integration.test.ts
-├── jsonl-store.test.ts
-├── plan-work.integration.test.ts
-├── preamble.test.ts
-├── root-plan-work.test.ts
-├── root-planning.test.ts
-├── work-journey.integration.test.ts
-├── intent-to-verified-work.e2e.test.ts
-├── work-maintenance.test.ts
-├── skill-capability.test.ts
-├── work-lifecycle.test.ts
-└── work-persistence.test.ts
-```
+- CLI, skill execution, and middleware lifecycle
+- Work lifecycle, persistence, recovery, review, and shipping gates
+- approvals and evidence
+- UnifiedStore and JSONL sanitisation
+- capability selection and admission
+- agent skill setup and unmanaged-file protection
+- documentation contracts
+- learning and maintenance flows
+- an intent-to-verified Work journey
 
-The directory also contains small legacy support modules such as `analyzer.ts`, `judge.ts`, `index.ts`, and `types.ts`. They are not themselves the current test suite.
+The dedicated `repository-qa.test.ts` adds a project-wide acceptance contract around the public CLI, package/runtime alignment, verification catalog, architecture boundaries, public agent surface, and documentation path claims.
 
-When new behaviour is added, add focused unit or integration coverage where it gives useful evidence.
+When new behaviour is added, add focused unit or integration coverage where it gives useful evidence. Use an end-to-end test when the claim crosses multiple real runtime boundaries.
 
 ## What matters most
 
@@ -81,13 +73,13 @@ Test conventional commit validation and safety-sensitive filesystem or git opera
 
 ### Agent surfaces
 
-Test generated Codex and Claude skill adapters without overwriting unmanaged user-authored skills.
+Test generated Claude and Codex skill surfaces without overwriting unmanaged user-authored skills. These are generated host-facing adapters. There is no separate `core/hosts/` runtime subsystem on the current branch.
 
 ## AI evaluation
 
-MIA has host adapters and skill metadata that can support deeper model evaluation, but the current package scripts do not expose a dedicated `eval:*` command family.
+MIA keeps deterministic repository correctness separate from model evaluation.
 
-Keep future model evaluation separate from deterministic repository gates so model variability does not obscure ordinary code regressions.
+The current package does not expose a dedicated `eval:*` command family. Future model evaluation should remain outside the ordinary CI correctness gate unless a specific deterministic benchmark becomes part of the product contract.
 
 ## CI principle
 
@@ -100,10 +92,6 @@ Do not document obsolete scripts, imaginary coverage thresholds, or historical d
 > **NO EVIDENCE = NOT COMPLETE.**
 
 A passing test suite is evidence for tested behaviour, not proof that the entire system is correct. State exactly what was checked and what was not.
-
----
-
-*Test the behaviour that matters. Keep the evidence close to the claim.*
 
 ## Intent-to-verified E2E
 
@@ -125,15 +113,13 @@ Plan → Work persistence → Review verification → Approval persistence → S
 
 The test uses real skill/state boundaries with injected verification results, so it proves lifecycle and persistence without making the repository test suite depend on an external model provider.
 
-
 ## Operate and maintain
 
 ```text
 Operational observation → maintenance Work → verification/review → ship → maintained
 ```
 
-work-maintenance.test.ts proves this seam using the existing Work lifecycle and UnifiedStore timeline. It does not require monitoring infrastructure or a background service.
-
+`work-maintenance.test.ts` proves this seam using the existing Work lifecycle and UnifiedStore timeline. It does not require monitoring infrastructure or a background service.
 
 ## Evidence-driven learning
 
