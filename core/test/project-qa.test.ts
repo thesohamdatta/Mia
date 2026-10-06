@@ -6,13 +6,12 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AGENT_SKILLS } from '../agent/surface.js';
 import { createExecutionContext } from '../context.js';
-import { hasInjection, sanitizeForStorage } from '../state/jsonl-store.js';
-import { skills } from '../skills/index.js';
 import { execute as checkpointExecute } from '../skills/checkpoint/execute.js';
+import { skills } from '../skills/index.js';
 import { execute as vcExecute } from '../skills/vc/execute.js';
-import { resolveVerificationChecks } from '../verification/suite.js';
+import { hasInjection, sanitizeForStorage } from '../state/jsonl-store.js';
 import { runVerification } from '../verification/run-checks.js';
-
+import { resolveVerificationChecks } from '../verification/suite.js';
 describe('MIA project QA contract', () => {
   it('keeps one canonical registered skill definition per command', () => {
     const names = Object.keys(skills);
