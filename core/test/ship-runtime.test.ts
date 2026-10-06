@@ -29,9 +29,7 @@ describe('Ship skill runtime', () => {
         name,
         status: 'passed' as const,
         command:
-          name === 'tests'
-            ? 'bun test'
-            : `bun run ${name === 'unused-code' ? 'knip' : name}`,
+          name === 'tests' ? 'bun test' : `bun run ${name === 'unused-code' ? 'knip' : name}`,
         durationMs: 1,
         detail: 'passed',
       })),
