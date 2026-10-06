@@ -3,8 +3,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { AGENT_SKILLS } from '../agent/surface.js';
-import { repositoryChecks } from '../verification/suite.js';
 import { listSkillDefinitions } from '../skills/index.js';
+import { repositoryChecks } from '../verification/suite.js';
 
 const ROOT = resolve(import.meta.dir, '../..');
 
