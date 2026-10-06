@@ -17,8 +17,6 @@ Keep the repository simple, deep, evolvable, explicit, and verifiable. Context i
 | Testing Strategy | [docs/reference/testing-strategy.md](docs/reference/testing-strategy.md) |
 | Review Standards | [docs/reference/review-standards.md](docs/reference/review-standards.md) |
 | Evidence Semantics | [docs/reference/evidence.md](docs/reference/evidence.md) |
-| Multi-Agent Protocol | [.agents/PROTOCOL.md](.agents/PROTOCOL.md) |
-| Multi-Agent State | [.agents/state.json](.agents/state.json) & [.agents/handoffs/](.agents/handoffs/) |
 
 ## Non-Negotiables
 
@@ -26,8 +24,8 @@ Keep the repository simple, deep, evolvable, explicit, and verifiable. Context i
 - **Single Ownership**: Preserve MIA's execution pipeline. Do not introduce duplicate stores, registries, or engines.
 - **TDD First**: `RED → GREEN → REFACTOR → VERIFY`. Fail first for new behavior or regressions.
 - **Verification Gate**: No claim without evidence. Focused test → typecheck → lint → full repo gate.
-- **Governance Pipeline**: Follow `SENTRY → PULSE → MAINTAINER → ORCHESTRATOR` sequence in [.agents/PROTOCOL.md](.agents/PROTOCOL.md).
-- **Git Discipline**: Target `master`. One writer at a time. Never force-push or self-approve. Keep PRs focused.
+- **Git Discipline**: Target `master`. Keep PRs focused. Never force-push, self-approve, or self-merge.
+- **Human Control**: Do not change repository settings, secrets, release/tag state, or deployment settings without explicit human instruction.
 
 ## Development Loop
 
