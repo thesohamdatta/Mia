@@ -81,7 +81,7 @@ Test conventional commit validation and safety-sensitive filesystem or git opera
 
 ### Agent surfaces
 
-Test generated Codex and Claude skill adapters without overwriting unmanaged user-authored skills.
+Test generated Claude and Codex skill surfaces without overwriting unmanaged user-authored skills. There is no separate runtime host-adapter subsystem on the current branch.
 
 ## AI evaluation
 
