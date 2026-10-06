@@ -30,11 +30,11 @@ describe('Repository QA contract', () => {
     expect(existsSync(resolve(ROOT, 'package-lock.json'))).toBe(false);
     expect(pkg.packageManager).toMatch(/^bun@/);
     expect(pkg.dependencies ?? {}).toEqual({});
-    expect(pkg.scripts.build).toBeDefined();
-    expect(pkg.scripts.test).toBeDefined();
-    expect(pkg.scripts.typecheck).toBeDefined();
+    expect(pkg.scripts['build']).toBeDefined();
+    expect(pkg.scripts['test']).toBeDefined();
+    expect(pkg.scripts['typecheck']).toBeDefined();
     expect(pkg.scripts['lint:check']).toBeDefined();
-    expect(pkg.scripts.knip).toBeDefined();
+    expect(pkg.scripts['knip']).toBeDefined();
     expect(pkg.scripts['validate:frontmatter']).toBeDefined();
     expect(pkg.version).toMatch(/^0\.\d+\.\d+$/);
   });
