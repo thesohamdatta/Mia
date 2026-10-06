@@ -1,7 +1,7 @@
 // VC Skill Executor - Professional git management
 // Runs: mia vc
 
-import { existsSync, readdirSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
@@ -89,7 +89,7 @@ Commands:
   sync                Pull then push current branch
   tag <version>       Create annotated tag (v1.2.3)
   release <type>      Bump version (major|minor|patch), commit, tag, push
-  clean               Remove known generated build artifacts (bin, dist, build, root *.exe)
+  clean               Remove ignored generated files under bin, dist, and build
   ignore              Show/edit .gitignore
   hooks               Install git hooks (commit-msg validation)
 
@@ -220,17 +220,24 @@ Conventional commits enforced. Clean history = happy maintainers.`,
     }
 
     case 'clean': {
-      for (const directory of ['bin', 'dist', 'build']) {
-        await rm(join(cwd, directory), { recursive: true, force: true });
+      const generatedFiles = await runGit(
+        ['ls-files', '--others', '--ignored', '--exclude-standard', '--', 'bin', 'dist', 'build'],
+        cwd
+      );
+      if (!generatedFiles.ok) {
+        return { ok: false, error: generatedFiles.output };
       }
-      if (existsSync(cwd)) {
-        for (const entry of readdirSync(cwd, { withFileTypes: true })) {
-          if (entry.isFile() && entry.name.endsWith('.exe')) {
-            await rm(join(cwd, entry.name), { force: true });
-          }
-        }
+
+      for (const relativePath of generatedFiles.output.split('\n').map((line) => line.trim()).filter(Boolean)) {
+        await rm(join(cwd, relativePath), { force: true });
       }
-      return { ok: true, output: 'Cleaned known generated build artifacts' };
+
+      return {
+        ok: true,
+        output: generatedFiles.output.trim()
+          ? 'Cleaned known generated build artifacts'
+          : 'No generated build artifacts to clean',
+      };
     }
 
     case 'ignore': {
