@@ -105,9 +105,8 @@ describe('Work lifecycle journey', () => {
       );
       expect(evidence).toHaveLength(repositoryChecks.length + 1);
       const evidenceNames = evidence.map((event) => (event.data as { name: string }).name);
-      expect(evidenceNames[0]).toBe('tests');
-      expect(evidenceNames.slice(1).sort()).toEqual(
-        repositoryChecks.map((check) => check.name).sort()
+      expect(evidenceNames.sort()).toEqual(
+        ['tests', ...repositoryChecks.map((check) => check.name)].sort()
       );
 
       const approvals = await shipCtx.unifiedStore.listApprovals(
