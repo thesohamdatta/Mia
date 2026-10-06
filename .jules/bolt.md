@@ -1,7 +1,0 @@
-## 2025-05-23 - Filesystem-based git root resolution vs process spawning
-**Learning:** Initializing execution context on every CLI invocation using synchronous process execution (`execSync('git rev-parse --show-toplevel')`) adds ~5-6ms per invocation due to subshell process spawning overhead. Traversing directories up the tree to check for `.git` using `existsSync` reduces latency to ~0.007ms (~1000x faster) while accurately identifying the working tree root.
-**Action:** Avoid spawning synchronous git subprocesses in high-frequency CLI initialization paths; use synchronous filesystem checks (`existsSync`) to locate repository boundary markers.
-
-## 2025-05-22 - Lazy reverse line parsing for JSONL store queries
-**Learning:** Appending JSONL logs for timeline/learnings history causes full-file scan operations (`readJsonl`) to scale O(N) over time. In CLI environments where every command executes a middleware query for recent events (`limit=5`), reading lines from the end of the file backwards allows parsing only the required `K` entries and terminating early (O(K)).
-**Action:** When querying the latest items from append-only log files, always scan lines backwards with filter predicates to terminate JSON parsing early once the requested limit is reached.
