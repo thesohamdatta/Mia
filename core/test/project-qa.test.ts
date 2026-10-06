@@ -23,7 +23,9 @@ describe('MIA project QA contract', () => {
       expect(definition.manifest.name).toBe(name);
       const versionParts = definition.manifest.version.split('.');
       expect(versionParts).toHaveLength(3);
-      expect(versionParts.every((part) => part.length > 0 && Number.isInteger(Number(part)))).toBe(true);
+      expect(versionParts.every((part) => part.length > 0 && Number.isInteger(Number(part)))).toBe(
+        true
+      );
       expect(definition.manifest.description.trim().length).toBeGreaterThan(0);
       expect(Array.isArray(definition.manifest.allowedTools)).toBe(true);
       expect(Array.isArray(definition.manifest.verification)).toBe(true);
