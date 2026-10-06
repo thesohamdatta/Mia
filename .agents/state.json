@@ -7,7 +7,7 @@
   "priority": "P1",
   "writer": "orchestrator",
   "blocked_reason": null,
-  "verification_commit": "6f8b4455deae08f62c901c662381a78e5b3ceca4",
+  "verification_commit": "c8522e1653f687e3d24197021771e00a394b9ccb",
   "stages": {
     "sentry": {
       "status": "complete",
@@ -27,5 +27,5 @@
     }
   },
   "last_updated_by": "orchestrator",
-  "notes": "Cycle-007 reconciled against current master. Runtime cleanup merged via #102. Full post-merge repository verification and issue #100 real-host acceptance remain the next CLI-readiness gates."
+  "notes": "Cycle-007 is reconciled against current master. PR #102 and the current-base AGENTS router fix #126 are merged. Fresh CI run #359 passed on c8522e1. Issue #100 remains the real Claude/Codex host acceptance gate."
 }
