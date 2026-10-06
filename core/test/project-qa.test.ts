@@ -109,9 +109,13 @@ describe('MIA project QA contract', () => {
     const project = await mkdtemp(join(tmpdir(), 'mia-qa-vc-'));
     const stateDir = join(project, '.mia');
     const stateFile = join(stateDir, 'important-state.json');
+    const generatedDir = join(project, 'bin');
+    const generatedFile = join(generatedDir, 'generated.txt');
     await mkdir(stateDir, { recursive: true });
+    await mkdir(generatedDir, { recursive: true });
     await writeFile(join(project, '.gitignore'), '.mia/\nnode_modules/\nbin/\ndist/\n');
     await writeFile(stateFile, '{"keep":true}\n');
+    await writeFile(generatedFile, 'generated');
     execFileSync('git', ['init'], { cwd: project });
     execFileSync('git', ['config', 'user.email', 'qa@example.com'], { cwd: project });
     execFileSync('git', ['config', 'user.name', 'MIA QA'], { cwd: project });
@@ -129,6 +133,7 @@ describe('MIA project QA contract', () => {
 
       expect(result.ok).toBe(true);
       expect(await readFile(stateFile, 'utf8')).toBe('{"keep":true}\n');
+      expect(existsSync(generatedFile)).toBe(false);
     } finally {
       await rm(project, { recursive: true, force: true });
     }
