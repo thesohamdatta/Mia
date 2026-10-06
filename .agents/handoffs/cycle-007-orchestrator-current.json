@@ -3,9 +3,7 @@
   "integration_branch": "master",
   "verification_commit": "6f8b4455deae08f62c901c662381a78e5b3ceca4",
   "objective": "Reconcile cycle-007 against the current integration branch after the core-boundary merge.",
-  "scope": [
-    "cycle coordination metadata only"
-  ],
+  "scope": ["cycle coordination metadata only"],
   "findings": [
     "The prior orchestrator snapshot was stale and was superseded rather than merged.",
     "PR #102 is merged and contains the substantive runtime cleanup.",
@@ -16,9 +14,7 @@
     "Current master contains the merged PR #102 plus documentation-only agent governance commits.",
     "No stale cycle-007 PR remains active."
   ],
-  "blocking_issues": [
-    "Issue #100 remains open as the real Claude/Codex host acceptance gate."
-  ],
+  "blocking_issues": ["Issue #100 remains open as the real Claude/Codex host acceptance gate."],
   "remaining_uncertainty": [
     "A fresh full repository gate has not been executed on the post-merge master commit in this connector session."
   ],
