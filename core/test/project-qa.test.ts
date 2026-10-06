@@ -55,7 +55,14 @@ describe('MIA project QA contract', () => {
       version: string;
       packageManager?: string;
       dependencies?: Record<string, string>;
-      scripts: Record<string, string>;
+      scripts: {
+        build: string;
+        test: string;
+        typecheck: string;
+        knip: string;
+        'lint:check': string;
+        'validate:frontmatter': string;
+      };
     };
 
     expect(pkg.main).toBe('core/cli/index.ts');
