@@ -10,6 +10,7 @@ import { skills } from '../skills/index.js';
 import { execute as checkpointExecute } from '../skills/checkpoint/execute.js';
 import { execute as vcExecute } from '../skills/vc/execute.js';
 import { hasInjection, sanitizeForStorage } from '../state/jsonl-store.js';
+import { runVerification } from '../verification/run-checks.js';
 import { repositoryChecks, resolveVerificationChecks } from '../verification/suite.js';
 
 const ROOT = resolve(import.meta.dir, '../..');
