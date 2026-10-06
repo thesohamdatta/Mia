@@ -57,6 +57,16 @@ function bumpVersion(version: string, type: 'major' | 'minor' | 'patch'): string
   }
 }
 
+async function isCleanWorkingTree(cwd: string): Promise<boolean> {
+  const res = await runGit(['status', '--porcelain'], cwd);
+  return res.ok && res.output.trim() === '';
+}
+
+async function getCurrentBranch(cwd: string): Promise<string> {
+  const res = await runGit(['branch', '--show-current'], cwd);
+  return res.ok ? res.output.trim() : '';
+}
+
 async function updatePackageVersion(newVersion: string, cwd: string): Promise<void> {
   const pkgPath = join(cwd, 'package.json');
   const pkg = await Bun.file(pkgPath).json();
@@ -85,9 +95,9 @@ Commands:
   amend               Amend last commit (edit message, add staged)
   log [n]             Show last n commits (default 10)
   branch [name]       List branches or create/switch to new branch
-  sync                Pull then push current branch
+  sync                Show guarded sync instructions; use --apply to pull then push
   tag <version>       Create annotated tag (v1.2.3)
-  release <type>      Bump version (major|minor|patch), commit, tag, push
+  release <type>      Bump version on clean master, commit, tag, push
   clean               Remove untracked build artifacts (node_modules, *.exe)
   ignore              Show/edit .gitignore
   hooks               Install git hooks (commit-msg validation)
@@ -95,11 +105,11 @@ Commands:
 Examples:
   mia vc commit "feat(cli): add direct execution"
   mia vc commit "fix(config): simplify paths"
-  mia vc release patch
+  mia vc sync --apply\n  mia vc release patch
   mia vc branch feature/skill-system
   mia vc tag v1.0.0
 
-Conventional commits enforced. Clean history = happy maintainers.`,
+Conventional commits enforced. Sync and release operations require explicit safety preconditions.`,
       };
     }
 
@@ -126,7 +136,7 @@ Conventional commits enforced. Clean history = happy maintainers.`,
         };
       const valid = validateConventionalCommit(msg);
       if (!valid.valid) return { ok: false, error: valid.error };
-      const addRes = await runGit(['add', '-A'], cwd);
+      const addRes = await runGit(['add', '-u'], cwd);
       if (!addRes.ok) return { ok: false, error: addRes.output };
       const commitRes = await runGit(['commit', '-m', msg], cwd);
       return {
@@ -144,7 +154,7 @@ Conventional commits enforced. Clean history = happy maintainers.`,
         if (!valid.valid) return { ok: false, error: valid.error };
         commitArgs.splice(2, 0, '-m', msg);
       }
-      const addRes = await runGit(['add', '-A'], cwd);
+      const addRes = await runGit(['add', '-u'], cwd);
       if (!addRes.ok) return { ok: false, error: addRes.output };
       const commitRes = await runGit(commitArgs, cwd);
       return {
@@ -170,6 +180,12 @@ Conventional commits enforced. Clean history = happy maintainers.`,
     }
 
     case 'sync': {
+      if (args[1] !== '--apply') {
+        return {
+          ok: true,
+          output: 'Sync is guarded. Review the current branch, then run \'mia vc sync --apply\' to pull --rebase and push.',
+        };
+      }
       const pullRes = await runGit(['pull', '--rebase'], cwd);
       if (!pullRes.ok) return { ok: false, error: `Pull failed: ${pullRes.output}` };
       const pushRes = await runGit(['push'], cwd);
@@ -200,6 +216,12 @@ Conventional commits enforced. Clean history = happy maintainers.`,
       const type = args[1] as 'major' | 'minor' | 'patch';
       if (!['major', 'minor', 'patch'].includes(type))
         return { ok: false, error: 'Release type required: major, minor, or patch' };
+      if (!(await isCleanWorkingTree(cwd))) {
+        return { ok: false, error: 'Release requires a clean working tree.' };
+      }
+      if ((await getCurrentBranch(cwd)) !== 'master') {
+        return { ok: false, error: 'Release requires the canonical master branch.' };
+      }
       const current = await getCurrentVersion(cwd);
       const next = bumpVersion(current, type);
       const tag = `v${next}`;
