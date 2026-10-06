@@ -34,6 +34,14 @@ describe('MIA project QA contract', () => {
     for (const name of AGENT_SKILLS) {
       const definition = skills[name];
       expect(definition?.manifest.invocation).toBe('both');
+      for (const adapterPath of [
+        `.claude/skills/${name}/SKILL.md`,
+        `.agents/skills/${name}/SKILL.md`,
+      ]) {
+        const adapter = await readFile(join(process.cwd(), adapterPath), 'utf8');
+        expect(adapter).toContain(`invocation: ${definition?.manifest.invocation}`);
+        expect(adapter).toContain('<!-- MIA-MANAGED-SKILL -->');
+      }
     }
   });
 
