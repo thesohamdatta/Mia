@@ -23,18 +23,25 @@ describe('Repository QA contract', () => {
       main: string;
       packageManager?: string;
       dependencies?: Record<string, string>;
-      scripts: Record<string, string>;
+      scripts: {
+        build: string;
+        test: string;
+        typecheck: string;
+        knip: string;
+        'lint:check': string;
+        'validate:frontmatter': string;
+      } & Record<string, string>;
     };
 
     expect(pkg.main).toBe('core/cli/index.ts');
     expect(existsSync(resolve(ROOT, 'package-lock.json'))).toBe(false);
     expect(pkg.packageManager).toMatch(/^bun@/);
     expect(pkg.dependencies ?? {}).toEqual({});
-    expect(pkg.scripts['build']).toBeDefined();
-    expect(pkg.scripts['test']).toBeDefined();
-    expect(pkg.scripts['typecheck']).toBeDefined();
+    expect(pkg.scripts.build).toBeDefined();
+    expect(pkg.scripts.test).toBeDefined();
+    expect(pkg.scripts.typecheck).toBeDefined();
     expect(pkg.scripts['lint:check']).toBeDefined();
-    expect(pkg.scripts['knip']).toBeDefined();
+    expect(pkg.scripts.knip).toBeDefined();
     expect(pkg.scripts['validate:frontmatter']).toBeDefined();
     expect(pkg.version).toMatch(/^0\.\d+\.\d+$/);
   });
