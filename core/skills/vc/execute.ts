@@ -1,6 +1,9 @@
 // VC Skill Executor - Professional git management
 // Runs: mia vc
 
+import { existsSync, readdirSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
 const _CONVENTIONAL_TYPES = [
@@ -64,8 +67,6 @@ async function updatePackageVersion(newVersion: string, cwd: string): Promise<vo
   await Bun.write(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 
-import { join } from 'node:path';
-
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'help';
   const cwd = ctx.cwd;
@@ -88,7 +89,7 @@ Commands:
   sync                Pull then push current branch
   tag <version>       Create annotated tag (v1.2.3)
   release <type>      Bump version (major|minor|patch), commit, tag, push
-  clean               Remove known generated build artifacts (bin, dist, build, *.exe)
+  clean               Remove known generated build artifacts (bin, dist, build, root *.exe)
   ignore              Show/edit .gitignore
   hooks               Install git hooks (commit-msg validation)
 
@@ -219,8 +220,17 @@ Conventional commits enforced. Clean history = happy maintainers.`,
     }
 
     case 'clean': {
-      const res = await runGit(['clean', '-fdX', '--', 'bin', 'dist', 'build', '*.exe'], cwd);
-      return { ok: res.ok, output: res.output || 'Cleaned known generated build artifacts' };
+      for (const directory of ['bin', 'dist', 'build']) {
+        await rm(join(cwd, directory), { recursive: true, force: true });
+      }
+      if (existsSync(cwd)) {
+        for (const entry of readdirSync(cwd, { withFileTypes: true })) {
+          if (entry.isFile() && entry.name.endsWith('.exe')) {
+            await rm(join(cwd, entry.name), { force: true });
+          }
+        }
+      }
+      return { ok: true, output: 'Cleaned known generated build artifacts' };
     }
 
     case 'ignore': {
