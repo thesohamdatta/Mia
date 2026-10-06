@@ -22,10 +22,11 @@ Review in this order:
 
 ## Architecture
 
-- Keep CLI, context, middleware, skills, state, config, and host adapters separated.
+- Keep CLI, context, middleware, skills, state, config, and generated host-facing adapters separated by responsibility.
 - Do not reintroduce HTTP or a daemon just to make local execution look more sophisticated.
 - Prefer deep modules and explicit interfaces.
 - Record significant one-way architectural decisions in an ADR.
+- Do not create a runtime host-adapter subsystem when the product only needs generated host-facing skill files.
 
 ## Maintainability
 
@@ -44,6 +45,7 @@ Match the test to the behaviour:
 | Pure deterministic logic | focused unit test |
 | Skill + state interaction | integration test |
 | CLI journey | end-to-end test when justified |
+| Repository contract | project-wide QA contract test |
 | Documentation contract | markdown/link/frontmatter validation |
 
 Do not require a test layer that the behaviour does not need.
@@ -79,6 +81,7 @@ bun run typecheck
 bun run lint:check
 bun run knip
 bun run build
+bun run verify:binary
 ```
 
 Add documentation validation when Markdown changed.
