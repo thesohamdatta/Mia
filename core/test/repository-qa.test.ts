@@ -27,6 +27,7 @@ describe('Repository QA contract', () => {
     };
 
     expect(pkg.main).toBe('core/cli/index.ts');
+    expect(existsSync(resolve(ROOT, 'package-lock.json'))).toBe(false);
     expect(pkg.packageManager).toMatch(/^bun@/);
     expect(pkg.dependencies ?? {}).toEqual({});
     expect(pkg.scripts.build).toBeDefined();
