@@ -12,6 +12,7 @@ import { execute as vcExecute } from '../skills/vc/execute.js';
 import { hasInjection, sanitizeForStorage } from '../state/jsonl-store.js';
 import { runVerification } from '../verification/run-checks.js';
 import { resolveVerificationChecks } from '../verification/suite.js';
+
 describe('MIA project QA contract', () => {
   it('keeps one canonical registered skill definition per command', () => {
     const names = Object.keys(skills);
