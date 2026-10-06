@@ -16,9 +16,7 @@ export function shipWork(work: Work, requiredVerificationNames: readonly string[
     (name) => evidenceByName.get(name)?.status !== 'passed'
   );
   if (missingVerification.length > 0) {
-    throw new Error(
-      `Work verification is incomplete: ${missingVerification.join(', ')}`
-    );
+    throw new Error(`Work verification is incomplete: ${missingVerification.join(', ')}`);
   }
 
   if (
