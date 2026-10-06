@@ -138,7 +138,7 @@ Fill out the PR template when one is provided:
 core/       # Runtime and executable skills
 scripts/    # Build and documentation tooling
 docs/       # Canonical and historical documentation
-.agents/    # Agent coordination state and handoffs
+.agents/    # Generated local agent skill surface
 .github/    # CI workflows
 ```
 
