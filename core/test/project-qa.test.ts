@@ -28,7 +28,7 @@ describe('MIA project QA contract', () => {
     }
   });
 
-  it('keeps the public agent surface intentionally small', () => {
+  it('keeps the public agent surface intentionally small', async () => {
     expect(AGENT_SKILLS).toEqual(['plan', 'review', 'ship']);
 
     for (const name of AGENT_SKILLS) {
