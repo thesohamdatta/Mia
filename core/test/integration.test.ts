@@ -99,7 +99,15 @@ describe('Integration: CLI -> Skill -> Store', () => {
     expect(definition).toBeDefined();
     if (!definition) throw new Error('vc definition not found');
 
+    await Bun.write(join(testDir, 'tracked.txt'), 'initial');
+    const { execSync } = require('node:child_process');
+    execSync('git add tracked.txt && git commit -m "test: seed tracked file"', {
+      cwd: testDir,
+      stdio: 'ignore',
+    });
     await Bun.write(join(testDir, 'tracked.txt'), 'tracked change');
+    await Bun.write(join(testDir, 'untracked.txt'), 'local-only');
+
     const result = await executeSkillDefinition(
       definition,
       ['commit', 'fix(test): commit tracked changes'],
@@ -107,76 +115,9 @@ describe('Integration: CLI -> Skill -> Store', () => {
     );
 
     expect(result.ok).toBe(true);
-    const status = await Bun.import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { createExecutionContext } from '../context.js';
-import { executeSkillDefinition } from '../skills/executor.js';
-import { getSkill, listSkillDefinitions, listSkills } from '../skills/index.js';
-import { createUnifiedStore } from '../state/unified-store.js';
-
-describe('Integration: CLI -> Skill -> Store', () => {
-  let testDir: string;
-  let originalCwd: string;
-
-  beforeEach(() => {
-    originalCwd = process.cwd();
-    testDir = mkdtempSync(join(tmpdir(), 'mia-test-'));
-    process.chdir(testDir);
-
-    const { execSync } = require('node:child_process');
-    execSync('git init', { cwd: testDir, stdio: 'ignore' });
-    execSync('git config user.email "test@test.com"', { cwd: testDir, stdio: 'ignore' });
-    execSync('git config user.name "Test"', { cwd: testDir, stdio: 'ignore' });
-    execSync('git commit --allow-empty -m "initial"', { cwd: testDir, stdio: 'ignore' });
-  });
-
-  afterEach(() => {
-    process.chdir(originalCwd);
-    rmSync(testDir, { recursive: true, force: true });
-  });
-
-  it('should list all registered skills', () => {
-    const skills = listSkills();
-    expect(skills.length).toBeGreaterThanOrEqual(11);
-    expect(skills).toContain('grill');
-    expect(skills).toContain('plan');
-    expect(skills).toContain('spec');
-    expect(skills).toContain('ship');
-    expect(skills).toContain('health');
-    expect(skills).toContain('learn');
-    expect(skills).toContain('retro');
-    expect(skills).toContain('memory');
-    expect(skills).toContain('checkpoint');
-    expect(skills).toContain('review');
-    expect(skills).toContain('vc');
-    expect(skills).toContain('setup');
-  });
-
-  it('should execute setup skill through the normal skill path', async () => {
-    const ctx = createExecutionContext();
-    const definition = getSkill('setup');
-
-    expect(definition).toBeDefined();
-    if (!definition) throw new Error('setup definition not found');
-
-    const result = await executeSkillDefinition(definition, [], ctx);
-
-    expect(result.ok).toBe(true);
-    expect(result.output).toContain('claude: generated plan, review, ship');
-    expect(result.output).toContain('codex: generated plan, review, ship');
-    expect(await Bun.file(join(ctx.cwd, '.agents', 'skills', 'plan', 'SKILL.md')).exists()).toBe(
-      true
-    );
-    expect(await Bun.file(join(ctx.cwd, '.claude', 'skills', 'ship', 'SKILL.md')).exists()).toBe(
-      true
-    );
-  });
-
-git status --short`.cwd(testDir).text();
-    expect(status).toContain('??');
-    expect(status).toContain('tracked.txt');
+    const status = execSync('git status --short', { cwd: testDir, encoding: 'utf8' });
+    expect(status).toContain('?? untracked.txt');
+    expect(status).not.toContain('tracked.txt');
   });
 
   it('should execute vc skill through validated CLI path', async () => {
