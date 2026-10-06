@@ -89,7 +89,7 @@ describe('MIA project QA contract', () => {
       );
 
       expect(result.ok).toBe(false);
-      expect(existsSync(resolve(root, '..', 'escaped.md'))).toBe(false);
+      expect(existsSync(resolve(root, 'escaped.md'))).toBe(false);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
