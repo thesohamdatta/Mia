@@ -8,8 +8,8 @@ import { createExecutionContext } from '../context.js';
 import { createRootPlan } from '../root/types.js';
 import { execute as executeReview } from '../skills/review/execute.js';
 import { execute as executeShip } from '../skills/ship/execute.js';
-import { createWorkFromRootPlan } from '../work/from-root-plan.js';
 import { repositoryChecks } from '../verification/suite.js';
+import { createWorkFromRootPlan } from '../work/from-root-plan.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 
 function context(testDir: string) {
