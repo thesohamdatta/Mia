@@ -18,6 +18,7 @@ Core skills:
   review      Pre-landing PR review
   health      Code quality dashboard
   setup       Install MIA agent skills for supported hosts
+  vc          Work with git status, commits, branches, tags, releases, and hooks
 
 Learning skills:
   learn       Manage project learnings (list, add)
