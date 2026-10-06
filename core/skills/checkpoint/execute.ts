@@ -26,7 +26,11 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     try {
       name = validateCheckpointName(args[1] || `checkpoint-${Date.now()}`);
     } catch (error) {
-      return { ok: false, status: 'blocked', error: error instanceof Error ? error.message : String(error) };
+      return {
+        ok: false,
+        status: 'blocked',
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
     const summary = args.slice(2).join(' ').trim();
     if (!summary) {
@@ -71,7 +75,11 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     try {
       name = validateCheckpointName(args[1]);
     } catch (error) {
-      return { ok: false, status: 'blocked', error: error instanceof Error ? error.message : String(error) };
+      return {
+        ok: false,
+        status: 'blocked',
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
     const file = join(checkpointDir, `${name}.md`);
     if (!existsSync(file)) {
