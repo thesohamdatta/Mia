@@ -1,23 +1,24 @@
 {
   "cycle": "cycle-007",
   "integration_branch": "master",
-  "verification_commit": "6f8b4455deae08f62c901c662381a78e5b3ceca4",
-  "objective": "Reconcile cycle-007 against the current integration branch after the core-boundary merge.",
+  "verification_commit": "c8522e1653f687e3d24197021771e00a394b9ccb",
+  "objective": "Reconcile cycle-007 against the current integration branch and leave one authoritative verification record.",
   "scope": ["cycle coordination metadata only"],
   "findings": [
-    "The prior orchestrator snapshot was stale and was superseded rather than merged.",
-    "PR #102 is merged and contains the substantive runtime cleanup.",
-    "Current master contains no additional runtime changes after that merge."
+    "PR #102 is merged and contains the core runtime boundary cleanup.",
+    "PR #126 is merged and restores the AGENTS Layer 0 router contract plus handoff formatting.",
+    "Stale and duplicate open PRs targeting legacy main or duplicating #126 were closed after review.",
+    "Current master has a fresh successful CI run on c8522e1."
   ],
   "checks": [
-    "PR #102 GitHub verification was green before merge.",
-    "Current master contains the merged PR #102 plus documentation-only agent governance commits.",
-    "No stale cycle-007 PR remains active."
+    "CI run #359 passed on c8522e1653f687e3d24197021771e00a394b9ccb.",
+    "All configured CI validation stages completed successfully.",
+    "No open pull requests remain in the repository."
   ],
   "blocking_issues": ["Issue #100 remains open as the real Claude/Codex host acceptance gate."],
   "remaining_uncertainty": [
-    "A fresh full repository gate has not been executed on the post-merge master commit in this connector session."
+    "Real external Claude/Codex host invocation is still unproven in repository evidence."
   ],
-  "recommended_next_action": "Run the full repository gate and execute issue #100 before declaring CLI migration complete.",
+  "recommended_next_action": "Execute issue #100 against a supported real host, then reassess the remaining MVP gaps from the verified master state.",
   "status": "COMPLETE"
 }
