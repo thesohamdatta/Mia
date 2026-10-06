@@ -21,7 +21,9 @@ describe('MIA project QA contract', () => {
 
     for (const [name, definition] of Object.entries(skills)) {
       expect(definition.manifest.name).toBe(name);
-      expect(definition.manifest.version).toMatch(/^\\d+\\.\\d+\\.\\d+/);
+      const versionParts = definition.manifest.version.split('.');
+      expect(versionParts).toHaveLength(3);
+      expect(versionParts.every((part) => part.length > 0 && Number.isInteger(Number(part)))).toBe(true);
       expect(definition.manifest.description.trim().length).toBeGreaterThan(0);
       expect(Array.isArray(definition.manifest.allowedTools)).toBe(true);
       expect(Array.isArray(definition.manifest.verification)).toBe(true);
