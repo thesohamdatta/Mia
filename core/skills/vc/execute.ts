@@ -1,7 +1,6 @@
 // VC Skill Executor - Professional git management
 // Runs: mia vc
 
-import { readdirSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
@@ -228,7 +227,10 @@ Conventional commits enforced. Clean history = happy maintainers.`,
         return { ok: false, error: generatedFiles.output };
       }
 
-      for (const relativePath of generatedFiles.output.split('\n').map((line) => line.trim()).filter(Boolean)) {
+      for (const relativePath of generatedFiles.output
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)) {
         await rm(join(cwd, relativePath), { force: true });
       }
 
