@@ -10,7 +10,7 @@ managed-by: mia
 name: plan
 description: "Create an explicit implementation plan"
 version: 1.0.0
-invocation: model
+invocation: both
 phase: plan
 side-effects: local-write
 ---
