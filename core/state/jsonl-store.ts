@@ -6,15 +6,12 @@ export const INJECTION_PATTERNS: readonly RegExp[] = [
   /you\s+are\s+now\s+/i,
   /always\s+output\s+no\s+findings/i,
   /skip\s+(all\s+)?(security|review|checks)/i,
-  /override[:\\s]/i,
-  /\\bsystem\\s*:/i,
-  /\\bassistant\\s*:/i,
-  /\\buser\\s*:/i,
-  /\\bhuman\\s*:/i,
-  /disregard\\s+(all\\s+)?(previous|above|prior)/i,
-  /from\\s+now\\s+on\\b/i,
-  /do\\s+not\\s+(report|flag|mention)/i,
-  /approve\\s+(all|every|this)/i,
+  /override(?:\s|:)/i,
+  /\b(?:system|assistant|user|human)\s*:/i,
+  /disregard\s+(all\s+)?(previous|above|prior)/i,
+  /from\s+now\s+on\b/i,
+  /do\s+not\s+(report|flag|mention)/i,
+  /approve\s+(all|every|this)/i,
 ];
 
 export function hasInjection(text: string): boolean {
@@ -86,11 +83,6 @@ export function readJsonl<T = unknown>(path: string): T[] {
   return out;
 }
 
-/**
- * Reads the tail (most recent entries) from a JSONL file by iterating backwards from the end.
- * Lazy JSON parsing and early termination reduce time complexity from O(N) full file parse to O(K)
- * where K is the requested limit of matching records.
- */
 export function readJsonlTail<T = unknown>(
   path: string,
   limit: number,
@@ -108,9 +100,6 @@ export function readJsonlTail<T = unknown>(
   const out: T[] = [];
   let end = raw.length;
 
-  // Optimize: Iterate backwards using lastIndexOf to slice lines on demand.
-  // This avoids raw.split('\n') which allocates an O(N) array of all line strings in memory,
-  // reducing memory allocations from O(N) to O(K) where K is the number of inspected tail entries.
   while (end > 0 && out.length < limit) {
     const start = raw.lastIndexOf('\n', end - 1);
     const line = start === -1 ? raw.slice(0, end) : raw.slice(start + 1, end);
