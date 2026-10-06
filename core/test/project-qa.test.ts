@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -65,11 +65,11 @@ describe('MIA project QA contract', () => {
     expect(pkg.main).toBe('core/cli/index.ts');
     expect(pkg.packageManager).toMatch(/^bun@/);
     expect(pkg.dependencies ?? {}).toEqual({});
-    expect(pkg.scripts.build).toBeDefined();
-    expect(pkg.scripts.test).toBeDefined();
-    expect(pkg.scripts.typecheck).toBeDefined();
+    expect(pkg.scripts['build']).toBeDefined();
+    expect(pkg.scripts['test']).toBeDefined();
+    expect(pkg.scripts['typecheck']).toBeDefined();
     expect(pkg.scripts['lint:check']).toBeDefined();
-    expect(pkg.scripts.knip).toBeDefined();
+    expect(pkg.scripts['knip']).toBeDefined();
     expect(pkg.scripts['validate:frontmatter']).toBeDefined();
     expect(pkg.version).toMatch(/^0\.\d+\.\d+$/);
     expect(existsSync(join(ROOT, 'package-lock.json'))).toBe(false);
