@@ -57,8 +57,15 @@ describe('Repository QA contract', () => {
 
     for (const check of repositoryChecks) {
       expect(check.command[0]).toBe('bun');
+
+      if (check.command[1] === 'test') {
+        expect(check.command).toEqual(['bun', 'test']);
+        continue;
+      }
+
       expect(check.command[1]).toBe('run');
-      expect(pkg.scripts[check.command[2] ?? '']).toBeDefined();
+      expect(check.command[2]).toBeDefined();
+      expect(pkg.scripts[check.command[2] as keyof typeof pkg.scripts]).toBeDefined();
     }
   });
 
@@ -79,12 +86,22 @@ describe('Repository QA contract', () => {
     });
 
     expect(help).toContain('MIA (Machine Intelligence Architecture) CLI');
-    expect(help).toContain('plan');
-    expect(help).toContain('review');
-    expect(help).toContain('ship');
-    expect(help).toContain('setup');
-    expect(help).toContain('health');
-    expect(help).toContain('vc');
+    for (const command of [
+      'grill',
+      'plan',
+      'spec',
+      'review',
+      'ship',
+      'health',
+      'setup',
+      'learn',
+      'retro',
+      'memory',
+      'checkpoint',
+      'vc',
+    ]) {
+      expect(help).toContain(command);
+    }
 
     const version = execFileSync('bun', ['run', 'core/cli/index.ts', '--version'], {
       cwd: ROOT,
