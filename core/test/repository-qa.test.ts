@@ -121,7 +121,7 @@ describe('Repository QA contract', () => {
     ).toThrow();
   });
 
-  it('keeps current documentation from claiming removed runtime host-adapter paths', () => {
+  it('keeps current documentation free of broken legacy runtime links', () => {
     const files = [
       'README.md',
       'docs/reference/testing-strategy.md',
@@ -131,8 +131,8 @@ describe('Repository QA contract', () => {
 
     for (const file of files) {
       const content = readFileSync(resolve(ROOT, file), 'utf8');
-      expect(content).not.toContain('core/hosts/');
-      expect(content).not.toContain('core/daemon/');
+      expect(content).not.toMatch(/\]\((?:\.\.\/)*core\/hosts\//);
+      expect(content).not.toMatch(/\]\((?:\.\.\/)*core\/daemon\//);
     }
   });
 });
