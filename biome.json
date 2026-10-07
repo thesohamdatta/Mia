@@ -41,6 +41,19 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "build", "bin", "*.exe", ".git", ".husky", ".claude"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "build",
+      "bin",
+      "*.exe",
+      ".git",
+      ".husky",
+      ".claude",
+      ".venv",
+      "**/.venv",
+      "__pycache__",
+      "**/__pycache__"
+    ]
   }
 }
