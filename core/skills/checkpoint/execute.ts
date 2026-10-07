@@ -6,6 +6,15 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
+function validateCheckpointName(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error('Checkpoint name is required');
+  if (trimmed === '.' || trimmed === '..' || /[\\/\0]/.test(trimmed)) {
+    throw new Error('Checkpoint name must be a single safe filename');
+  }
+  return trimmed;
+}
+
 // JSON string escaping is a valid YAML double-quoted scalar, so this keeps
 // summaries containing colons, quotes, hashes or newlines inside the value.
 function yamlScalar(value: string): string {
@@ -19,7 +28,16 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   mkdirSync(checkpointDir, { recursive: true });
 
   if (subcmd === 'save') {
-    const name = args[1] || `checkpoint-${Date.now()}`;
+    let name: string;
+    try {
+      name = validateCheckpointName(args[1] || `checkpoint-${Date.now()}`);
+    } catch (error) {
+      return {
+        ok: false,
+        status: 'blocked',
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
     const summary = args.slice(2).join(' ').trim();
     if (!summary) {
       return { ok: false, status: 'blocked', error: 'Checkpoint summary required.' };
@@ -56,9 +74,18 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   }
 
   if (subcmd === 'load') {
-    const name = args[1];
-    if (!name) {
+    if (!args[1]) {
       return { ok: false, error: 'Usage: mia checkpoint load <name>' };
+    }
+    let name: string;
+    try {
+      name = validateCheckpointName(args[1]);
+    } catch (error) {
+      return {
+        ok: false,
+        status: 'blocked',
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
     const file = join(checkpointDir, `${name}.md`);
     if (!existsSync(file)) {
