@@ -1,33 +1,10 @@
 import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
 import { getSkill, listSkills } from '../skills/index.js';
+import { formatHelp } from './help.js';
 
 function showHelp(): void {
-  console.log(`MIA (Machine Intelligence Architecture) CLI
-Version: 0.3.0
-
-Usage: mia <skill> [args...]
-
-Core skills:
-  help        Show this help message
-  version     Show MIA version
-  grill       Start a clarification interview (golden rule enforcement)
-  plan        Create a verifiable plan with success criteria
-  spec        Turn intent into PRD → issues
-  ship        Run shipping verification and handoff
-  review      Pre-landing PR review
-  health      Code quality dashboard
-  setup       Install MIA agent skills for supported hosts
-
-Learning skills:
-  learn       Manage project learnings (list, add)
-  retro       Weekly retrospective with timeline + learnings
-  memory      Read/write long-term memory (~/.mia/memory.md)
-  checkpoint  Save/resume working state
-
-Run 'mia <skill> --help' for skill-specific usage.
-
-~ maximum value per line ~`);
+  console.log(formatHelp());
 }
 
 function showVersion(): void {
@@ -85,4 +62,6 @@ async function main(): Promise<void> {
   }
 }
 
-main();
+if (import.meta.main) {
+  main();
+}
