@@ -47,6 +47,14 @@ coverage/
 !.mia/skills/  # Keep built-in skills
 .claude/
 
+# Matt Pocock skills (installed locally via `npx skills`, not committed)
+.agents/skills/*
+!.agents/skills/Mia/
+!.agents/skills/plan/
+!.agents/skills/review/
+!.agents/skills/ship/
+skills-lock.json
+
 # Temporary files
 *.tmp
 *.temp
