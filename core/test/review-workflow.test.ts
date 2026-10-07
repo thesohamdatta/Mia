@@ -136,4 +136,50 @@ describe('Review skill runtime', () => {
       evidence: [{ runId: 'run-review', name: 'tests', status: 'failed' }],
     });
   });
+
+  it('blocks review when declared success criteria are not attested', async () => {
+    const ctx = context();
+    let work = createWork({
+      objective: 'Build X',
+      successCriteria: ['Criterion 1', 'Criterion 2'],
+    });
+    work = transitionWork(transitionWork(work, 'specified'), 'planned');
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+    const result = await execute([work.id], ctx, async () => passedVerification());
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe('Review criteria verification failed');
+    expect(result.output).toContain('BLOCKED: Success criteria require verification evidence');
+    expect(result.output).toContain('CRITERIA:');
+    expect(result.output).toContain('UNVERIFIED Criterion 1');
+
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
+    expect(restored?.state).toBe('in_progress');
+  });
+
+  it('passes review and transitions to ready_to_ship with --attest-all', async () => {
+    const ctx = context();
+    let work = createWork({
+      objective: 'Build X',
+      successCriteria: ['Criterion 1', 'Criterion 2'],
+    });
+    work = transitionWork(transitionWork(work, 'specified'), 'planned');
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+    const result = await execute([work.id, '--attest-all'], ctx, async () => passedVerification());
+
+    expect(result.ok).toBe(true);
+    expect(result.output).toContain('READY_TO_SHIP');
+    expect(result.output).toContain('CRITERIA:');
+    expect(result.output).toContain('PASS Criterion 1');
+    expect(result.output).toContain('PASS Criterion 2');
+
+    const restored = await loadWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id);
+    expect(restored?.state).toBe('ready_to_ship');
+    expect(restored?.verification?.criteria).toEqual([
+      { criterion: 'Criterion 1', status: 'passed' },
+      { criterion: 'Criterion 2', status: 'passed' },
+    ]);
+  });
 });
