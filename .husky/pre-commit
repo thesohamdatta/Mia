@@ -1,21 +1,40 @@
 #!/usr/bin/env sh
+set -e
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Pre-commit hook - runs on every commit
-# Runs fast checks: linting, formatting, type checking
+# Fast checks: formatting, linting, type checking, docs.
+#
+# Formatting is applied and the fixes are re-staged, so a commit never records
+# a file that still fails the check it just ran.
 
 echo "🔍 Running pre-commit checks..."
 
-# Run biome lint and format check
-echo "📝 Checking code style with Biome..."
-bunx biome check --write --unsafe .
+# Format and lint staged files only, with safe fixes only. Restricting to
+# Biome-supported extensions keeps the hook from failing when a commit touches
+# only shell/markdown files, and staged-only keeps it from mutating unrelated
+# work-in-progress files.
+STAGED="$(git diff --cached --name-only --diff-filter=ACMR -- \
+  '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs' '*.json' '*.jsonc' '*.css')"
+if [ -n "$STAGED" ]; then
+  echo "📝 Checking and formatting staged files with Biome..."
+  # shellcheck disable=SC2086
+  bunx biome check --write $STAGED
+  # Re-stage so fixes land in the commit instead of being discarded.
+  # shellcheck disable=SC2086
+  git add $STAGED
+fi
 
-# Run TypeScript type checking
 echo "🔍 Running TypeScript type check..."
 bunx tsc --noEmit
 
-# Run knip to check for unused dependencies/exports
 echo "🔍 Checking for unused code with Knip..."
 bunx knip
+
+echo "📝 Validating markdown..."
+bun run lint:md
+
+echo "📄 Validating documentation frontmatter..."
+bun run validate:frontmatter
 
 echo "✅ Pre-commit checks passed!"
