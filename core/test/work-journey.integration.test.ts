@@ -38,7 +38,7 @@ describe('Work lifecycle journey', () => {
       expect(workId).toMatch(/^work_/);
 
       const reviewCtx = testContext(testDir);
-      const reviewResult = await executeReview([workId as string], reviewCtx, async () => ({
+      const reviewResult = await executeReview([workId as string, '--attest-all'], reviewCtx, async () => ({
         records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
         passed: true,
       }));
@@ -55,6 +55,7 @@ describe('Work lifecycle journey', () => {
         runId: reviewCtx.run.id,
         passed: true,
         evidence: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' }],
+        criteria: [{ criterion: 'Tests pass', status: 'passed' }],
       });
 
       const approval = resolveApproval(

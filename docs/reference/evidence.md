@@ -51,6 +51,18 @@ Important claims may reference the source, test, command, CI run, generated arti
 Work keeps only the state needed to resume and enforce lifecycle gates:
 
 - verification status, run identity, and lightweight evidence references
+- criterion-level evidence records (`criteria: CriterionEvidence[]`) mapping declared `successCriteria` to `'passed' | 'failed'` status
 - the latest approval identity, action, and status when an approval exists
 
 The full verification output remains an Evidence event in UnifiedStore. The full Approval remains an Approval event in UnifiedStore. Work references these outcomes without becoming a second evidence or approval store.
+
+## Criterion-level outcome verification
+
+Repository verification checks (`tests`, `typecheck`, `lint`, `knip`, `build`) prove that the repository compiles and passes existing regression tests. They do not prove that a task satisfied its specific objective.
+
+When a `Work` item declares `successCriteria`:
+
+1. `mia review <workId> --attest-all` (or `--criterion <name>`) records criterion-level evidence on `Work.verification.criteria`.
+2. `completeReview` blocks advancing to `ready_to_ship` if any declared criterion is missing or unverified.
+3. `shipWork` enforces that all declared `successCriteria` are verified as passed before transitioning to `shipped`.
+4. Work items with empty `successCriteria` pass verification based on repository checks alone, preserving backward compatibility.

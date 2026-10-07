@@ -61,7 +61,7 @@ describe('Intent to verified Work', () => {
       );
 
       const reviewCtx = context(testDir);
-      const reviewResult = await executeReview([planned.id], reviewCtx, async () => ({
+      const reviewResult = await executeReview([planned.id, '--attest-all'], reviewCtx, async () => ({
         records: [{ runId: reviewCtx.run.id, name: 'tests', status: 'passed' as const }],
         passed: true,
       }));
@@ -78,6 +78,9 @@ describe('Intent to verified Work', () => {
       expect(ready?.state).toBe('ready_to_ship');
       expect(ready?.verification?.passed).toBe(true);
       expect(ready?.verification?.runId).toBe(reviewCtx.run.id);
+      expect(ready?.verification?.criteria).toEqual([
+        { criterion: 'Repository checks pass', status: 'passed' },
+      ]);
 
       const approval = resolveApproval(
         createApproval({

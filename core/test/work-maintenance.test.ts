@@ -68,6 +68,12 @@ describe('maintenance seam', () => {
           status: 'passed',
         },
       ],
+      criteria: [
+        {
+          criterion: 'Endpoint no longer times out in the reproduction',
+          status: 'passed',
+        },
+      ],
     });
     work = completeVerification(work, { passed: true });
     work = completeReview(work, { passed: true });

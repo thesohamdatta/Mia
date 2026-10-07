@@ -33,6 +33,8 @@ export function recordVerification(work: Work, outcome: VerificationRecordOutcom
     }
   }
 
+  const criteria = outcome.criteria ?? work.verification?.criteria;
+
   return {
     ...work,
     verification: {
@@ -43,7 +45,7 @@ export function recordVerification(work: Work, outcome: VerificationRecordOutcom
         name: record.name,
         status: record.status,
       })),
-      ...(outcome.criteria ? { criteria: [...outcome.criteria] } : {}),
+      ...(criteria ? { criteria: [...criteria] } : {}),
     },
     updatedAt: new Date().toISOString(),
   };
@@ -77,7 +79,9 @@ export function completeReview(work: Work, outcome: ReviewOutcome): Work {
       verifiedCriteria.some((c) => c.criterion === criterion && c.status === 'passed')
     );
     if (!allPassed) {
-      throw new Error('Cannot complete review: declared success criteria are not verified as passed');
+      throw new Error(
+        'Cannot complete review: declared success criteria are not verified as passed'
+      );
     }
   }
   return transitionWork(work, outcome.passed ? 'ready_to_ship' : 'in_progress');
