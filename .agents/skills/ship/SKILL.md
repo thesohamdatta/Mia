@@ -10,7 +10,7 @@ managed-by: mia
 name: ship
 description: "Run repository verification before handoff"
 version: 1.0.0
-invocation: model
+invocation: both
 phase: handoff
 side-effects: local-write
 ---

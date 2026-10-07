@@ -10,7 +10,7 @@ managed-by: mia
 name: review
 description: "Advance a Work item through verification and review"
 version: 1.0.0
-invocation: model
+invocation: both
 phase: review
 side-effects: local-write
 ---
