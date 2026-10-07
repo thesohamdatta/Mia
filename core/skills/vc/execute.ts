@@ -1,6 +1,8 @@
 // VC Skill Executor - Professional git management
 // Runs: mia vc
 
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
 const _CONVENTIONAL_TYPES = [
@@ -73,8 +75,6 @@ async function updatePackageVersion(newVersion: string, cwd: string): Promise<vo
   pkg.version = newVersion;
   await Bun.write(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
-
-import { join } from 'node:path';
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'help';
@@ -242,8 +242,27 @@ Conventional commits enforced. Sync and release operations require explicit safe
     }
 
     case 'clean': {
-      const res = await runGit(['clean', '-fd', '-X'], cwd);
-      return { ok: res.ok, output: res.output || 'Cleaned untracked build artifacts' };
+      const generatedFiles = await runGit(
+        ['ls-files', '--others', '--ignored', '--exclude-standard', '--', 'bin', 'dist', 'build'],
+        cwd
+      );
+      if (!generatedFiles.ok) {
+        return { ok: false, error: generatedFiles.output };
+      }
+
+      for (const relativePath of generatedFiles.output
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)) {
+        await rm(join(cwd, relativePath), { force: true });
+      }
+
+      return {
+        ok: true,
+        output: generatedFiles.output.trim()
+          ? 'Cleaned known generated build artifacts'
+          : 'No generated build artifacts to clean',
+      };
     }
 
     case 'ignore': {
