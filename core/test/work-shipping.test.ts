@@ -105,4 +105,58 @@ describe('Work shipping gate', () => {
     const shipped = shipWork(verifiedWork(false));
     expect(shipped.state).toBe('shipped');
   });
+
+  it('blocks shipping when declared success criteria are not verified as passed', () => {
+    let work = readyWork();
+    work = {
+      ...work,
+      successCriteria: ['Criterion A', 'Criterion B'],
+    };
+    work = recordVerification(work, {
+      runId: 'run-verify',
+      passed: true,
+      records: [
+        {
+          runId: 'run-verify',
+          name: 'tests',
+          status: 'passed',
+          command: 'bun test',
+          durationMs: 1,
+          detail: 'passed',
+        },
+      ],
+      criteria: [{ criterion: 'Criterion A', status: 'passed' }],
+    });
+
+    expect(() => shipWork(work)).toThrow(/Work success criteria not verified: Criterion B/);
+  });
+
+  it('ships work when all declared success criteria are verified as passed', () => {
+    let work = readyWork();
+    work = {
+      ...work,
+      successCriteria: ['Criterion A', 'Criterion B'],
+    };
+    work = recordVerification(work, {
+      runId: 'run-verify',
+      passed: true,
+      records: [
+        {
+          runId: 'run-verify',
+          name: 'tests',
+          status: 'passed',
+          command: 'bun test',
+          durationMs: 1,
+          detail: 'passed',
+        },
+      ],
+      criteria: [
+        { criterion: 'Criterion A', status: 'passed' },
+        { criterion: 'Criterion B', status: 'passed' },
+      ],
+    });
+
+    const shipped = shipWork(work);
+    expect(shipped.state).toBe('shipped');
+  });
 });

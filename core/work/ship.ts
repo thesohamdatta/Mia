@@ -16,6 +16,16 @@ export function shipWork(work: Work): Work {
     throw new Error('Work verification has not passed');
   }
 
+  if (work.successCriteria.length > 0) {
+    const verifiedCriteria = work.verification.criteria || [];
+    const unverified = work.successCriteria.filter(
+      (sc) => !verifiedCriteria.some((c) => c.criterion === sc && c.status === 'passed')
+    );
+    if (unverified.length > 0) {
+      throw new Error(`Work success criteria not verified: ${unverified.join(', ')}`);
+    }
+  }
+
   if (work.requiresHumanApproval) {
     if (!work.approval) {
       throw new Error('Work human approval is required');
