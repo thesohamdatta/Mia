@@ -65,6 +65,60 @@ describe('Integration: CLI -> Skill -> Store', () => {
     );
   });
 
+  it('guards vc sync behind an explicit apply flag', async () => {
+    const ctx = createExecutionContext();
+    const definition = getSkill('vc');
+
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
+
+    const result = await executeSkillDefinition(definition, ['sync'], ctx);
+
+    expect(result.ok).toBe(true);
+    expect(result.output).toContain('mia vc sync --apply');
+  });
+
+  it('rejects release from a dirty working tree', async () => {
+    const ctx = createExecutionContext();
+    const definition = getSkill('vc');
+
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
+
+    await Bun.write(join(testDir, 'dirty.txt'), 'local change');
+    const result = await executeSkillDefinition(definition, ['release', 'patch'], ctx);
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('clean working tree');
+  });
+
+  it('does not stage untracked files during vc commit', async () => {
+    const ctx = createExecutionContext();
+    const definition = getSkill('vc');
+
+    expect(definition).toBeDefined();
+    if (!definition) throw new Error('vc definition not found');
+
+    await Bun.write(join(testDir, 'tracked.txt'), 'initial');
+    const { execSync } = require('node:child_process');
+    execSync('git add tracked.txt && git commit -m "test: seed tracked file"', {
+      cwd: testDir,
+      stdio: 'ignore',
+    });
+    await Bun.write(join(testDir, 'tracked.txt'), 'tracked change');
+    await Bun.write(join(testDir, 'untracked.txt'), 'local-only');
+
+    const result = await executeSkillDefinition(
+      definition,
+      ['commit', 'fix(test): commit tracked changes'],
+      ctx
+    );
+
+    expect(result.ok).toBe(true);
+    const status = execSync('git status --short', { cwd: testDir, encoding: 'utf8' });
+    expect(status.trim()).toBe('?? untracked.txt');
+  });
+
   it('should execute vc skill through validated CLI path', async () => {
     const ctx = createExecutionContext();
     const definition = getSkill('vc');
