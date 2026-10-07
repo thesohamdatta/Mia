@@ -1,4 +1,5 @@
 import { getSkill } from '../skills/index.js';
+import { MIA_VERSION } from '../version.js';
 
 const BUILTIN_LINES: readonly string[] = [
   '  help        Show this help message',
@@ -27,7 +28,7 @@ function lines(names: readonly string[]): string[] {
 
 export function formatHelp(): string {
   return `MIA (Machine Intelligence Architecture) CLI
-Version: 0.3.0
+Version: ${MIA_VERSION}
 
 Usage: mia <skill> [args...]
 

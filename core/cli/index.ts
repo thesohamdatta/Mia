@@ -1,6 +1,7 @@
 import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
 import { getSkill, listSkills } from '../skills/index.js';
+import { MIA_VERSION } from '../version.js';
 import { formatHelp } from './help.js';
 
 function showHelp(): void {
@@ -8,7 +9,7 @@ function showHelp(): void {
 }
 
 function showVersion(): void {
-  console.log('MIA v0.3.0 (Machine Intelligence Architecture)');
+  console.log(`MIA v${MIA_VERSION} (Machine Intelligence Architecture)`);
   console.log('Built on gstack principles. ~ maximum value per line ~');
 }
 
