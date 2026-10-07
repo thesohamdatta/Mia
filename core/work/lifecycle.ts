@@ -71,5 +71,14 @@ export function completeVerification(work: Work, outcome: VerificationOutcome): 
 }
 
 export function completeReview(work: Work, outcome: ReviewOutcome): Work {
+  if (outcome.passed && work.successCriteria.length > 0) {
+    const verifiedCriteria = work.verification?.criteria || [];
+    const allPassed = work.successCriteria.every((criterion) =>
+      verifiedCriteria.some((c) => c.criterion === criterion && c.status === 'passed')
+    );
+    if (!allPassed) {
+      throw new Error('Cannot complete review: declared success criteria are not verified as passed');
+    }
+  }
   return transitionWork(work, outcome.passed ? 'ready_to_ship' : 'in_progress');
 }

@@ -48,13 +48,13 @@ async function runSkill(skillName: string, args: string[] = []): Promise<void> {
   const ctx = createExecutionContext();
   const result = await executeSkillDefinition(definition, args, ctx);
 
+  if (result.output) {
+    console.log(result.output);
+  }
+
   if (!result.ok) {
     console.error(`❌ ${result.error ?? 'Unknown error'}`);
     process.exit(1);
-  }
-
-  if (result.output) {
-    console.log(result.output);
   }
 }
 

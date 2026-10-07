@@ -59,6 +59,53 @@ describe('Work lifecycle operations', () => {
     expect(completeReview(work, { passed: true }).state).toBe('ready_to_ship');
   });
 
+  it('blocks ready_to_ship when declared success criteria are not verified as passed', () => {
+    let work = createWork({
+      objective: 'Build X',
+      successCriteria: ['Feature works', 'Tests pass'],
+    });
+    work = { ...work, state: 'review' };
+
+    expect(() => completeReview(work, { passed: true })).toThrow(
+      /declared success criteria are not verified as passed/
+    );
+
+    work = {
+      ...work,
+      verification: {
+        runId: 'run-1',
+        passed: true,
+        evidence: [],
+        criteria: [{ criterion: 'Feature works', status: 'passed' }],
+      },
+    };
+    expect(() => completeReview(work, { passed: true })).toThrow(
+      /declared success criteria are not verified as passed/
+    );
+  });
+
+  it('advances review to ready_to_ship when all success criteria have passed', () => {
+    let work = createWork({
+      objective: 'Build X',
+      successCriteria: ['Feature works', 'Tests pass'],
+    });
+    work = {
+      ...work,
+      state: 'review',
+      verification: {
+        runId: 'run-1',
+        passed: true,
+        evidence: [],
+        criteria: [
+          { criterion: 'Feature works', status: 'passed' },
+          { criterion: 'Tests pass', status: 'passed' },
+        ],
+      },
+    };
+
+    expect(completeReview(work, { passed: true }).state).toBe('ready_to_ship');
+  });
+
   it('records a lightweight verification projection on Work', () => {
     const work = createWork({ objective: 'Build X' });
 
