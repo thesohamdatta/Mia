@@ -116,8 +116,7 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
     expect(result.ok).toBe(true);
     const status = execSync('git status --short', { cwd: testDir, encoding: 'utf8' });
-    expect(status).toContain('?? untracked.txt');
-    expect(status).not.toContain('tracked.txt');
+    expect(status.trim()).toBe('?? untracked.txt');
   });
 
   it('should execute vc skill through validated CLI path', async () => {
