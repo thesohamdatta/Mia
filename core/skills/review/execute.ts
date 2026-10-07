@@ -64,12 +64,21 @@ export async function execute(
     : repositoryChecks.slice(0, 4);
   const verification = await verify(ctx, checks);
 
-  const criteriaEvidence: CriterionEvidence[] | undefined =
+  // Determine which criteria (if any) are attested for this run — for display only at this point
+  const criteriaDisplay: { criterion: string; attested: boolean }[] | undefined =
     work.successCriteria.length > 0
       ? work.successCriteria.map((criterion) => ({
           criterion,
-          status: attestAll || attestedCriteria.includes(criterion) ? 'passed' : 'failed',
+          attested: attestAll || attestedCriteria.includes(criterion),
         }))
+      : undefined;
+
+  const allCriteriaAttested = criteriaDisplay?.every((c) => c.attested) ?? true;
+
+  // Only write criteria to the verification record when all pass — prevents stale 'failed' entries
+  const criteriaEvidence: CriterionEvidence[] | undefined =
+    criteriaDisplay && allCriteriaAttested
+      ? criteriaDisplay.map((c) => ({ criterion: c.criterion, status: 'passed' as const }))
       : undefined;
 
   work = recordVerification(work, {
@@ -106,7 +115,7 @@ export async function execute(
     };
   }
 
-  if (criteriaEvidence?.some((c) => c.status !== 'passed')) {
+  if (!allCriteriaAttested && criteriaDisplay) {
     work = completeVerification(work, { passed: false });
     await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
@@ -121,9 +130,7 @@ export async function execute(
         ...verification.records.map((record) => `PASS ${record.name} (${record.durationMs}ms)`),
         '',
         'CRITERIA:',
-        ...criteriaEvidence.map(
-          (c) => `${c.status === 'passed' ? 'PASS' : 'UNVERIFIED'} ${c.criterion}`
-        ),
+        ...criteriaDisplay.map((c) => `${c.attested ? 'PASS' : 'UNVERIFIED'} ${c.criterion}`),
         '',
         'BLOCKED: Success criteria require verification evidence before ready_to_ship.',
       ].join('\n'),
@@ -144,8 +151,8 @@ export async function execute(
       `Work: ${work.id}`,
       '',
       ...verification.records.map((record) => `PASS ${record.name} (${record.durationMs}ms)`),
-      ...(criteriaEvidence
-        ? ['', 'CRITERIA:', ...criteriaEvidence.map((c) => `PASS ${c.criterion}`)]
+      ...(criteriaDisplay
+        ? ['', 'CRITERIA:', ...criteriaDisplay.map((c) => `PASS ${c.criterion}`)]
         : []),
       '',
       `READY_TO_SHIP: ${work.id}`,

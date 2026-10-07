@@ -1,3 +1,4 @@
+import { allCriteriaPassed } from './lifecycle.js';
 import type { Work } from './types.js';
 
 export function shipWork(work: Work): Work {
@@ -16,14 +17,12 @@ export function shipWork(work: Work): Work {
     throw new Error('Work verification has not passed');
   }
 
-  if (work.successCriteria.length > 0) {
-    const verifiedCriteria = work.verification.criteria || [];
+  if (!allCriteriaPassed(work)) {
+    const verified = work.verification.criteria ?? [];
     const unverified = work.successCriteria.filter(
-      (sc) => !verifiedCriteria.some((c) => c.criterion === sc && c.status === 'passed')
+      (sc) => !verified.some((c) => c.criterion === sc && c.status === 'passed')
     );
-    if (unverified.length > 0) {
-      throw new Error(`Work success criteria not verified: ${unverified.join(', ')}`);
-    }
+    throw new Error(`Work success criteria not verified: ${unverified.join(', ')}`);
   }
 
   if (work.requiresHumanApproval) {
