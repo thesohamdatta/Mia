@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Architecture Agent — SDK Flow</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --edge: #8b949e;
+    --text: #e6edf3;
+    --muted: #9da7b3;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --amber: #d29922;
+    --violet: #bc8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header { padding: 22px 28px 8px; }
+  header h1 { margin: 0 0 4px; font-size: 20px; }
+  header p { margin: 0; color: var(--muted); }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; padding: 10px 28px 0; color: var(--muted); font-size: 12px; }
+  .legend span::before { content: "■"; margin-right: 6px; }
+  .l-cli::before { color: var(--accent); }
+  .l-core::before { color: var(--violet); }
+  .l-phase::before { color: var(--green); }
+  .l-art::before { color: var(--amber); }
+  .wrap { padding: 16px 28px 40px; overflow: auto; }
+  svg { min-width: 940px; }
+  .node rect {
+    fill: var(--panel); stroke-width: 1.6; rx: 10; ry: 10;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+  }
+  .node text { fill: var(--text); font-size: 12.5px; }
+  .node .title { font-weight: 600; font-size: 13px; }
+  .node .sub { fill: var(--muted); font-size: 11px; }
+  .cli rect { stroke: var(--accent); }
+  .core rect { stroke: var(--violet); }
+  .phase rect { stroke: var(--green); }
+  .art rect { stroke: var(--amber); }
+  .edge { stroke: var(--edge); stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+  .edge.dashed { stroke-dasharray: 5 4; }
+  .edge-label { fill: var(--muted); font-size: 10.5px; }
+  .loop { stroke: var(--amber); stroke-dasharray: 6 4; fill: none; marker-end: url(#arrow-amber); }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Architecture Improvement Agent — execution flow</h1>
+    <p>OpenHands Software Agent SDK · single-file Python · read-only analysis with an evidence gate.</p>
+  </header>
+  <div class="legend">
+    <span class="l-cli">CLI / config</span>
+    <span class="l-core">SDK core</span>
+    <span class="l-phase">Pipeline phase</span>
+    <span class="l-art">Artifact / feedback</span>
+  </div>
+  <div class="wrap">
+    <svg viewBox="0 0 960 1180" width="960" height="1180" role="img" aria-label="Architecture agent flow diagram">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#8b949e" />
+        </marker>
+        <marker id="arrow-amber" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#d29922" />
+        </marker>
+      </defs>
+
+      <!-- CLI -->
+      <g class="node cli" transform="translate(330,20)">
+        <rect width="300" height="58" />
+        <text class="title" x="150" y="26" text-anchor="middle">CLI — argparse</text>
+        <text class="sub" x="150" y="44" text-anchor="middle">&lt;repo&gt; --out --focus --max-rounds</text>
+      </g>
+      <path class="edge" d="M480,78 L480,108" />
+      <text class="edge-label" x="492" y="98">env: LLM_API_KEY / LLM_BASE_MODEL</text>
+
+      <!-- Config -->
+      <g class="node cli" transform="translate(330,108)">
+        <rect width="300" height="58" />
+        <text class="title" x="150" y="26" text-anchor="middle">Config loader</text>
+        <text class="sub" x="150" y="44" text-anchor="middle">validate key · resolve model · output dir</text>
+      </g>
+      <path class="edge" d="M480,166 L480,196" />
+
+      <!-- LLM -->
+      <g class="node core" transform="translate(250,196)">
+        <rect width="460" height="70" />
+        <text class="title" x="230" y="26" text-anchor="middle">LLM (main) + LLM (condenser, usage_id="condenser")</text>
+        <text class="sub" x="230" y="46" text-anchor="middle">openhands.sdk.LLM · model, api_key, base_url</text>
+        <text class="sub" x="230" y="61" text-anchor="middle">LLMSummarizingCondenser(max_size, keep_first)</text>
+      </g>
+      <path class="edge" d="M480,266 L480,296" />
+
+      <!-- Agent -->
+      <g class="node core" transform="translate(180,296)">
+        <rect width="600" height="150" />
+        <text class="title" x="300" y="26" text-anchor="middle">Agent  (openhands.sdk.Agent)</text>
+        <text x="24" y="52">tools:</text>
+        <text class="sub" x="60" y="52">TerminalTool · FileEditorTool · TaskTrackerTool</text>
+        <text x="24" y="76">agent_context.skills:</text>
+        <text class="sub" x="60" y="76">architecture-rubric (trigger=None, always loaded)</text>
+        <text class="sub" x="240" y="96">refactor-planning (KeywordTrigger, on demand)</text>
+        <text x="24" y="120">contract:</text>
+        <text class="sub" x="60" y="120">every finding cites command output or file:line</text>
+        <text class="sub" x="60" y="138">MIA principles · read-only on target repo</text>
+      </g>
+      <path class="edge" d="M480,446 L480,476" />
+
+      <!-- Pipeline container -->
+      <g class="node phase" transform="translate(120,476)">
+        <rect width="720" height="470" />
+        <text class="title" x="360" y="26" text-anchor="middle">Pipeline — deterministic phases (one Conversation.run() each)</text>
+      </g>
+
+      <!-- Phases -->
+      <g class="node phase" transform="translate(150,506)">
+        <rect width="660" height="52" />
+        <text class="title" x="16" y="22">P0 RECON</text>
+        <text class="sub" x="120" y="22">inventory: languages · dirs · LOC · entrypoints (fixed shell)</text>
+        <text class="sub" x="16" y="40">→ logs structure summary to terminal</text>
+      </g>
+      <path class="edge" d="M480,558 L480,574" />
+
+      <g class="node phase" transform="translate(150,574)">
+        <rect width="660" height="52" />
+        <text class="title" x="16" y="22">P1 SIGNALS</text>
+        <text class="sub" x="128" y="22">raw metrics: coupling · duplication · file size · dead code</text>
+        <text class="sub" x="16" y="40">→ candidate findings with raw evidence attached</text>
+      </g>
+      <path class="edge" d="M480,626 L480,642" />
+
+      <g class="node phase" transform="translate(150,642)">
+        <rect width="660" height="52" />
+        <text class="title" x="16" y="22">P2 ANALYSIS</text>
+        <text class="sub" x="126" y="22">map signals → MIA rubrics + boundary violations</text>
+        <text class="sub" x="16" y="40">→ evidence gate: drop findings without proof</text>
+      </g>
+      <path class="edge" d="M480,694 L480,710" />
+
+      <g class="node phase" transform="translate(150,710)">
+        <rect width="660" height="52" />
+        <text class="title" x="16" y="22">P3 PRIORITIZE</text>
+        <text class="sub" x="140" y="22">score impact / risk / effort → smallest reversible slices first</text>
+        <text class="sub" x="16" y="40">→ ordered refactor backlog</text>
+      </g>
+      <path class="edge" d="M480,762 L480,778" />
+
+      <g class="node phase" transform="translate(150,778)">
+        <rect width="660" height="52" />
+        <text class="title" x="16" y="22">P4 REPORT</text>
+        <text class="sub" x="126" y="22">write ARCHITECTURE_REPORT.md (findings + evidence blocks)</text>
+      </g>
+      <path class="edge" d="M480,830 L480,846" />
+
+      <g class="node phase" transform="translate(150,846)">
+        <rect width="660" height="52" />
+        <text class="title" x="16" y="22">P5 PLAN</text>
+        <text class="sub" x="114" y="22">write REFACTOR_PLAN.md (MIA shape: criteria · steps · risks)</text>
+      </g>
+
+      <path class="edge" d="M480,898 L480,946" />
+
+      <!-- Artifacts -->
+      <g class="node art" transform="translate(330,946)">
+        <rect width="300" height="70" />
+        <text class="title" x="150" y="26" text-anchor="middle">Artifacts (--out)</text>
+        <text class="sub" x="150" y="45" text-anchor="middle">ARCHITECTURE_REPORT.md</text>
+        <text class="sub" x="150" y="61" text-anchor="middle">REFACTOR_PLAN.md</text>
+      </g>
+
+      <!-- Feedback loop -->
+      <path class="loop" d="M300,1016 C60,1016 60,530 148,530" />
+      <text class="edge-label" x="70" y="780">engineer / execution agent acts → re-run for next slice</text>
+    </svg>
+  </div>
+</body>
+</html>
