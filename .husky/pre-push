@@ -1,17 +1,20 @@
 #!/usr/bin/env sh
+set -e
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Pre-push hook - runs on push to remote
-# Runs tests and full validation
+# Runs tests and the full build, then the compiled-binary smoke test
+# (the same sequence CI runs).
 
 echo "🚀 Running pre-push checks..."
 
-# Run all tests
 echo "🧪 Running tests..."
 bun test
 
-# Run full build to ensure everything compiles
 echo "🔨 Building project..."
 bun run build
+
+echo "🧪 Verifying compiled binary..."
+bun run verify:binary
 
 echo "✅ Pre-push checks passed! Ready to push."
