@@ -6,6 +6,12 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
+// JSON string escaping is a valid YAML double-quoted scalar, so this keeps
+// summaries containing colons, quotes, hashes or newlines inside the value.
+function yamlScalar(value: string): string {
+  return JSON.stringify(value);
+}
+
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'list';
   const projectsDir = ctx.config.projectsDir;
@@ -20,7 +26,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     }
     const checkpointId = randomUUID();
     const file = join(checkpointDir, `${name}.md`);
-    const content = `---\nts: ${new Date().toISOString()}\nid: ${checkpointId}\nproject: ${ctx.slug}\nphase: active\nsummary: ${summary}\n---\n\n`;
+    const content = `---\nts: ${new Date().toISOString()}\nid: ${checkpointId}\nproject: ${ctx.slug}\nphase: active\nsummary: ${yamlScalar(summary)}\n---\n\n`;
     writeFileSync(file, content, 'utf-8');
     await ctx.unifiedStore.appendCheckpoint(projectsDir, ctx.slug, {
       id: checkpointId,
