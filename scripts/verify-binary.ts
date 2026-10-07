@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { MIA_VERSION } from '../core/version.js';
 
 const root = mkdtempSync(join(tmpdir(), 'mia-binary-'));
 const project = join(root, 'project');
@@ -33,7 +34,7 @@ try {
   assertContains(run(['--help']), 'MIA (Machine Intelligence Architecture) CLI');
   assertContains(run(['--help']), 'plan');
   assertContains(run(['--help']), 'learn');
-  assertContains(run(['--version']), 'MIA v0.3.0');
+  assertContains(run(['--version']), `MIA v${MIA_VERSION}`);
 
   assertContains(run(['plan', 'create', 'Verify compiled MIA']), 'Work: work_');
   assertContains(
