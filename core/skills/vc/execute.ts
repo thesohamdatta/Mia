@@ -183,7 +183,8 @@ Conventional commits enforced. Sync and release operations require explicit safe
       if (args[1] !== '--apply') {
         return {
           ok: true,
-          output: "Sync is guarded. Review the current branch, then run 'mia vc sync --apply' to pull --rebase and push.",
+          output:
+            "Sync is guarded. Review the current branch, then run 'mia vc sync --apply' to pull --rebase and push.",
         };
       }
       const pullRes = await runGit(['pull', '--rebase'], cwd);
