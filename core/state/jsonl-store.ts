@@ -6,15 +6,12 @@ export const INJECTION_PATTERNS: readonly RegExp[] = [
   /you\s+are\s+now\s+/i,
   /always\s+output\s+no\s+findings/i,
   /skip\s+(all\s+)?(security|review|checks)/i,
-  /override[:\\s]/i,
-  /\\bsystem\\s*:/i,
-  /\\bassistant\\s*:/i,
-  /\\buser\\s*:/i,
-  /\\bhuman\\s*:/i,
-  /disregard\\s+(all\\s+)?(previous|above|prior)/i,
-  /from\\s+now\\s+on\\b/i,
-  /do\\s+not\\s+(report|flag|mention)/i,
-  /approve\\s+(all|every|this)/i,
+  /override(?:\s|:)/i,
+  /\b(?:system|assistant|user|human)\s*:/i,
+  /disregard\s+(all\s+)?(previous|above|prior)/i,
+  /from\s+now\s+on\b/i,
+  /do\s+not\s+(report|flag|mention)/i,
+  /approve\s+(all|every|this)/i,
 ];
 
 export function hasInjection(text: string): boolean {
