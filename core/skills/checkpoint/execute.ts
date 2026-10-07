@@ -6,6 +6,15 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
+function validateCheckpointName(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error('Checkpoint name is required');
+  if (trimmed === '.' || trimmed === '..' || /[\\/\0]/.test(trimmed)) {
+    throw new Error('Checkpoint name must be a single safe filename');
+  }
+  return trimmed;
+}
+
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'list';
   const projectsDir = ctx.config.projectsDir;
@@ -13,7 +22,16 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   mkdirSync(checkpointDir, { recursive: true });
 
   if (subcmd === 'save') {
-    const name = args[1] || `checkpoint-${Date.now()}`;
+    let name: string;
+    try {
+      name = validateCheckpointName(args[1] || `checkpoint-${Date.now()}`);
+    } catch (error) {
+      return {
+        ok: false,
+        status: 'blocked',
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
     const summary = args.slice(2).join(' ').trim();
     if (!summary) {
       return { ok: false, status: 'blocked', error: 'Checkpoint summary required.' };
@@ -21,7 +39,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     const checkpointId = randomUUID();
     const file = join(checkpointDir, `${name}.md`);
     const content = `---\nts: ${new Date().toISOString()}\nid: ${checkpointId}\nproject: ${ctx.slug}\nphase: active\nsummary: ${summary}\n---\n\n`;
-    writeFileSync(file, content, 'utf-8');
+    writeFileSync(file, content, 'utf8');
     await ctx.unifiedStore.appendCheckpoint(projectsDir, ctx.slug, {
       id: checkpointId,
       name,
@@ -50,9 +68,18 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   }
 
   if (subcmd === 'load') {
-    const name = args[1];
-    if (!name) {
+    if (!args[1]) {
       return { ok: false, error: 'Usage: mia checkpoint load <name>' };
+    }
+    let name: string;
+    try {
+      name = validateCheckpointName(args[1]);
+    } catch (error) {
+      return {
+        ok: false,
+        status: 'blocked',
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
     const file = join(checkpointDir, `${name}.md`);
     if (!existsSync(file)) {
