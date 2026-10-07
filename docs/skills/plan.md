@@ -8,7 +8,7 @@ audience: agent
 load: on-demand
 name: plan
 version: 1.0.0
-invocation: user
+invocation: both
 phase: plan
 side-effects: local-write
 ---
@@ -19,12 +19,12 @@ Create an explicit implementation plan
 
 ## Invocation
 
-Explicitly invoked by the user through the MIA CLI.
+Available to model-triggered workflows when the task matches this skill.
 
 ## Contract
 
 - Phase: plan
-- Invocation: user
+- Invocation: both
 - Side effects: local-write
 - Verification: none
 

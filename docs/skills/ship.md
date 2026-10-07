@@ -8,7 +8,7 @@ audience: agent
 load: on-demand
 name: ship
 version: 1.0.0
-invocation: user
+invocation: both
 phase: handoff
 side-effects: local-write
 ---
@@ -19,12 +19,12 @@ Run repository verification before handoff
 
 ## Invocation
 
-Explicitly invoked by the user through the MIA CLI.
+Available to model-triggered workflows when the task matches this skill.
 
 ## Contract
 
 - Phase: handoff
-- Invocation: user
+- Invocation: both
 - Side effects: local-write
 - Verification: typecheck
 lint

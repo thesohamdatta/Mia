@@ -8,7 +8,7 @@ audience: agent
 load: on-demand
 name: review
 version: 1.0.0
-invocation: user
+invocation: both
 phase: review
 side-effects: local-write
 ---
@@ -19,12 +19,12 @@ Prepare a review surface for the current change
 
 ## Invocation
 
-Explicitly invoked by the user through the MIA CLI.
+Available to model-triggered workflows when the task matches this skill.
 
 ## Contract
 
 - Phase: review
-- Invocation: user
+- Invocation: both
 - Side effects: local-write
 - Verification: typecheck, lint, unused-code, tests
 
