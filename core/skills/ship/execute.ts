@@ -75,7 +75,10 @@ export async function execute(
   }
 
   try {
-    const shipped = shipWork(work);
+    const shipped = shipWork(
+      work,
+      checks.map((check) => check.name)
+    );
 
     await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, shipped);
 

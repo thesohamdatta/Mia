@@ -8,6 +8,7 @@ import { createExecutionContext } from '../context.js';
 import { createRootPlan } from '../root/types.js';
 import { execute as executeReview } from '../skills/review/execute.js';
 import { execute as executeShip } from '../skills/ship/execute.js';
+import { repositoryChecks } from '../verification/suite.js';
 import { createWorkFromRootPlan } from '../work/from-root-plan.js';
 import { loadWork, saveWork } from '../work/persistence.js';
 
@@ -96,7 +97,14 @@ describe('Intent to verified Work', () => {
 
       const shipCtx = context(testDir);
       const shipResult = await executeShip([planned.id], shipCtx, async () => ({
-        records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
+        records: repositoryChecks.map((check) => ({
+          runId: shipCtx.run.id,
+          name: check.name,
+          status: 'passed' as const,
+          command: check.command.join(' '),
+          durationMs: 1,
+          detail: 'passed',
+        })),
         passed: true,
       }));
 
@@ -127,7 +135,7 @@ describe('Intent to verified Work', () => {
         resumedCtx.slug,
         10
       );
-      expect(evidence).toHaveLength(2);
+      expect(evidence).toHaveLength(repositoryChecks.length + 1);
       expect(evidence.every((event) => event.type === 'evidence')).toBe(true);
     } finally {
       rmSync(testDir, { recursive: true, force: true });

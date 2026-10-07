@@ -8,6 +8,7 @@ import { executeSkillDefinition } from '../skills/executor.js';
 import { getSkill } from '../skills/index.js';
 import { execute as executeReview } from '../skills/review/execute.js';
 import { execute as executeShip } from '../skills/ship/execute.js';
+import { repositoryChecks } from '../verification/suite.js';
 import { loadWork } from '../work/persistence.js';
 
 function testContext(testDir: string) {
@@ -70,7 +71,14 @@ describe('Work lifecycle journey', () => {
 
       const shipCtx = testContext(testDir);
       const shipResult = await executeShip([workId as string], shipCtx, async () => ({
-        records: [{ runId: shipCtx.run.id, name: 'tests', status: 'passed' as const }],
+        records: repositoryChecks.map((check) => ({
+          runId: shipCtx.run.id,
+          name: check.name,
+          status: 'passed' as const,
+          command: check.command.join(' '),
+          durationMs: 1,
+          detail: 'passed',
+        })),
         passed: true,
       }));
       expect(shipResult.ok).toBe(true);
@@ -95,11 +103,11 @@ describe('Work lifecycle journey', () => {
         shipCtx.slug,
         10
       );
-      expect(evidence).toHaveLength(2);
-      expect(evidence.map((event) => (event.data as { name: string }).name)).toEqual([
-        'tests',
-        'tests',
-      ]);
+      expect(evidence).toHaveLength(repositoryChecks.length + 1);
+      const evidenceNames = evidence.map((event) => (event.data as { name: string }).name);
+      expect(evidenceNames.sort()).toEqual(
+        ['tests', ...repositoryChecks.map((check) => check.name)].sort()
+      );
 
       const approvals = await shipCtx.unifiedStore.listApprovals(
         shipCtx.config.projectsDir,

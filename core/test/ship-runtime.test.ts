@@ -21,17 +21,18 @@ describe('Ship skill runtime', () => {
   }
 
   function passedVerification() {
+    const checks = ['typecheck', 'lint', 'unused-code', 'tests', 'build'] as const;
+
     return {
-      records: [
-        {
-          runId: 'run-ship',
-          name: 'tests',
-          status: 'passed' as const,
-          command: 'bun test',
-          durationMs: 1,
-          detail: 'passed',
-        },
-      ],
+      records: checks.map((name) => ({
+        runId: 'run-ship',
+        name,
+        status: 'passed' as const,
+        command:
+          name === 'tests' ? 'bun test' : `bun run ${name === 'unused-code' ? 'knip' : name}`,
+        durationMs: 1,
+        detail: 'passed',
+      })),
       passed: true,
     };
   }
@@ -96,7 +97,7 @@ describe('Ship skill runtime', () => {
     expect(verified).toBe(false);
   });
 
-  it('persists a shipped Work after verification and approval requirements are satisfied', async () => {
+  it('persists a shipped Work after every declared verification check passes and approval requirements are satisfied', async () => {
     const ctx = context();
     const work = readyWork(true);
     await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
@@ -120,7 +121,13 @@ describe('Ship skill runtime', () => {
     expect(restored?.verification).toEqual({
       runId: 'run-ship',
       passed: true,
-      evidence: [{ runId: 'run-ship', name: 'tests', status: 'passed' }],
+      evidence: [
+        { runId: 'run-ship', name: 'typecheck', status: 'passed' },
+        { runId: 'run-ship', name: 'lint', status: 'passed' },
+        { runId: 'run-ship', name: 'unused-code', status: 'passed' },
+        { runId: 'run-ship', name: 'tests', status: 'passed' },
+        { runId: 'run-ship', name: 'build', status: 'passed' },
+      ],
     });
     expect(restored?.approval).toEqual({
       id: approval.id,

@@ -1,12 +1,22 @@
 import type { Work } from './types.js';
 
-export function shipWork(work: Work): Work {
+export function shipWork(work: Work, requiredVerificationNames: readonly string[] = []): Work {
   if (work.state !== 'ready_to_ship') {
     throw new Error(`Work is not ready to ship: ${work.state}`);
   }
 
   if (!work.verification || work.verification.evidence.length === 0) {
     throw new Error('Work verification evidence is missing');
+  }
+
+  const evidenceByName = new Map(
+    work.verification.evidence.map((evidence) => [evidence.name, evidence])
+  );
+  const missingVerification = requiredVerificationNames.filter(
+    (name) => evidenceByName.get(name)?.status !== 'passed'
+  );
+  if (missingVerification.length > 0) {
+    throw new Error(`Work verification is incomplete: ${missingVerification.join(', ')}`);
   }
 
   if (

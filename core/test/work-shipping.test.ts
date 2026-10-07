@@ -44,6 +44,14 @@ describe('Work shipping gate', () => {
     expect(() => shipWork(work)).toThrow(/verification evidence is missing/);
   });
 
+  it('blocks shipping when a required verification check is missing', () => {
+    const work = verifiedWork();
+
+    expect(() => shipWork(work, ['tests', 'typecheck'])).toThrow(
+      /Work verification is incomplete: typecheck/
+    );
+  });
+
   it('blocks shipping when verification has not passed', () => {
     const work = recordVerification(readyWork(), {
       runId: 'run-verify',
