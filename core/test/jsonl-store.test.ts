@@ -33,6 +33,62 @@ describe('jsonl-store performance & behavior', () => {
     expect(readJsonlTail(jsonlFile, -5)).toEqual([]);
   });
 
+  it('reads only a bounded tail from a large JSONL file', () => {
+    const lines = Array.from({ length: 10000 }, (_, i) => JSON.stringify({ id: i + 1 }));
+    writeFileSync(jsonlFile, lines.join('\n') + String.fromCharCode(10), 'utf-8');
+    const tail = readJsonlTail<{ id: number }>(jsonlFile, 3);
+    expect(tail.map((entry) => entry.id)).toEqual([10000, 9999, 9998]);
+  });
+
+  it('preserves Unicode when a multibyte character straddles the chunk boundary', () => {
+    const first = JSON.stringify({ id: 1, text: 'a'.repeat(65520) });
+    const second = JSON.stringify({ id: 2, text: '😀 café 東京' });
+    const prefix = first + String.fromCharCode(10);
+    const boundary =
+      65536 - Buffer.byteLength(second, 'utf-8') + 1;
+    const padding = Math.max(0, boundary - Buffer.byteLength(prefix, 'utf-8'));
+    const content =
+      JSON.stringify({ id: 0, text: 'b'.repeat(padding) }) +
+      String.fromCharCode(10) +
+      second;
+    writeFileSync(jsonlFile, content, 'utf-8');
+
+    const tail = readJsonlTail<{ id: number; text: string }>(jsonlFile, 1);
+    expect(tail).toEqual([JSON.parse(second)]);
+  });
+
+  it('handles Unicode and malformed lines across a chunk boundary', () => {
+    const records = [
+      JSON.stringify({ id: 1, text: 'older' }),
+      'INVALID_JSON',
+      JSON.stringify({ id: 2, text: 'café 東京 😀'.repeat(3000) }),
+      JSON.stringify({ id: 3, text: 'newest' }),
+    ];
+    writeFileSync(jsonlFile, records.join(String.fromCharCode(10)), 'utf-8');
+
+    const tail = readJsonlTail<{ id: number; text: string }>(jsonlFile, 2);
+    expect(tail.map(({ id }) => id)).toEqual([3, 2]);
+    expect(tail[1]?.text).toBe('café 東京 😀'.repeat(3000));
+  });
+
+  it('keeps scanning older records when the filter rejects recent records', () => {
+    const records = Array.from({ length: 2000 }, (_, index) => ({
+      id: index + 1,
+      type: (index + 1) % 2 === 0 ? 'keep' : 'skip',
+    }));
+    writeFileSync(
+      jsonlFile,
+      records.map((record) => JSON.stringify(record)).join(String.fromCharCode(10))
+    );
+
+    const tail = readJsonlTail<{ id: number; type: string }>(
+      jsonlFile,
+      3,
+      (record) => record.type === 'keep'
+    );
+    expect(tail.map(({ id }) => id)).toEqual([2000, 1998, 1996]);
+  });
+
   it('should return entries in reverse chronological order up to limit', () => {
     appendJsonl(jsonlFile, { id: 1, val: 'first' });
     appendJsonl(jsonlFile, { id: 2, val: 'second' });
