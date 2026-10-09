@@ -41,14 +41,23 @@ function validateConventionalCommit(msg: string): { valid: boolean; error?: stri
 
 async function getCurrentVersion(cwd: string): Promise<string> {
   const pkg = await Bun.file(join(cwd, 'package.json')).json();
-  return pkg.version || '0.0.0';
+  return typeof pkg.version === 'string' ? pkg.version : '';
+}
+
+const SEMVER_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
+
+function parseVersion(version: string): [number, number, number] | null {
+  const match = SEMVER_PATTERN.exec(version);
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
 }
 
 function bumpVersion(version: string, type: 'major' | 'minor' | 'patch'): string {
-  const parts = version.split('.').map(Number);
-  const major = parts[0] ?? 0;
-  const minor = parts[1] ?? 0;
-  const patch = parts[2] ?? 0;
+  const parsed = parseVersion(version);
+  if (!parsed) {
+    throw new Error(`Cannot release from a non-semver version: "${version}"`);
+  }
+  const [major, minor, patch] = parsed;
   switch (type) {
     case 'major':
       return `${major + 1}.0.0`;
@@ -224,7 +233,12 @@ Conventional commits enforced. Sync and release operations require explicit safe
         return { ok: false, error: 'Release requires the canonical master branch.' };
       }
       const current = await getCurrentVersion(cwd);
-      const next = bumpVersion(current, type);
+      let next: string;
+      try {
+        next = bumpVersion(current, type);
+      } catch (error) {
+        return { ok: false, error: error instanceof Error ? error.message : String(error) };
+      }
       const tag = `v${next}`;
       await updatePackageVersion(next, cwd);
       const addRes = await runGit(['add', 'package.json'], cwd);
