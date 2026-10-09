@@ -44,7 +44,8 @@ describe('jsonl-store performance & behavior', () => {
     const first = JSON.stringify({ id: 1, text: 'a'.repeat(65520) });
     const second = JSON.stringify({ id: 2, text: '😀 café 東京' });
     const prefix = first + String.fromCharCode(10);
-    const boundary = 65536 - Buffer.byteLength(second, 'utf-8') + 1;
+    const boundary =
+      65536 - Buffer.byteLength(second, 'utf-8') + 1;
     const padding = Math.max(0, boundary - Buffer.byteLength(prefix, 'utf-8'));
     const content =
       JSON.stringify({ id: 0, text: 'b'.repeat(padding) }) +
