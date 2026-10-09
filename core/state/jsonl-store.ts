@@ -1,4 +1,13 @@
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import {
+  appendFileSync,
+  closeSync,
+  existsSync,
+  fstatSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  readSync,
+} from 'node:fs';
 import { dirname } from 'node:path';
 
 export const INJECTION_PATTERNS: readonly RegExp[] = [
@@ -84,9 +93,8 @@ export function readJsonl<T = unknown>(path: string): T[] {
 }
 
 /**
- * Reads the tail (most recent entries) from a JSONL file by iterating backwards from the end.
- * Lazy JSON parsing and early termination reduce time complexity from O(N) full file parse to O(K)
- * where K is the requested limit of matching records.
+ * Reads recent JSONL records from the end of a file in bounded chunks.
+ * Newlines are located at the byte level before UTF-8 decoding.
  */
 export function readJsonlTail<T = unknown>(
   path: string,
@@ -95,36 +103,62 @@ export function readJsonlTail<T = unknown>(
 ): T[] {
   if (!existsSync(path) || limit <= 0) return [];
 
-  let raw: string;
+  let fd: number;
   try {
-    raw = readFileSync(path, 'utf-8');
+    fd = openSync(path, 'r');
   } catch {
     return [];
   }
 
   const out: T[] = [];
-  let end = raw.length;
+  const chunkSize = 64 * 1024;
+  let position = 0;
+  let remainder = Buffer.alloc(0);
 
-  // Optimize: Iterate backwards using lastIndexOf to slice lines on demand.
-  // This avoids raw.split('\n') which allocates an O(N) array of all line strings in memory,
-  // reducing memory allocations from O(N) to O(K) where K is the number of inspected tail entries.
-  while (end > 0 && out.length < limit) {
-    const start = raw.lastIndexOf('\n', end - 1);
-    const line = start === -1 ? raw.slice(0, end) : raw.slice(start + 1, end);
-    end = start;
+  try {
+    position = fstatSync(fd).size;
+    while (position > 0 && out.length < limit) {
+      const length = Math.min(chunkSize, position);
+      position -= length;
 
-    const trimmed = line.trim();
-    if (!trimmed) continue;
+      const chunk = Buffer.allocUnsafe(length);
+      const bytesRead = readSync(fd, chunk, 0, length, position);
+      const data = bytesRead === length ? chunk : chunk.subarray(0, bytesRead);
+      const combined =
+        remainder.length > 0
+          ? Buffer.concat([data, remainder], data.length + remainder.length)
+          : data;
 
-    try {
-      const parsed = JSON.parse(trimmed) as T;
-      if (!filter || filter(parsed)) {
-        out.push(parsed);
+      let lineEnd = combined.length;
+      for (let i = combined.length - 1; i >= 0 && out.length < limit; i--) {
+        if (combined[i] !== 0x0a) continue;
+        parseLine(combined.subarray(i + 1, lineEnd));
+        lineEnd = i;
       }
-    } catch {
-      // Skip malformed lines
+
+      remainder = Buffer.from(combined.subarray(0, lineEnd));
     }
+
+    if (out.length < limit && remainder.length > 0) {
+      parseLine(remainder);
+    }
+  } catch {
+    return out;
+  } finally {
+    closeSync(fd);
   }
 
   return out;
+
+  function parseLine(bytes: Buffer): void {
+    const trimmed = bytes.toString('utf-8').trim();
+    if (!trimmed) return;
+
+    try {
+      const parsed = JSON.parse(trimmed) as T;
+      if (!filter || filter(parsed)) out.push(parsed);
+    } catch {
+      // Skip malformed records and continue looking for older entries.
+    }
+  }
 }
