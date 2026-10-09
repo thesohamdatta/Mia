@@ -46,10 +46,7 @@ describe('jsonl-store performance & behavior', () => {
     const prefix = first + String.fromCharCode(10);
     const boundary = 65536 - Buffer.byteLength(second, 'utf-8') + 1;
     const padding = Math.max(0, boundary - Buffer.byteLength(prefix, 'utf-8'));
-    const content =
-      JSON.stringify({ id: 0, text: 'b'.repeat(padding) }) +
-      String.fromCharCode(10) +
-      second;
+    const content = JSON.stringify({ id: 0, text: 'b'.repeat(padding) }) + String.fromCharCode(10) + second;
     writeFileSync(jsonlFile, content, 'utf-8');
 
     const tail = readJsonlTail<{ id: number; text: string }>(jsonlFile, 1);
@@ -80,11 +77,7 @@ describe('jsonl-store performance & behavior', () => {
       records.map((record) => JSON.stringify(record)).join(String.fromCharCode(10))
     );
 
-    const tail = readJsonlTail<{ id: number; type: string }>(
-      jsonlFile,
-      3,
-      (record) => record.type === 'keep'
-    );
+    const tail = readJsonlTail<{ id: number; type: string }>(jsonlFile, 3, (record) => record.type === 'keep');
     expect(tail.map(({ id }) => id)).toEqual([2000, 1998, 1996]);
   });
 
@@ -106,11 +99,7 @@ describe('jsonl-store performance & behavior', () => {
     appendJsonl(jsonlFile, { id: 4, type: 'A' });
     appendJsonl(jsonlFile, { id: 5, type: 'B' });
 
-    const tailA = readJsonlTail<{ id: number; type: string }>(
-      jsonlFile,
-      2,
-      (item) => item.type === 'A'
-    );
+    const tailA = readJsonlTail<{ id: number; type: string }>(jsonlFile, 2, (item) => item.type === 'A');
     expect(tailA).toHaveLength(2);
     expect(tailA[0]?.id).toBe(4);
     expect(tailA[1]?.id).toBe(3);
