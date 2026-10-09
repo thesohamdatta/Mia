@@ -1,17 +1,22 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
+// Patterns describe an injection *intent* (a verb plus its target), not a
+// single keyword. Storing a note like "override the default port" must not be
+// treated as an attack, so a lone "override"/"system:"/"approve this" is not
+// enough on its own.
 export const INJECTION_PATTERNS: readonly RegExp[] = [
-  /ignore\s+(all\s+)?previous\s+(instructions|context|rules)/i,
+  /ignore\s+(?:all\s+|any\s+|the\s+)?(?:previous|prior|above|earlier|preceding)\s+(?:instructions|context|rules|prompts?|messages?)/i,
   /you\s+are\s+now\s+/i,
   /always\s+output\s+no\s+findings/i,
-  /skip\s+(all\s+)?(security|review|checks)/i,
-  /override(?:\s|:)/i,
-  /\b(?:system|assistant|user|human)\s*:/i,
-  /disregard\s+(all\s+)?(previous|above|prior)/i,
-  /from\s+now\s+on\b/i,
-  /do\s+not\s+(report|flag|mention)/i,
-  /approve\s+(all|every|this)/i,
+  /skip\s+(?:all\s+|any\s+|the\s+)?(?:security|review|checks|tests|verification)\b/i,
+  /\boverride\b\s*:?\s*(?:all\s+|every\s+|any\s+|the\s+)?(?:instructions|prompts?|rules|checks?|safety|verification|review|ignore|disregard|approve|skip)/i,
+  /\b(?:system|developer|assistant|human|user)\s*:\s*(?:ignore|disregard|approve|override|you\s+are|do\s+not|skip)/i,
+  /disregard\s+(?:all\s+|any\s+|the\s+)?(?:previous|prior|above|earlier|preceding)\b/i,
+  /from\s+now\s+on\s+(?:you|ignore|always|approve|skip|disregard)/i,
+  /do\s+not\s+(?:report|flag|mention|include)\b/i,
+  /approve\s+(?:all|every|any)\s+(?:changes?|requests?|prs?|pull)/i,
+  /approve\s+(?:this|the)\s+(?:without|automatically|now|immediately|anyway)/i,
 ];
 
 export function hasInjection(text: string): boolean {
