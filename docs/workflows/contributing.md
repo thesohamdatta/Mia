@@ -1,153 +1,73 @@
+---
+title: "Contributing to MIA"
+layer: 2
+last_updated: "2026-10-10"
+owner: engineering
+---
+
 # Contributing to MIA
 
-Thank you for contributing! This guide helps you get started quickly.
+MIA benefits from changes that are focused, verifiable, and easy to review. This guide covers the repository workflow; see [Writing documentation for MIA](../reference/documentation-style.md) when changing docs.
 
-## Quick Start
+## Set up the repository
 
 ```bash
-# Clone and setup
 git clone https://github.com/thesohamdatta/Mia.git
 cd Mia
-bun ci
+bun install
 ```
 
-## Git Workflow
+Use the `master` branch as the integration base and work on a short-lived branch.
 
-We use a lightweight GitHub Flow: short-lived branches, Pull Requests into `master`, CI before merge, and squash merges.
+## Make a change
 
-### Branching
-- **master** - canonical integration branch
-- **feature/*** - new features, short-lived
-- **fix/*** - bug fixes, short-lived
-- **docs/*** - documentation updates
-- **refactor/*** - code improvements
-- **chore/*** - maintenance tasks
+1. State the problem and expected outcome.
+2. Keep the patch focused; avoid unrelated cleanup.
+3. Update tests and documentation when behaviour or user-facing contracts change.
+4. Run the narrowest relevant checks while iterating.
+5. Run the broader relevant verification suite before opening a pull request.
+6. Explain the change and include the verification evidence in the pull request.
 
-### Workflow
-1. Create a branch from `master`: `git checkout -b feature/my-feature`
-2. Make changes with small, focused commits
-3. Push branch: `git push -u origin feature/my-feature`
-4. Open a Pull Request against `master`
-5. CI runs (tests, lint, type-check, build)
-6. Code review
-7. Squash and merge to `master`
-8. Delete branch locally and remotely
+## Commit messages
 
-## Commit Messages (Conventional Commits)
+MIA uses Conventional Commits. Common forms include:
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
+```text
+feat(cli): add a supported command
+fix(state): handle a malformed event
+docs: clarify installation
+test: cover checkpoint loading
+refactor(skills): simplify a workflow
 ```
 
-### Types
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, no code change |
-| `refactor` | Code change, no feature/fix |
-| `perf` | Performance improvement |
-| `test` | Adding/correcting tests |
-| `chore` | Build, tools, maintenance |
-| `build` | Build system, dependencies |
-| `ci` | CI configuration |
-| `revert` | Revert previous commit |
+Describe the change that actually happened. Do not use an old example that names a removed subsystem as though it still exists.
 
-### Examples
+## Verification
+
+The repository exposes these checks:
+
 ```bash
-feat(cli): add --json output flag
-fix(daemon): handle SIGTERM gracefully
-docs: update installation guide
-refactor(skills): simplify loader logic
-test: add config parser tests
-chore: upgrade typescript to 5.5
-```
-
-### Breaking Changes
-Add `!` after type/scope and include `BREAKING CHANGE:` in footer:
-```bash
-feat(cli)!: change default output format
-
-BREAKING CHANGE: default output is now JSON instead of text
-```
-
-## Code Quality Gates
-
-All checks must pass before merge:
-
-| Check | Command | Runs On |
-|-------|---------|---------|
-| Lint & Format | `bun run lint:check` | pre-commit, CI |
-| Type Check | `bun run typecheck` | pre-commit, CI |
-| Unused Code | `bun run knip` | pre-commit, CI |
-| Tests | `bun test` | pre-push, CI |
-| Build | `bun run build` | pre-push, CI |
-
-### Local Development
-```bash
-# Run all checks manually
-bun run lint:check
-bun run typecheck
-bun run knip
-bun run validate:frontmatter
-bun run lint:md
 bun test
+bun run typecheck
+bun run lint:check
+bun run knip
+bun run lint:md
+bun run validate:frontmatter
 bun run build
 ```
 
-## Pull Request Guidelines
+Choose checks based on the changed code. For a documentation-only change, at minimum run the Markdown and link checks that are available; for code changes, run the relevant tests, type checks, lint, and build before handoff.
 
-### Before Opening
-- [ ] Branch is up to date with `master`
-- [ ] All checks pass locally
-- [ ] Commit messages follow Conventional Commits
-- [ ] No WIP/fixup commits (squash them)
+A green check is evidence for the checks it ran, not a guarantee that the whole change is correct.
 
-### PR Template
-Fill out the PR template when one is provided:
-- Clear description of changes
-- Link related issues
-- List testing done
-- Check all applicable boxes
+## Pull requests
 
-### Review Process
-- Self-review first
-- Request review from maintainer
-- Address feedback in new commits (not force-push unless needed)
-- Squash commits on merge
+Include:
 
-## Code Style
+- the problem being solved;
+- the important implementation choices;
+- test and verification results;
+- documentation changes;
+- known limitations or follow-up work.
 
-- **Language**: TypeScript (strict mode)
-- **Formatter/Linter**: Biome (configured in `biome.json`)
-- **No `any`** unless absolutely necessary
-- **Explicit types** for public APIs
-- **Small, focused functions**
-- **Meaningful names** over comments
-
-## Project Structure
-
-```
-core/       # Runtime and executable skills
-scripts/    # Build and documentation tooling
-docs/       # Canonical and historical documentation
-.agents/    # Agent coordination state and handoffs
-.github/    # CI workflows
-```
-
-## Getting Help
-
-- Check existing issues and PRs
-- Read `AGENTS.md`, `docs/core/architecture.md`, and `docs/core/principles.md`
-- Ask in discussions or open an issue
-
----
-
-**Remember**: Simple, Deep, Evolvable. Keep it simple. Build only what is necessary. Test in real life, learn quickly, iterate based on evidence.
+Keep the scope reviewable and make remaining uncertainty explicit.

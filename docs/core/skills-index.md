@@ -1,71 +1,68 @@
-# MIA Skills & Commands
+---
+title: "Skills and commands"
+layer: 3
+last_updated: "2026-10-10"
+owner: engineering
+---
 
-This page describes the executable skill surface that exists in the current repository.
+# Skills and commands
 
-Skills are registered explicitly in `core/skills/index.ts`. The registry is a direct map of `SkillDefinition` values, not filesystem discovery.
+MIA exposes a small, explicit set of CLI skills. Each registered skill has a definition that describes its identity, required capabilities, side effects, expected verification, and workflow phase.
 
-## Core workflow
+The authoritative command map is `core/skills/index.ts`. Use `mia --help` (or `bun run core/cli/index.ts --help` from the repository) to inspect the version you're running.
 
-| Skill | CLI | Current role |
-| :--- | :--- | :--- |
-| `grill` | `mia grill` | Clarify problem, assumptions, risks, scope, and definition of done |
-| `plan` | `mia plan` | Build a plan around explicit success criteria |
-| `spec` | `mia spec` | Shape intent into a project specification |
-| `review` | `mia review` | Run deterministic pre-landing verification |
-| `health` | `mia health` | Run the repository verification suite |
-| `setup` | `mia setup` | Install MIA agent skills for supported hosts |
-| `ship` | `mia ship` | Gate handoff on repository verification |
+## Commands
 
-## Learning and state
+| Command | Purpose |
+|---|---|
+| `grill` | Clarify the problem, assumptions, risks, scope, and definition of done. |
+| `plan` | Create a plan and durable Work record from an objective. |
+| `spec` | Shape intent into a project specification. |
+| `setup` | Install MIA's agent-facing skills for supported hosts without replacing unmanaged skills. |
+| `review` | Run the pre-landing review workflow. |
+| `health` | Run the repository's configured verification checks. |
+| `ship` | Check repository verification and handoff readiness. |
+| `learn` | List or store project learnings. |
+| `retro` | Review recent timeline activity and learnings. |
+| `memory` | Read or append long-term memory. |
+| `checkpoint` | Save, list, or load working state. |
+| `vc` | Inspect and deliberately mutate Git state. |
 
-| Skill | CLI | Current role |
-| :--- | :--- | :--- |
-| `learn` | `mia learn` | List or append project learnings |
-| `retro` | `mia retro` | Summarise recent timeline activity and learnings |
-| `memory` | `mia memory` | Read or append long-term memory |
-| `checkpoint` | `mia checkpoint` | Save, list, or load working state |
+Use the Bun entry point before the compiled executable is available:
 
-## Version control
-
-| Skill | CLI | Current role |
-| :--- | :--- | :--- |
-| `vc` | `mia vc` | Inspect and deliberately mutate Git state |
-
-## Skill contract
-
-Each registered skill is a `SkillDefinition`:
-
-```ts
-interface SkillDefinition {
-  manifest: SkillManifest;
-  executor: SkillExecutor;
-}
+```bash
+bun run core/cli/index.ts --help
+bun run core/cli/index.ts grill start
+bun run core/cli/index.ts plan create "Describe the intended outcome"
 ```
 
-The manifest records:
+## What a skill definition declares
 
-- identity and description
-- allowed tools
-- declared side-effect class
-- declared verification names
-- workflow phase
+The runtime models a registered skill as a `SkillDefinition` containing a manifest and an executor. The manifest records:
 
-Skill documentation is generated from the executable registry. Do not infer command availability, invocation semantics, or permissions from Markdown alone.
+- **Identity:** name, version, and description.
+- **Capabilities:** the tools required by the skill.
+- **Side effects:** the declared class of changes a skill may make.
+- **Verification:** names resolved against the repository's verification catalog.
+- **Phase:** the workflow phase associated with the skill.
+- **Invocation:** the declared invocation mode.
 
-The CLI does not execute a raw executor. It resolves a `SkillDefinition` and sends it through the execution boundary, which validates the manifest before middleware and executor code run.
+The skill executor is run through a shared execution boundary rather than called directly by the CLI. That boundary validates the definition and checks declared tool grants against the current execution context.
 
-## Verification boundary
+## Review, health, and ship
 
-Executable verification is implemented in `core/verification/`.
+These skills serve different purposes:
 
-`health` and `ship` run the configured repository checks and persist their `EvidenceRecord` results through `UnifiedStore`. `review` runs the deterministic pre-landing subset.
+- `review` runs the deterministic pre-landing verification subset.
+- `health` runs the checks declared for the current repository verification suite.
+- `ship` checks verification and reports whether handoff is unblocked.
 
-The manifest's `verification` field is executable contract metadata. `health`, `review`, and `ship` resolve the declared names against the canonical repository verification catalog before running checks. `allowedTools` is enforced at the skill admission boundary against `ExecutionContext.grantedTools`. A missing grant blocks the skill before middleware and executor code run. MIA still does not own the underlying tool execution runtime.
+A successful result must be interpreted in the scope of checks actually run. `ship` does not push code, merge changes, or open a pull request.
+
+## Host integration
+
+`setup` installs supported agent-facing skills. It skips existing unmanaged skills instead of overwriting them. MIA does not own the host's model loop or underlying tool execution runtime.
 
 ## Source of truth
 
-The authoritative command surface is `core/skills/index.ts`. Documentation describes that executable source and must not be used as evidence that an unregistered command exists.
-
----
-
-*Keep the command surface small. Put depth behind the interface.*
+Read the executable registry and the skill implementation when you need details. Documentation describes that behaviour; it does not make an unregistered command exist.
