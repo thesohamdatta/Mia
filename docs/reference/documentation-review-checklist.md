@@ -1,3 +1,10 @@
+---
+title: "Documentation review checklist"
+layer: 3
+last_updated: "2026-10-10"
+owner: documentation
+---
+
 # Documentation review checklist
 
 Use this checklist when a change adds, removes, or alters user-facing behaviour.

@@ -1,3 +1,10 @@
+---
+title: "Configuration and local state"
+layer: 3
+last_updated: "2026-10-10"
+owner: runtime
+---
+
 # Configuration and local state
 
 The active MIA CLI has a deliberately small configuration contract. This page documents the runtime path that is currently wired into execution; it does not describe every configuration type present in the repository.

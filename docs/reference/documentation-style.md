@@ -1,3 +1,10 @@
+---
+title: "Writing documentation for MIA"
+layer: 1
+last_updated: "2026-10-10"
+owner: documentation
+---
+
 # Writing documentation for MIA
 
 MIA's documentation should be as deliberate as its code: useful to a reader, honest about evidence, and cheap to maintain.

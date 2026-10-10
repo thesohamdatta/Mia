@@ -1,3 +1,10 @@
+---
+title: "A first MIA workflow"
+layer: 2
+last_updated: "2026-10-10"
+owner: documentation
+---
+
 # A first MIA workflow
 
 MIA is designed to make the path from an unclear request to a verifiable handoff more deliberate. Use only the phases that fit the work; a one-line typo does not need a full planning ceremony.

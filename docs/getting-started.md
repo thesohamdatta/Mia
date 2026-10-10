@@ -1,3 +1,10 @@
+---
+title: "Getting started"
+layer: 1
+last_updated: "2026-10-10"
+owner: documentation
+---
+
 # Getting started
 
 This guide takes you from a fresh checkout to running the MIA CLI. MIA is developed with Bun and TypeScript; the repository scripts are the reliable entry point.

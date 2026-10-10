@@ -1,3 +1,10 @@
+---
+title: "MIA documentation"
+layer: 0
+last_updated: "2026-10-10"
+owner: documentation
+---
+
 # MIA documentation
 
 MIA is an engineering harness around AI-assisted software development. These docs explain how to run it, how its parts fit together, and how to change it without inventing behaviour that the code does not provide.
