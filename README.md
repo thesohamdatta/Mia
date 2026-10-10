@@ -72,4 +72,4 @@ For precise behaviour, prefer the executable source and tests over a stale descr
 
 - [GitHub repository](https://github.com/thesohamdatta/Mia)
 - [Documentation index](docs/README.md)
-- [MIT license](LICENSE)
+- **License:** MIT, as declared in [package.json](package.json).
