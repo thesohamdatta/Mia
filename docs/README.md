@@ -16,7 +16,7 @@ Start with the task you came here to complete.
 ## Understand MIA
 
 - [Architecture](core/architecture.md) — the CLI execution path, skill boundary, host boundary, and local persistence.
-- [Engineering principles](core/principles.md) — the principles that guide implementation decisions.
+- [Engineering principles](../PRINCIPLES.md) — the short, reader-facing statement of MIA's principles.
 - [Design philosophy](core/design-philosophy.md) — simplicity, depth, and evolvability.
 - [Glossary](core/glossary.md) — terms used throughout the project.
 
