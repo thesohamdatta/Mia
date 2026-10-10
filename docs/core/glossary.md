@@ -1,3 +1,10 @@
+---
+title: "MIA glossary"
+layer: 2
+last_updated: "2026-10-10"
+owner: documentation
+---
+
 # MIA glossary
 
 A short reference for terms used in the MIA documentation and source code.

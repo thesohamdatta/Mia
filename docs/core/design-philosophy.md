@@ -1,3 +1,10 @@
+---
+title: "MIA design philosophy"
+layer: 1
+last_updated: "2026-10-10"
+owner: architecture
+---
+
 # MIA design philosophy
 
 MIA is shaped by three design principles: simple, deep, and evolvable. They describe how we want the system to feel to a user and how we want it to change over time.

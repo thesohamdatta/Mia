@@ -1,3 +1,10 @@
+---
+title: "Skills and commands"
+layer: 3
+last_updated: "2026-10-10"
+owner: engineering
+---
+
 # Skills and commands
 
 MIA exposes a small, explicit set of CLI skills. Each registered skill has a definition that describes its identity, required capabilities, side effects, expected verification, and workflow phase.

@@ -1,3 +1,10 @@
+---
+title: "MIA architecture"
+layer: 2
+last_updated: "2026-10-10"
+owner: architecture
+---
+
 # MIA architecture
 
 MIA is a local-first Bun CLI that wraps AI-assisted engineering work in explicit workflows and durable state. Skills execute in the CLI process; a separate daemon and HTTP control plane are not part of the current runtime.

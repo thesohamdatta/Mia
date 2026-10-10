@@ -1,3 +1,10 @@
+---
+title: "Testing and verification"
+layer: 3
+last_updated: "2026-10-10"
+owner: verification
+---
+
 # Testing and verification
 
 MIA uses tests and repository checks as evidence for specific claims. The goal is not to maximize the number of checks; it is to test the behaviour that matters and state what the result proves.

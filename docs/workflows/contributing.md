@@ -1,3 +1,10 @@
+---
+title: "Contributing to MIA"
+layer: 2
+last_updated: "2026-10-10"
+owner: engineering
+---
+
 # Contributing to MIA
 
 MIA benefits from changes that are focused, verifiable, and easy to review. This guide covers the repository workflow; see [Writing documentation for MIA](../reference/documentation-style.md) when changing docs.
