@@ -41,7 +41,7 @@ const define = (
 };
 
 export const skills: Record<string, SkillDefinition> = {
-  grill: define('grill', 'Clarify intent before non-trivial work', 'none', [], 'clarify', {
+  grill: define('grill', 'Clarify intent before non-trivial work', 'local-write', [], 'clarify', {
     execute: grillExecute,
   }),
   plan: define(
