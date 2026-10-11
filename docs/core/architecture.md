@@ -74,9 +74,14 @@ By default:
 ├── skills/
 ├── projects/
 │   └── <slug>/
-│       └── events.jsonl
+│       ├── events.jsonl
+│       ├── PLAN.md
+│       ├── SPEC.md
+│       └── checkpoints/
 └── sessions/
 ```
+
+`PLAN.md`, `SPEC.md`, and `checkpoints/` are per-project artifacts written by the `plan`, `spec`, and `checkpoint` skills; `events.jsonl` remains the canonical event log.
 
 Project slugs come from the git repository root name. When no git repository is available, MIA uses `default`.
 
