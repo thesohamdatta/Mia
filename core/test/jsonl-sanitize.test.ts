@@ -42,6 +42,10 @@ describe('jsonl sanitize boundary', () => {
     expect(sanitizeForStorage(attack)).not.toBe(attack);
   });
 
+  it('flags a bare approve-this request with no qualifier', () => {
+    expect(hasInjection('approve this')).toBe(true);
+  });
+
   it('keeps benign text intact through the append path', () => {
     appendJsonl(jsonlFile, { note: 'override the default port to 8080' });
     const raw = readFileSync(jsonlFile, 'utf-8');
