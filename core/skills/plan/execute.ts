@@ -2,10 +2,13 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createRootPlan } from '../../root/types.js';
 import { createWorkFromRootPlan } from '../../work/from-root-plan.js';
+import { loadGrillSession } from '../../work/grill-session.js';
 import { saveWork } from '../../work/persistence.js';
 import type { ExecutionContext, LearningRecord, SkillExecutor, SkillResult } from '../types.js';
 
-function makePlan(request: string, learnings: string[]) {
+const DEFAULT_EVIDENCE = ['Tests pass'];
+
+function makePlan(request: string, learnings: string[], successCriteria: string[]) {
   return createRootPlan(
     {
       request,
@@ -25,7 +28,7 @@ function makePlan(request: string, learnings: string[]) {
       dependencies: [],
       nextActions: ['Implement the planned work'],
       approvals: [],
-      expectedEvidence: ['Tests pass'],
+      expectedEvidence: successCriteria,
     }
   );
 }
@@ -62,6 +65,25 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       return { ok: false, status: 'blocked', error: 'Usage: mia plan create <objective>' };
     }
 
+    // Consume the shared design concept: planning is blocked until the grill
+    // interview has resolved every design branch.
+    const grill = await loadGrillSession(ctx);
+    if (grill) {
+      const unresolved = grill.questions.filter((question) => !question.resolved);
+      if (unresolved.length > 0) {
+        return {
+          ok: false,
+          status: 'blocked',
+          error: `Cannot plan: ${unresolved.length} unresolved design decision(s). Next: ${unresolved[0]?.prompt}\nResolve with: mia grill answer <decision>`,
+        };
+      }
+    }
+    const resolved = grill?.questions ?? [];
+    const successQuestion = resolved.find((question) => question.id === 'success');
+    const successCriteria = successQuestion?.answer?.trim()
+      ? [successQuestion.answer.trim()]
+      : DEFAULT_EVIDENCE;
+
     const learningEvents = await ctx.unifiedStore.listLearnings(
       ctx.config.projectsDir,
       ctx.slug,
@@ -71,7 +93,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       .map((event) => (event.data as Partial<LearningRecord>).insight)
       .filter((insight): insight is string => Boolean(insight?.trim()));
 
-    const plan = makePlan(objective, learnings);
+    const plan = makePlan(objective, learnings, successCriteria);
     const work = createWorkFromRootPlan(plan);
     await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
@@ -88,6 +110,15 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       '## Success Criteria',
       ...work.successCriteria.map((criterion) => `- [ ] ${criterion}`),
       '',
+      ...(resolved.length > 0
+        ? [
+            '## Design Concept',
+            ...resolved.map(
+              (question) => `- ${question.prompt} — ${question.answer ?? '(unresolved)'}`
+            ),
+            '',
+          ]
+        : []),
       '## Steps',
       ...plan.nextActions.map((action, index) => `${index + 1}. [ ] ${action}`),
       '',

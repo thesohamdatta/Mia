@@ -3,82 +3,21 @@
 //
 // "Grill me" is a real interview, not a static prompt: it captures decisions
 // one question at a time and persists a shared design concept that later
-// phases can consume. Sessions are stored as `timeline` events with a
-// `kind` discriminator (the same pattern used for operational observations),
-// so no new store or event type is introduced. GRILL.md is a derived artifact.
+// phases can consume. The session itself is owned by core/work/grill-session;
+// this executor only drives it and renders output. GRILL.md is a derived
+// artifact.
 
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import {
+  DESIGN_QUESTIONS,
+  type GrillSession,
+  createGrillSession,
+  loadGrillSession,
+  nextUnresolved,
+  saveGrillSession,
+} from '../../work/grill-session.js';
 import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
-
-export interface GrillQuestion {
-  id: string;
-  prompt: string;
-  resolved: boolean;
-  answer?: string;
-}
-
-export interface GrillSession {
-  objective: string;
-  questions: GrillQuestion[];
-  startedAt: string;
-  updatedAt: string;
-}
-
-interface GrillEvent {
-  kind: 'grill-session';
-  session: GrillSession;
-}
-
-// The design tree: each branch is resolved one by one before implementation.
-const DESIGN_QUESTIONS: readonly { id: string; prompt: string }[] = [
-  { id: 'problem', prompt: "What's the actual problem we're solving?" },
-  { id: 'assumptions', prompt: 'What do we believe is true (assumptions)?' },
-  { id: 'risks', prompt: 'What could go wrong (technical, product, timeline)?' },
-  { id: 'success', prompt: "What does 'done' look like (verifiable criteria)?" },
-  { id: 'dependencies', prompt: 'What do we need from others (dependencies)?' },
-  { id: 'scope', prompt: "What's explicitly NOT in scope?" },
-];
-
-function newSession(objective: string): GrillSession {
-  const now = new Date().toISOString();
-  return {
-    objective,
-    questions: DESIGN_QUESTIONS.map((q) => ({ ...q, resolved: false })),
-    startedAt: now,
-    updatedAt: now,
-  };
-}
-
-function nextUnresolved(session: GrillSession): GrillQuestion | undefined {
-  return session.questions.find((question) => !question.resolved);
-}
-
-async function saveSession(ctx: ExecutionContext, session: GrillSession): Promise<void> {
-  session.updatedAt = new Date().toISOString();
-  const event: GrillEvent = { kind: 'grill-session', session };
-  await ctx.unifiedStore.appendTimeline(ctx.config.projectsDir, ctx.slug, event);
-}
-
-export async function loadGrillSession(ctx: ExecutionContext): Promise<GrillSession | null> {
-  const events = await ctx.unifiedStore.query(
-    ctx.config.projectsDir,
-    ctx.slug,
-    'timeline',
-    (event) => {
-      const data = event.data as Partial<GrillEvent>;
-      return data.kind === 'grill-session' && data.session !== undefined;
-    },
-    1
-  );
-  const latest = events[0];
-  return latest ? structuredClone((latest.data as GrillEvent).session) : null;
-}
-
-export async function listGrillDecisions(ctx: ExecutionContext): Promise<GrillQuestion[]> {
-  const session = await loadGrillSession(ctx);
-  return session ? session.questions.map((question) => ({ ...question })) : [];
-}
 
 async function writeGrillArtifact(ctx: ExecutionContext, session: GrillSession): Promise<string> {
   const path = join(ctx.config.projectsDir, ctx.slug, 'GRILL.md');
@@ -143,8 +82,8 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
       };
     }
 
-    const created = newSession(objective);
-    await saveSession(ctx, created);
+    const created = createGrillSession(objective);
+    await saveGrillSession(ctx, created);
     const path = await writeGrillArtifact(ctx, created);
     return {
       ok: true,
@@ -176,7 +115,7 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
 
     question.resolved = true;
     question.answer = answer;
-    await saveSession(ctx, session);
+    await saveGrillSession(ctx, session);
     await writeGrillArtifact(ctx, session);
     return { ok: true, status: 'success', output: renderSession(session) };
   }

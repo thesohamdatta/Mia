@@ -4,9 +4,9 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createExecutionContext } from '../context.js';
 import { executeSkillDefinition } from '../skills/executor.js';
-import { listGrillDecisions, loadGrillSession } from '../skills/grill/execute.js';
 import { getSkill } from '../skills/index.js';
 import type { ExecutionContext } from '../skills/types.js';
+import { listGrillDecisions, loadGrillSession } from '../work/grill-session.js';
 
 // "Grill me" must be a real, persisted interview: it captures decisions one by
 // one, keeps unresolved questions visible, and leaves a shared design concept
