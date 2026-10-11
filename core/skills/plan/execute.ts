@@ -2,8 +2,8 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createRootPlan } from '../../root/types.js';
 import { createWorkFromRootPlan } from '../../work/from-root-plan.js';
+import { loadGrillSession } from '../../work/grill-session.js';
 import { saveWork } from '../../work/persistence.js';
-import { loadGrillSession } from '../grill/execute.js';
 import type { ExecutionContext, LearningRecord, SkillExecutor, SkillResult } from '../types.js';
 
 const DEFAULT_EVIDENCE = ['Tests pass'];
