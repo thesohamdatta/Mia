@@ -1,12 +1,17 @@
-# Testing Strategy
+---
+title: "Testing and verification"
+layer: 3
+last_updated: "2026-10-10"
+owner: verification
+---
 
-MIA uses testing as evidence for claims about the repository.
+# Testing and verification
 
-This document describes the verification stack and the test structure that currently exists in the repository.
+MIA uses tests and repository checks as evidence for specific claims. The goal is not to maximize the number of checks; it is to test the behaviour that matters and state what the result proves.
 
-## Current checks
+## Repository checks
 
-The main repository checks are:
+The current package scripts include:
 
 ```bash
 bun test
@@ -18,129 +23,40 @@ bun run validate:frontmatter
 bun run build
 ```
 
-GitHub Actions runs the supported repository checks on the `master` integration branch.
+Use the narrowest useful checks while iterating, then run the relevant broader suite before handoff. Check `package.json` and the workflow under `.github/workflows/` if the set of scripts changes.
 
-## Current test organisation
+## What to test
 
-The repository keeps focused regression and integration coverage under `core/test/`.
+### State persistence
 
-Current test files include:
-
-```text
-core/test/
-├── agent-setup.test.ts
-├── agent-surface.test.ts
-├── capability-team.test.ts
-├── integration.test.ts
-├── jsonl-store.test.ts
-├── plan-work.integration.test.ts
-├── preamble.test.ts
-├── root-plan-work.test.ts
-├── root-planning.test.ts
-├── work-journey.integration.test.ts
-├── intent-to-verified-work.e2e.test.ts
-├── work-maintenance.test.ts
-├── skill-capability.test.ts
-├── work-lifecycle.test.ts
-└── work-persistence.test.ts
-```
-
-The directory also contains small legacy support modules such as `analyzer.ts`, `judge.ts`, `index.ts`, and `types.ts`. They are not themselves the current test suite.
-
-When new behaviour is added, add focused unit or integration coverage where it gives useful evidence.
-
-## What matters most
-
-### JSONL state
-
-Test append, parsing, malformed-line handling, tail queries, filtering, and the storage sanitisation boundary.
+Cover append and query behaviour, malformed-line handling, filtering, and sanitisation where relevant. Confirm that reading state does not accidentally mutate it.
 
 ### Skill execution
 
-Test the important path:
+Test the boundaries that matter: command dispatch, skill validation, capability admission, execution results, and the state changes made by the skill. Use integration tests when a behaviour crosses module or persistence boundaries.
 
-```text
-CLI → skill → UnifiedStore
-```
+### Work lifecycle
 
-The Work system also has direct coverage for:
+Test creation, persistence, recovery, transitions, approvals, and verification links when the change touches those contracts.
 
-```text
-RootPlan → Work → persistence → recovery
-```
+### Agent setup
 
-### Configuration
+Test that generated host-facing skill files are correct and that existing unmanaged files are not overwritten.
 
-Test default paths and environment-variable behaviour when changing configuration.
+### Documentation
 
-The current CLI runtime derives its active configuration from `MIA_DIR`. The broader `core/config/ConfigLoader` remains compatibility/transition code and is not the active `createExecutionContext()` path.
+For documentation changes, check that:
 
-### Git helpers
+- commands and file paths exist in the checked-out revision;
+- internal links resolve;
+- diagrams render using GitHub-supported Mermaid syntax;
+- claims about configuration and architecture match active code;
+- generated skill documentation remains consistent with the executable registry.
 
-Test conventional commit validation and safety-sensitive filesystem or git operations before changing them.
+## Evidence and limits
 
-### Agent surfaces
+A passing test proves the behaviour covered by that test. A successful type check proves the compiler accepted the checked sources under the configured rules. A successful build proves that the build completed for that revision.
 
-Test generated Codex and Claude skill adapters without overwriting unmanaged user-authored skills.
+Do not call a test suite comprehensive unless its coverage supports that claim. Do not claim a check passed unless it actually ran and its result was observed.
 
-## AI evaluation
-
-MIA has host adapters and skill metadata that can support deeper model evaluation, but the current package scripts do not expose a dedicated `eval:*` command family.
-
-Keep future model evaluation separate from deterministic repository gates so model variability does not obscure ordinary code regressions.
-
-## CI principle
-
-Every CI job should correspond to a command the repository actually supports.
-
-Do not document obsolete scripts, imaginary coverage thresholds, or historical daemon build targets as current guarantees.
-
-## Verification principle
-
-> **NO EVIDENCE = NOT COMPLETE.**
-
-A passing test suite is evidence for tested behaviour, not proof that the entire system is correct. State exactly what was checked and what was not.
-
----
-
-*Test the behaviour that matters. Keep the evidence close to the claim.*
-
-## Intent-to-verified E2E
-
-`intent-to-verified-work.e2e.test.ts` proves the v0.4 acceptance path with deterministic repository doubles:
-
-```text
-Human intent → Root plan → capability selection → Work → review verification → human approval → ship → recovery
-```
-
-It uses the real root, capability, Work, review, approval, and ship boundaries without requiring a model provider.
-
-## Durable lifecycle journey
-
-The critical resumability path is covered by `work-journey.integration.test.ts`:
-
-```text
-Plan → Work persistence → Review verification → Approval persistence → Ship → Work recovery
-```
-
-The test uses real skill/state boundaries with injected verification results, so it proves lifecycle and persistence without making the repository test suite depend on an external model provider.
-
-
-## Operate and maintain
-
-```text
-Operational observation → maintenance Work → verification/review → ship → maintained
-```
-
-work-maintenance.test.ts proves this seam using the existing Work lifecycle and UnifiedStore timeline. It does not require monitoring infrastructure or a background service.
-
-
-## Evidence-driven learning
-
-`learning-loop.test.ts` proves the smallest v0.4 learning contract:
-
-```text
-run N → record scoped learning + source run → fresh run N+1 → apply learning during planning
-```
-
-This is deliberately not model training or a second memory system. The shared `UnifiedStore` remains the persistence boundary.
+For the repository's definition of evidence, see [Review standards](review-standards.md).

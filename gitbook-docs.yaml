@@ -1,0 +1,12 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: MIA Docs
+  structure:
+    - type: space
+      key: sitesp_oa37O
+      title: MIA Documentation
+      path: mia-documentation
+      default: true
+      content:
+        directory: ./gitbook
+        language: en
