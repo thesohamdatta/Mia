@@ -15,7 +15,7 @@ side-effects: local-write
 
 # setup
 
-Install the MIA agent skill surface for supported coding-agent hosts.
+Install MIA agent skills for supported hosts
 
 ## Invocation
 
@@ -34,9 +34,7 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-1. Generate the public MIA skill surface.
-2. Preserve unmanaged host skills.
-3. Report generated and skipped skills.
+Phase: execute
 
 ---
 

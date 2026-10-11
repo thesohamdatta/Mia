@@ -29,6 +29,11 @@ MIA means **Machine Intelligence Architecture**. It is a local-first AI engineer
 | **Workflow** | A repeatable engineering procedure describing how work moves from intent to verified outcome. |
 | **Checkpoint** | Persisted working state associated with an execution identity so work can resume with explicit context. |
 | **Recovery** | Re-establishing a coherent run or repository state after interruption or failure. |
+| **Software factory** | The system that turns a signal into verified, shipped software through named phases and three loops. MIA owns the contracts and evidence; the host owns execution. |
+| **Signal** | An input to the factory such as a bug report, review comment, failing check, or user request. |
+| **Agent readiness** | The deterministic feedback a codebase gives an agent, assessed across eight areas. |
+| **Factory loop** | One of the inner (pre-PR), outer (PR), or meta (post-development) automation points. |
+| **Model routing** | Choosing the cheapest model tier predicted to clear the quality bar for a task. |
 
 ## Runtime shape
 

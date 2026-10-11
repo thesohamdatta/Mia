@@ -38,7 +38,8 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: verify
+1. Run `mia health`.
+2. Inspect each recorded evidence record.
 
 ---
 

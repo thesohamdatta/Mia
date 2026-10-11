@@ -12,6 +12,7 @@ const CORE_SKILLS: readonly string[] = [
   'ship',
   'review',
   'health',
+  'factory',
   'setup',
 ];
 const LEARNING_SKILLS: readonly string[] = ['learn', 'retro', 'memory', 'checkpoint'];

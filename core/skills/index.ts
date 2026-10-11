@@ -1,5 +1,6 @@
 import { execute as checkpointExecute } from './checkpoint/execute.js';
 import { validateSkillDefinition } from './executor.js';
+import { execute as factoryExecute } from './factory/execute.js';
 import { execute as grillExecute } from './grill/execute.js';
 import { execute as healthExecute } from './health/execute.js';
 import { execute as learnExecute } from './learn/execute.js';
@@ -82,6 +83,14 @@ export const skills: Record<string, SkillDefinition> = {
     ['typecheck', 'lint', 'unused-code', 'tests', 'build'],
     'verify',
     { execute: healthExecute }
+  ),
+  factory: define(
+    'factory',
+    'Assess agent readiness, factory metrics, and model routing',
+    'none',
+    [],
+    'verify',
+    { execute: factoryExecute }
   ),
   learn: define('learn', 'Store and retrieve project learnings', 'local-write', [], 'verify', {
     execute: learnExecute,

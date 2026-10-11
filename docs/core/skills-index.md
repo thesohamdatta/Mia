@@ -21,6 +21,7 @@ The authoritative command map is `core/skills/index.ts`. Use `mia --help` (or `b
 | `setup` | Install MIA's agent-facing skills for supported hosts without replacing unmanaged skills. |
 | `review` | Run the pre-landing review workflow. |
 | `health` | Run the repository's configured verification checks. |
+| `factory` | Assess agent readiness, report factory metrics, route a task to a model tier, and print the factory map. |
 | `ship` | Check repository verification and handoff readiness. |
 | `learn` | List or store project learnings. |
 | `retro` | Review recent timeline activity and learnings. |

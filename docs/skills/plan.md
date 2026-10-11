@@ -34,7 +34,9 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: plan
+1. Resolve the grill interview first.
+2. Run `mia plan create "<objective>"`.
+3. Review the written plan and its success criteria.
 
 ---
 

@@ -15,7 +15,7 @@ side-effects: local-write
 
 # review
 
-Prepare a review surface for the current change
+Advance a Work item through verification and review
 
 ## Invocation
 
@@ -26,7 +26,10 @@ Available to model-triggered workflows when the task matches this skill.
 - Phase: review
 - Invocation: both
 - Side effects: local-write
-- Verification: typecheck, lint, unused-code, tests
+- Verification: typecheck
+lint
+unused-code
+tests
 
 ## Runtime authority
 
@@ -34,7 +37,8 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: review
+1. Run `mia review <workId>`.
+2. Inspect the recorded evidence before landing.
 
 ---
 

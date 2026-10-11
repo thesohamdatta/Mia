@@ -95,9 +95,23 @@ function skillData([_name, definition]: [string, SkillDefinition]): SkillDocData
       manifest.invocation === 'model' || manifest.invocation === 'both'
         ? 'Available to model-triggered workflows when the task matches this skill.'
         : 'Explicitly invoked by the user through the MIA CLI.',
-    WORKFLOW: `Phase: ${manifest.phase}`,
+    WORKFLOW: WORKFLOWS[manifest.name] ?? `Phase: ${manifest.phase}`,
   };
 }
+
+// Skills with a meaningful procedure get an explicit workflow line; the rest
+// fall back to the phase name so the generated page stays accurate.
+const WORKFLOWS: Record<string, string> = {
+  factory:
+    '1. Assess readiness with `mia factory readiness` before handing more work to agents.\n2. Route each task to the cheapest tier with `mia factory route`.\n3. Read outcome metrics with `mia factory metrics`.\n4. Inspect phases, loops, and roles with `mia factory map`.',
+  grill:
+    '1. Start the interview with `mia grill start`.\n2. Answer each design branch with `mia grill answer <decision>`.\n3. Resolve every question before planning.',
+  plan: '1. Resolve the grill interview first.\n2. Run `mia plan create "<objective>"`.\n3. Review the written plan and its success criteria.',
+  spec: '1. Shape the intent with `mia spec`.\n2. Record the specification before implementation.',
+  ship: '1. Verify with `mia ship <workId>`.\n2. Ship only when verification and approval are present.',
+  review: '1. Run `mia review <workId>`.\n2. Inspect the recorded evidence before landing.',
+  health: '1. Run `mia health`.\n2. Inspect each recorded evidence record.',
+};
 
 function main(): void {
   ensureDir(OUTPUT_DIR);
