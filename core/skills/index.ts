@@ -1,3 +1,4 @@
+import { execute as approveExecute } from './approve/execute.js';
 import { execute as checkpointExecute } from './checkpoint/execute.js';
 import { validateSkillDefinition } from './executor.js';
 import { execute as factoryExecute } from './factory/execute.js';
@@ -91,6 +92,14 @@ export const skills: Record<string, SkillDefinition> = {
     [],
     'verify',
     { execute: factoryExecute }
+  ),
+  approve: define(
+    'approve',
+    'Record the human approval a ship gate requires',
+    'local-write',
+    [],
+    'handoff',
+    { execute: approveExecute }
   ),
   learn: define('learn', 'Store and retrieve project learnings', 'local-write', [], 'verify', {
     execute: learnExecute,

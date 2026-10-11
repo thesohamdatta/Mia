@@ -79,11 +79,22 @@ mia health
 
 ## Step 6: ship through the gate
 
+If the Work item requires human approval, record the decision first:
+
+```bash
+mia approve --status <workId>
+mia approve <workId> "reviewed the diff, checks pass"
+```
+
+`mia approve` only accepts work that is `ready_to_ship`, is idempotent, and refuses to change an already-resolved approval. Use `mia approve --reject <workId> <reason>` to block shipping instead.
+
+Then run the gate:
+
 ```bash
 mia ship <workId>
 ```
 
-`mia ship` refuses to ship when verification failed or a required human approval is missing. It does not push, merge, or open a pull request. Merge authority stays with a human.
+`mia ship` refuses to ship when verification failed or a required human approval is missing or rejected. It does not push, merge, or open a pull request. Merge authority stays with a human.
 
 ## Step 7: run the meta loop
 

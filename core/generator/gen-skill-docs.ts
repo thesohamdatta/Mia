@@ -109,6 +109,8 @@ const WORKFLOWS: Record<string, string> = {
   plan: '1. Resolve the grill interview first.\n2. Run `mia plan create "<objective>"`.\n3. Review the written plan and its success criteria.',
   spec: '1. Shape the intent with `mia spec`.\n2. Record the specification before implementation.',
   ship: '1. Verify with `mia ship <workId>`.\n2. Ship only when verification and approval are present.',
+  approve:
+    '1. Review the ready_to_ship work with `mia approve --status <workId>`.\n2. Record the decision with `mia approve <workId> [note]`, or reject with `mia approve --reject <workId> <reason>`.',
   review: '1. Run `mia review <workId>`.\n2. Inspect the recorded evidence before landing.',
   health: '1. Run `mia health`.\n2. Inspect each recorded evidence record.',
 };

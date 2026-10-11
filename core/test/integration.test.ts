@@ -135,10 +135,11 @@ describe('Integration: CLI -> Skill -> Store', () => {
 
   it('should expose executable skill definitions with explicit safety contracts', () => {
     const definitions = listSkillDefinitions();
-    expect(definitions).toHaveLength(13);
+    expect(definitions).toHaveLength(14);
     expect(getSkill('vc')?.manifest.sideEffects).toBe('git-write');
     expect(getSkill('setup')?.manifest.sideEffects).toBe('local-write');
     expect(getSkill('factory')?.manifest.sideEffects).toBe('none');
+    expect(getSkill('approve')?.manifest.sideEffects).toBe('local-write');
     expect(getSkill('health')?.manifest.verification).toEqual([
       'typecheck',
       'lint',

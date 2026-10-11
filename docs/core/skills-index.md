@@ -22,6 +22,7 @@ The authoritative command map is `core/skills/index.ts`. Use `mia --help` (or `b
 | `review` | Run the pre-landing review workflow. |
 | `health` | Run the repository's configured verification checks. |
 | `factory` | Assess agent readiness, report factory metrics, route a task to a model tier, and print the factory map. |
+| `approve` | Record the human approval a ship gate requires, or reject it. |
 | `ship` | Check repository verification and handoff readiness. |
 | `learn` | List or store project learnings. |
 | `retro` | Review recent timeline activity and learnings. |
