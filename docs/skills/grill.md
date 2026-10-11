@@ -10,7 +10,7 @@ name: grill
 version: 1.0.0
 invocation: user
 phase: clarify
-side-effects: none
+side-effects: local-write
 ---
 
 # grill
@@ -25,7 +25,7 @@ Explicitly invoked by the user through the MIA CLI.
 
 - Phase: clarify
 - Invocation: user
-- Side effects: none
+- Side effects: local-write
 - Verification: none
 
 ## Runtime authority
