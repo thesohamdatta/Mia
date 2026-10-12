@@ -34,7 +34,9 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: clarify
+1. Start the interview with `mia grill start`.
+2. Answer each design branch with `mia grill answer <decision>`.
+3. Resolve every question before planning.
 
 ---
 

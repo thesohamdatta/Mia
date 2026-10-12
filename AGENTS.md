@@ -17,6 +17,10 @@ Keep the repository simple, deep, evolvable, explicit, and verifiable. Context i
 | Testing Strategy | [docs/reference/testing-strategy.md](docs/reference/testing-strategy.md) |
 | Review Standards | [docs/reference/review-standards.md](docs/reference/review-standards.md) |
 | Evidence Semantics | [docs/reference/evidence.md](docs/reference/evidence.md) |
+| Software Factory | [docs/core/software-factory.md](docs/core/software-factory.md) |
+| Agent Readiness | [docs/reference/agent-readiness.md](docs/reference/agent-readiness.md) |
+| Factory Metrics | [docs/reference/factory-metrics.md](docs/reference/factory-metrics.md) |
+| Factory Runbook | [docs/workflows/software-factory.md](docs/workflows/software-factory.md) |
 | Multi-Agent Protocol | [.agents/PROTOCOL.md](.agents/PROTOCOL.md) |
 | Multi-Agent State | [.agents/state.json](.agents/state.json) & [.agents/handoffs/](.agents/handoffs/) |
 

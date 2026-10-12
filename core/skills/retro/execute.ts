@@ -5,7 +5,12 @@ import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
 
 export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const projectsDir = ctx.config.projectsDir;
-  const timeline = await ctx.unifiedStore.listTimeline(projectsDir, ctx.slug, 20);
+  // The `logTimelineStart` middleware records this run before the executor
+  // reads, so filter it out; a retrospective should report prior activity,
+  // not its own in-flight start event.
+  const timeline = (await ctx.unifiedStore.listTimeline(projectsDir, ctx.slug, 21)).filter(
+    (entry) => (entry.data as { runId?: string }).runId !== ctx.run.id
+  );
   const learnings = await ctx.unifiedStore.listLearnings(projectsDir, ctx.slug, 10);
 
   let output = '📊 RETROSPECTIVE\n\n## Recent Activity (auto-loaded)\n';

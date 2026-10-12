@@ -19,6 +19,10 @@ A short reference for terms used in the MIA documentation and source code.
 | **UnifiedStore** | The local event-store interface used for project learning, timeline, checkpoint, verification, and approval events. |
 | **Work** | A durable unit of engineering work created from a plan and advanced through the supported lifecycle. |
 | **Verification** | A check or observation used to establish a bounded claim about behaviour or repository state. |
+| **Software factory** | The system that turns a signal into verified, shipped software. MIA owns the contracts and evidence; the host owns execution. |
+| **Agent readiness** | The deterministic feedback a codebase gives an agent, assessed across eight areas. |
+| **Factory loop** | An automation point: inner (before a pull request), outer (at the pull request), or meta (after development). |
+| **Signal** | An input to the factory such as a bug report, review comment, failing check, or user request. |
 | **ADR** | Architecture Decision Record: a durable explanation of an accepted architectural decision and its trade-offs. |
 
 Use a term consistently. If the implementation's meaning changes, update the source, tests, and relevant documentation together.

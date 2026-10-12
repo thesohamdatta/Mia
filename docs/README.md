@@ -23,6 +23,7 @@ Start with the task you came here to complete.
 ## Understand MIA
 
 - [Architecture](core/architecture.md) — the CLI execution path, skill boundary, host boundary, and local persistence.
+- [The MIA software factory](core/software-factory.md) — how signals become shipped software, and what MIA owns versus the host.
 - [Engineering principles](../PRINCIPLES.md) — the short, reader-facing statement of MIA's principles.
 - [Design philosophy](core/design-philosophy.md) — simplicity, depth, and evolvability.
 - [Glossary](core/glossary.md) — terms used throughout the project.
@@ -30,6 +31,9 @@ Start with the task you came here to complete.
 ## Use and troubleshoot
 
 - [Skills and commands](core/skills-index.md) — registered skills and their responsibilities.
+- [Running the factory](workflows/software-factory.md) — the runbook for readiness, routing, loops, and metrics.
+- [Agent readiness](reference/agent-readiness.md) — the eight areas that decide how much work an agent can carry.
+- [Factory metrics](reference/factory-metrics.md) — the outcome measures the factory reports.
 - [Configuration](reference/configuration.md) — active runtime configuration and the `MIA_DIR` state root.
 - [Testing and verification](reference/testing-strategy.md) — the checks the repository actually defines.
 

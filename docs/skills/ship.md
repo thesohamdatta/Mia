@@ -38,7 +38,8 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: handoff
+1. Verify with `mia ship <workId>`.
+2. Ship only when verification and approval are present.
 
 ---
 

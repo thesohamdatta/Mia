@@ -34,7 +34,8 @@ The executable definition in `core/skills/index.ts` is authoritative. This page 
 
 ## Workflow
 
-Phase: specify
+1. Shape the intent with `mia spec`.
+2. Record the specification before implementation.
 
 ---
 
