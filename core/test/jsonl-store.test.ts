@@ -33,6 +33,29 @@ describe('jsonl-store performance & behavior', () => {
     expect(readJsonlTail(jsonlFile, -5)).toEqual([]);
   });
 
+  it('reads the requested tail from a large JSONL file', () => {
+    const lines = Array.from({ length: 10000 }, (_, i) => JSON.stringify({ id: i + 1 }));
+    const newline = String.fromCharCode(10);
+    const content = lines.join(newline);
+    writeFileSync(jsonlFile, [content, ''].join(newline), 'utf-8');
+    const tail = readJsonlTail<{ id: number }>(jsonlFile, 3);
+    expect(tail.map((entry) => entry.id)).toEqual([10000, 9999, 9998]);
+  });
+
+  it('preserves UTF-8 when a record crosses a chunk boundary', () => {
+    const first = JSON.stringify({ id: 1, text: 'before' });
+    const newline = String.fromCharCode(10);
+    const prefix = `${first}${newline}{"id":2,"text":"`;
+    const longText = `😀${'z'.repeat(65532)}`;
+    const content = `${prefix}${longText}"}${newline}`;
+    expect(Buffer.byteLength(content) - 65536).toBe(Buffer.byteLength(prefix) + 3);
+    writeFileSync(jsonlFile, content, 'utf-8');
+
+    const tail = readJsonlTail<{ id: number; text: string }>(jsonlFile, 2);
+    expect(tail.map((entry) => entry.id)).toEqual([2, 1]);
+    expect(tail[0]?.text).toBe(longText);
+  });
+
   it('should return entries in reverse chronological order up to limit', () => {
     appendJsonl(jsonlFile, { id: 1, val: 'first' });
     appendJsonl(jsonlFile, { id: 2, val: 'second' });
