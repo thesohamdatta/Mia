@@ -31,6 +31,9 @@ bunx tsc --noEmit
 echo "🔍 Checking for unused code with Knip..."
 bunx knip
 
+echo "🧪 Running tests..."
+bun test
+
 echo "📝 Validating markdown..."
 bun run lint:md
 

@@ -18,7 +18,7 @@
     "validate:frontmatter": "bun run scripts/sync-docs.ts",
     "typecheck": "bun x tsc --noEmit",
     "knip": "bun x knip",
-    "validate": "bun run lint && bun run typecheck && bun run knip",
+    "validate": "bun run lint:check && bun run typecheck && bun run knip && bun test",
     "prepare": "husky"
   },
   "keywords": ["ai", "agent", "workflow", "automation", "mia"],
