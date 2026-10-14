@@ -39,6 +39,17 @@ describe('Markdown engineering contract', () => {
     expect(workflow).toContain('explore → contract → plan → change → verify → review');
   });
 
+  it('points active guidance to the canonical principles document', () => {
+    const protocol = read('.agents/PROTOCOL.md');
+    const docsIndex = read('docs/README.md');
+
+    expect(protocol).toContain('docs/core/principles.md');
+    expect(protocol).not.toContain('PRINCIPLES.md');
+    expect(docsIndex).toContain('[Engineering principles](core/principles.md)');
+    expect(docsIndex).not.toContain('../PRINCIPLES.md');
+    expect(existsSync(join(ROOT, 'docs/core/principles.md'))).toBe(true);
+  });
+
   it('keeps project context and agent instructions separate', () => {
     const context = read('CONTEXT.md');
     const agentEngineering = read('docs/core/agent-engineering.md');
