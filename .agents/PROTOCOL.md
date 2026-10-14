@@ -33,7 +33,7 @@ The stages are serialized. A stage may act only after the previous stage has pro
 
 ## Non-negotiable rules
 
-1. Read `AGENTS.md`, `PRINCIPLES.md`, this protocol, and current shared state before acting.
+1. Read `AGENTS.md`, `docs/core/principles.md`, this protocol, and current shared state before acting.
 2. Triage the relevant issue/PR before implementation.
 3. Run a grill for ambiguous, architectural, or multi-file work.
 4. Define executable acceptance criteria before implementation.
