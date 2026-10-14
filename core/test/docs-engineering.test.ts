@@ -9,8 +9,8 @@ describe('Markdown engineering contract', () => {
   it('keeps AGENTS.md as a small router, not a knowledge dump', () => {
     const lines = read('AGENTS.md').trim().split('\n');
     expect(lines.length).toBeLessThanOrEqual(100);
-    expect(read('AGENTS.md')).toContain('docs/reference/evidence.md');
-    expect(read('AGENTS.md')).toContain('docs/reference/testing-strategy.md');
+    expect(read('AGENTS.md')).toContain('This repository uses **Bun**.');
+    expect(read('AGENTS.md')).toContain('bun run typecheck');
   });
 
   it('keeps agent-facing canonical docs discoverable from AGENTS.md', () => {

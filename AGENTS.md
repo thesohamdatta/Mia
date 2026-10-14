@@ -1,36 +1,21 @@
-# MIA Agent Entry Router
+MIA is a local-first Bun and TypeScript CLI for structured, evidence-driven AI-assisted software engineering.
 
-MIA is a local-first AI engineering OS (`CLI → ExecutionContext → Middleware → Skill Executor → state/local files`).
-Keep the repository simple, deep, evolvable, explicit, and verifiable. Context is a budget—read narrowly.
+This repository uses **Bun**. Check `package.json` for the available scripts.
 
-## Canonical Router
+- Build: `bun run build`
+- Typecheck: `bun run typecheck`
+- Tests: `bun test`
+- Markdown and documentation validation: `bun run lint:md` and `bun run validate:frontmatter`
 
-| Concern | Canonical Document |
-| :--- | :--- |
-| Project Vocabulary | [CONTEXT.md](CONTEXT.md) |
-| System Architecture | [docs/core/architecture.md](docs/core/architecture.md) |
-| Context Engineering | [docs/core/context.md](docs/core/context.md) |
-| Core Principles | [docs/core/principles.md](docs/core/principles.md) |
-| Agent Engineering | [docs/core/agent-engineering.md](docs/core/agent-engineering.md) |
-| Executable Skills | [docs/core/skills-index.md](docs/core/skills-index.md) & `core/skills/` |
-| Workflows | [docs/workflows/](docs/workflows/) & [docs/workflows/grill-to-ship.md](docs/workflows/grill-to-ship.md) |
-| Testing Strategy | [docs/reference/testing-strategy.md](docs/reference/testing-strategy.md) |
-| Review Standards | [docs/reference/review-standards.md](docs/reference/review-standards.md) |
-| Evidence Semantics | [docs/reference/evidence.md](docs/reference/evidence.md) |
-| Multi-Agent Protocol | [.agents/PROTOCOL.md](.agents/PROTOCOL.md) |
-| Multi-Agent State | [.agents/state.json](.agents/state.json) & [.agents/handoffs/](.agents/handoffs/) |
+For the task at hand, inspect the current source and tests, then load only the relevant guidance:
 
-## Non-Negotiables
+- Project vocabulary: [CONTEXT.md](CONTEXT.md)
+- Architecture and engineering principles: [docs/core/architecture.md](docs/core/architecture.md), [docs/core/principles.md](docs/core/principles.md)
+- Context and agent design: [docs/core/context.md](docs/core/context.md), [docs/core/agent-engineering.md](docs/core/agent-engineering.md)
+- Skills and their executable responsibilities: [docs/core/skills-index.md](docs/core/skills-index.md)
+- Task workflow: [docs/workflows/](docs/workflows/) and [docs/workflows/grill-to-ship.md](docs/workflows/grill-to-ship.md)
+- Tests and review: [docs/reference/testing-strategy.md](docs/reference/testing-strategy.md), [docs/reference/review-standards.md](docs/reference/review-standards.md)
+- Evidence and verification claims: [docs/reference/evidence.md](docs/reference/evidence.md)
+- Multi-agent coordination, only when coordinating agents: [.agents/PROTOCOL.md](.agents/PROTOCOL.md)
 
-- **Executable Truth**: Runtime code and passing tests outrank prose, summaries, or claims.
-- **Single Ownership**: Preserve MIA's execution pipeline. Do not introduce duplicate stores, registries, or engines.
-- **TDD First**: `RED → GREEN → REFACTOR → VERIFY`. Fail first for new behavior or regressions.
-- **Verification Gate**: No claim without evidence. Focused test → typecheck → lint → full repo gate.
-- **Governance Pipeline**: Follow `SENTRY → PULSE → MAINTAINER → ORCHESTRATOR` sequence in [.agents/PROTOCOL.md](.agents/PROTOCOL.md).
-- **Git Discipline**: Target `master`. One writer at a time. Never force-push or self-approve. Keep PRs focused.
-
-## Development Loop
-
-`triage → grill → plan → spec → execute → verify → review → ship → learn`
-
-*Simple rules. Explicit ownership. TDD before implementation. Evidence before progression.*
+Prefer executable code and tests over stale prose. Preserve unrelated work, keep changes focused, and do not introduce duplicate owners, stores, registries, or execution engines. Match verification to the change and report only checks that actually ran.
