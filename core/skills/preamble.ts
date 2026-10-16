@@ -116,8 +116,4 @@ export async function executeWithMiddlewares(
   return result;
 }
 
-const defaultMiddlewares: Middleware[] = [
-  requireProject,
-  loadRecentLearnings,
-  logTimelineStart,
-];
+const defaultMiddlewares: Middleware[] = [requireProject, loadRecentLearnings, logTimelineStart];
