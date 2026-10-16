@@ -2,13 +2,12 @@ import { executeWithMiddlewares } from './preamble.js';
 import type {
   ExecutionContext,
   SkillDefinition,
-  SkillExecutor,
   SkillInvocation,
   SkillManifest,
   SkillResult,
 } from './types.js';
 
-export class SkillContractError extends Error {
+class SkillContractError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'SkillContractError';
@@ -58,10 +57,7 @@ function validateStringList(
   }
 }
 
-export function enforceSkillCapabilities(
-  manifest: SkillManifest,
-  grantedTools: readonly string[]
-): void {
+function enforceSkillCapabilities(manifest: SkillManifest, grantedTools: readonly string[]): void {
   const grants = new Set(grantedTools.map((tool) => tool.trim()).filter(Boolean));
   const missing = manifest.allowedTools
     .map((tool) => tool.trim())
@@ -139,8 +135,3 @@ export async function executeSkillDefinition(
   );
 }
 
-export function createExecutor(
-  fn: (args: string[], context: ExecutionContext) => Promise<SkillResult>
-): SkillExecutor {
-  return { execute: fn };
-}

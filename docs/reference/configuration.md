@@ -1,7 +1,7 @@
 ---
 title: "Configuration and local state"
 layer: 3
-last_updated: "2026-10-10"
+last_updated: "2026-10-16"
 owner: runtime
 ---
 
@@ -29,8 +29,8 @@ MIA derives the project slug from the Git repository root. When it cannot identi
 
 Project event data is stored beneath the configured projects directory. The current event store uses an append-oriented `events.jsonl` file for event types such as learning, timeline, checkpoint, evidence, and approval.
 
-## What is not part of the active contract
+## Configuration contract
 
-The repository contains a broader `core/config/ConfigLoader` with JSON and environment override support. That loader is not currently wired into `createExecutionContext()`; do not assume every option represented in that schema changes active CLI behaviour.
+For runtime paths, the active CLI reads `MIA_DIR`; when it is unset, MIA defaults to `~/.mia`. Project, memory, skill, and session paths are derived from that root. The unused JSON loader and daemon-only settings have been removed rather than presenting them as supported configuration options.
 
 When configuration behaviour changes, update this page only after tracing the active execution path and its tests.

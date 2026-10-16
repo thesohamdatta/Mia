@@ -6,7 +6,7 @@ import { dirname } from 'node:path';
 // "user: alice reported the regression" must not be treated as an attack, so a
 // lone "override"/role-prefix is not enough on its own. A bare "approve this"
 // with nothing after it, though, has no benign reading and is flagged.
-export const INJECTION_PATTERNS: readonly RegExp[] = [
+const INJECTION_PATTERNS: readonly RegExp[] = [
   /ignore\s+(?:all\s+|any\s+|the\s+)?(?:previous|prior|above|earlier|preceding)\s+(?:instructions|context|rules|prompts?|messages?)/i,
   /you\s+are\s+now\s+/i,
   /always\s+output\s+no\s+findings/i,
@@ -25,7 +25,7 @@ export function hasInjection(text: string): boolean {
   return INJECTION_PATTERNS.some((p) => p.test(text));
 }
 
-export function firstInjectionMatch(text: string): RegExp | null {
+function firstInjectionMatch(text: string): RegExp | null {
   return INJECTION_PATTERNS.find((p) => p.test(text)) ?? null;
 }
 

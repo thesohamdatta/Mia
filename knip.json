@@ -1,6 +1,6 @@
 {
   "$schema": "https://knip.dev/schema.json",
-  "entry": ["core/**/index.ts", "core/test/**/*.ts", "core/skills/*/execute.ts", "scripts/*.ts"],
+  "entry": ["core/**/*.test.ts"],
   "project": ["core/**/*.ts", "scripts/**/*.ts"],
   "rules": {
     "dependencies": "warn",
