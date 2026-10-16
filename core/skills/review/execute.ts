@@ -8,7 +8,7 @@ import {
   startWork,
 } from '../../work/lifecycle.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(
   args: string[],
@@ -104,4 +104,3 @@ export async function execute(
   };
 }
 
-export const executor: SkillExecutor = { execute };
