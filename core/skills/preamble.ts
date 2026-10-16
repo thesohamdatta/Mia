@@ -56,7 +56,6 @@ async function runMiddlewares(
   await next();
 }
 
-
 async function recordCompletion(ctx: ExecutionContext, result: SkillResult): Promise<void> {
   try {
     await ctx.unifiedStore.appendTimeline(ctx.config.projectsDir, ctx.slug, {
