@@ -42,4 +42,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   await writeFile(path, content, 'utf8');
   return { ok: true, status: 'success', output: `Specification written to ${path}` };
 }
-
