@@ -4,7 +4,7 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 function validateCheckpointName(name: string): string {
   const trimmed = name.trim();
@@ -97,5 +97,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
 
   return { ok: true, output: 'Usage: mia checkpoint [save <name> <summary>|list|load <name>]' };
 }
-
-export const executor: SkillExecutor = { execute };

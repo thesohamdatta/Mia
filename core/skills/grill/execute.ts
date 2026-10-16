@@ -17,7 +17,7 @@ import {
   nextUnresolved,
   saveGrillSession,
 } from '../../work/grill-session.js';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 async function writeGrillArtifact(ctx: ExecutionContext, session: GrillSession): Promise<string> {
   const path = join(ctx.config.projectsDir, ctx.slug, 'GRILL.md');
@@ -148,5 +148,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
     error: 'Usage: mia grill [start <objective>|answer <decision>|status|questions]',
   };
 }
-
-export const executor: SkillExecutor = { execute };

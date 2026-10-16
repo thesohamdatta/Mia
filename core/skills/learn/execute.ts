@@ -1,7 +1,7 @@
 // Learn Skill Executor - Manage project learnings
 // Runs: mia learn
 
-import type { ExecutionContext, LearningRecord, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, LearningRecord, SkillResult } from '../types.js';
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'list';
@@ -43,5 +43,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
 
   return { ok: true, output: 'Usage: mia learn [list|add <type> <key> <insight>]' };
 }
-
-export const executor: SkillExecutor = { execute };

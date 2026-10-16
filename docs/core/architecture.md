@@ -1,7 +1,7 @@
 ---
 title: "MIA architecture"
 layer: 2
-last_updated: "2026-10-10"
+last_updated: "2026-10-16"
 owner: architecture
 ---
 
@@ -65,7 +65,7 @@ Capability admission is not itself a tool sandbox. It checks the grants represen
 
 ## Configuration boundary
 
-The active CLI uses `MIA_DIR` and derives the normal runtime paths from it. A broader `core/config/ConfigLoader` exists in the repository but is not currently wired into `createExecutionContext()`. Treat its additional options as transition or compatibility code unless the runtime is updated.
+The active CLI reads `MIA_DIR`, defaulting to `~/.mia`, and derives runtime paths from it. The legacy `core/config/ConfigLoader` and daemon-era options had no consumers in the active execution path and have been removed.
 
 ## Architecture decision
 

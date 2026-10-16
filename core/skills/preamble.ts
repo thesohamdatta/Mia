@@ -1,15 +1,15 @@
 import type { ExecutionContext, SkillExecutor, SkillManifest, SkillResult } from './types.js';
 
-export type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
+type Middleware = (ctx: ExecutionContext, next: () => Promise<void>) => Promise<void>;
 
-export const requireProject: Middleware = async (ctx, next) => {
+const requireProject: Middleware = async (ctx, next) => {
   if (ctx.slug === 'default') {
     console.warn('Not in a git repository. Using default project.');
   }
   await next();
 };
 
-export const loadRecentLearnings: Middleware = async (ctx, next) => {
+const loadRecentLearnings: Middleware = async (ctx, next) => {
   try {
     const learnings = await ctx.unifiedStore.listLearnings(ctx.config.projectsDir, ctx.slug, 5);
     if (learnings.length > 0) {
@@ -27,7 +27,7 @@ export const loadRecentLearnings: Middleware = async (ctx, next) => {
   await next();
 };
 
-export const logTimelineStart: Middleware = async (ctx, next) => {
+const logTimelineStart: Middleware = async (ctx, next) => {
   try {
     await ctx.unifiedStore.appendTimeline(ctx.config.projectsDir, ctx.slug, {
       runId: ctx.run.id,
@@ -42,7 +42,7 @@ export const logTimelineStart: Middleware = async (ctx, next) => {
   await next();
 };
 
-export async function runMiddlewares(
+async function runMiddlewares(
   middlewares: readonly Middleware[],
   ctx: ExecutionContext
 ): Promise<void> {
@@ -54,13 +54,6 @@ export async function runMiddlewares(
     }
   };
   await next();
-}
-
-export function formatSkillOutput(result: SkillResult): string {
-  if (!result.ok) {
-    return `Error: ${result.error}`;
-  }
-  return result.output || 'Done';
 }
 
 async function recordCompletion(ctx: ExecutionContext, result: SkillResult): Promise<void> {
@@ -123,8 +116,4 @@ export async function executeWithMiddlewares(
   return result;
 }
 
-export const defaultMiddlewares: Middleware[] = [
-  requireProject,
-  loadRecentLearnings,
-  logTimelineStart,
-];
+const defaultMiddlewares: Middleware[] = [requireProject, loadRecentLearnings, logTimelineStart];

@@ -1,7 +1,7 @@
 // Retro Skill Executor - Weekly retrospective with timeline + learnings
 // Runs: mia retro
 
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const projectsDir = ctx.config.projectsDir;
@@ -25,5 +25,3 @@ export async function execute(_args: string[], ctx: ExecutionContext): Promise<S
 
   return { ok: true, output };
 }
-
-export const executor: SkillExecutor = { execute };

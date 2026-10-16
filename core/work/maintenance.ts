@@ -1,9 +1,9 @@
 import type { StoredEvent, UnifiedStore } from '../state/unified-store.js';
 import { type Work, createWork } from './types.js';
 
-export type ObservationSeverity = 'info' | 'warning' | 'incident';
+type ObservationSeverity = 'info' | 'warning' | 'incident';
 
-export interface OperationalObservation {
+interface OperationalObservation {
   id: string;
   severity: ObservationSeverity;
   summary: string;
@@ -16,7 +16,7 @@ interface ObservationEvent {
   observation: OperationalObservation;
 }
 
-export interface CreateMaintenanceWorkInput {
+interface CreateMaintenanceWorkInput {
   objective: string;
   observation: OperationalObservation;
   sourceWorkId?: string;

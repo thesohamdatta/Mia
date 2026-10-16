@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'create';
@@ -42,5 +42,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   await writeFile(path, content, 'utf8');
   return { ok: true, status: 'success', output: `Specification written to ${path}` };
 }
-
-export const executor: SkillExecutor = { execute };
