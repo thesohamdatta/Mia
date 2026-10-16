@@ -4,7 +4,7 @@ import { createRootPlan } from '../../root/types.js';
 import { createWorkFromRootPlan } from '../../work/from-root-plan.js';
 import { loadGrillSession } from '../../work/grill-session.js';
 import { saveWork } from '../../work/persistence.js';
-import type { ExecutionContext, LearningRecord, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, LearningRecord, SkillResult } from '../types.js';
 
 const DEFAULT_EVIDENCE = ['Tests pass'];
 
@@ -149,4 +149,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   return { ok: false, status: 'blocked', error: 'Usage: mia plan [create <objective>|template]' };
 }
 
-export const executor: SkillExecutor = { execute };
