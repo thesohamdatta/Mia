@@ -8,7 +8,7 @@ import type {
   SkillResult,
 } from './types.js';
 
-export class SkillContractError extends Error {
+class SkillContractError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'SkillContractError';
@@ -58,7 +58,7 @@ function validateStringList(
   }
 }
 
-export function enforceSkillCapabilities(
+function enforceSkillCapabilities(
   manifest: SkillManifest,
   grantedTools: readonly string[]
 ): void {
@@ -139,8 +139,3 @@ export async function executeSkillDefinition(
   );
 }
 
-export function createExecutor(
-  fn: (args: string[], context: ExecutionContext) => Promise<SkillResult>
-): SkillExecutor {
-  return { execute: fn };
-}
