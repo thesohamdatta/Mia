@@ -2,7 +2,6 @@ import { executeWithMiddlewares } from './preamble.js';
 import type {
   ExecutionContext,
   SkillDefinition,
-  SkillExecutor,
   SkillInvocation,
   SkillManifest,
   SkillResult,
@@ -58,10 +57,7 @@ function validateStringList(
   }
 }
 
-function enforceSkillCapabilities(
-  manifest: SkillManifest,
-  grantedTools: readonly string[]
-): void {
+function enforceSkillCapabilities(manifest: SkillManifest, grantedTools: readonly string[]): void {
   const grants = new Set(grantedTools.map((tool) => tool.trim()).filter(Boolean));
   const missing = manifest.allowedTools
     .map((tool) => tool.trim())
