@@ -4,7 +4,7 @@ import { repositoryChecks, resolveVerificationChecks } from '../../verification/
 import { recordApproval, recordVerification } from '../../work/lifecycle.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
 import { shipWork } from '../../work/ship.js';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(
   args: string[],
@@ -113,4 +113,3 @@ export async function execute(
   }
 }
 
-export const executor: SkillExecutor = { execute };
