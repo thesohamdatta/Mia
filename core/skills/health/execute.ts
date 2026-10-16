@@ -1,6 +1,6 @@
 import { runVerification } from '../../verification/run-checks.js';
 import { repositoryChecks, resolveVerificationChecks } from '../../verification/suite.js';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(_args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const checks = ctx.skill ? resolveVerificationChecks(ctx.skill.verification) : repositoryChecks;
@@ -31,4 +31,3 @@ export async function execute(_args: string[], ctx: ExecutionContext): Promise<S
   };
 }
 
-export const executor: SkillExecutor = { execute };
