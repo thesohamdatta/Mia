@@ -25,4 +25,3 @@ export async function execute(_args: string[], ctx: ExecutionContext): Promise<S
 
   return { ok: true, output };
 }
-
