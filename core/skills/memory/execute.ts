@@ -3,7 +3,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(args: string[], ctx: ExecutionContext): Promise<SkillResult> {
   const subcmd = args[0] || 'read';
@@ -34,4 +34,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
   return { ok: true, output: 'Usage: mia memory [read|append <content>]' };
 }
 
-export const executor: SkillExecutor = { execute };
