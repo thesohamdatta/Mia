@@ -3,7 +3,7 @@
 
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ExecutionContext, SkillExecutor, SkillResult } from '../types.js';
+import type { ExecutionContext, SkillResult } from '../types.js';
 
 const _CONVENTIONAL_TYPES = [
   'feat',
@@ -298,4 +298,3 @@ fi
   }
 }
 
-export const executor: SkillExecutor = { execute };
