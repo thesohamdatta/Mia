@@ -43,4 +43,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
 
   return { ok: true, output: 'Usage: mia learn [list|add <type> <key> <insight>]' };
 }
-

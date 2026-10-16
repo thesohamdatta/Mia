@@ -30,4 +30,3 @@ export async function execute(_args: string[], ctx: ExecutionContext): Promise<S
     error: verification.passed ? undefined : 'One or more repository checks failed',
   };
 }
-

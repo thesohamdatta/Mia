@@ -97,4 +97,3 @@ export async function execute(args: string[], ctx: ExecutionContext): Promise<Sk
 
   return { ok: true, output: 'Usage: mia checkpoint [save <name> <summary>|list|load <name>]' };
 }
-
