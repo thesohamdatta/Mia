@@ -45,8 +45,6 @@ describe('Work lifecycle', () => {
       'planned',
       'in_progress',
       'verification',
-      'review',
-      'ready_to_ship',
     ];
 
     for (const state of sequence) {
@@ -68,6 +66,8 @@ describe('Work lifecycle', () => {
         },
       ],
     });
+    work = transitionWork(work, 'review');
+    work = transitionWork(work, 'ready_to_ship');
     work = shipWork(work);
     expect(work.state).toBe('shipped');
 
