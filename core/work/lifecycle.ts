@@ -65,9 +65,50 @@ export function recordApproval(work: Work, approval: Approval): Work {
 }
 
 export function completeVerification(work: Work, outcome: VerificationOutcome): Work {
-  return transitionWork(work, outcome.passed ? 'review' : 'in_progress');
+  if (!outcome.passed) {
+    return transitionWork(work, 'in_progress');
+  }
+
+  const verification = work.verification;
+  if (!verification) {
+    throw new Error('Cannot complete verification: verification evidence is missing');
+  }
+
+  if (!verification.passed || verification.evidence.length === 0) {
+    throw new Error('Cannot complete verification: verification evidence has not passed');
+  }
+
+  const failedEvidence = verification.evidence.filter((evidence) => evidence.status !== 'passed');
+  if (failedEvidence.length > 0) {
+    throw new Error(
+      `Cannot complete verification: evidence has not passed: ${failedEvidence.map((evidence) => evidence.name).join(', ')}`
+    );
+  }
+
+  return transitionWork(work, 'review');
 }
 
 export function completeReview(work: Work, outcome: ReviewOutcome): Work {
-  return transitionWork(work, outcome.passed ? 'ready_to_ship' : 'in_progress');
+  if (!outcome.passed) {
+    return transitionWork(work, 'in_progress');
+  }
+
+  if (work.state !== 'review') {
+    throw new Error(`Cannot complete review from state: ${work.state}`);
+  }
+
+  if (!work.verification?.passed || work.verification.evidence.length === 0) {
+    throw new Error('Cannot complete review: passing verification evidence is required');
+  }
+
+  const failedEvidence = work.verification.evidence.filter(
+    (evidence) => evidence.status !== 'passed'
+  );
+  if (failedEvidence.length > 0) {
+    throw new Error(
+      `Cannot complete review: verification evidence has not passed: ${failedEvidence.map((evidence) => evidence.name).join(', ')}`
+    );
+  }
+
+  return transitionWork(work, 'ready_to_ship');
 }
