@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createExecutionContext } from '../context.js';
+import { execute as review } from '../skills/review/execute.js';
 import { execute as ship } from '../skills/ship/execute.js';
 import { createUnifiedStore } from '../state/unified-store.js';
 import { loadWork, saveWork } from '../work/persistence.js';
@@ -164,4 +165,33 @@ describe('shipping lifecycle reconciliation', () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
+  it('does not mark review ready when a reported pass contains failed evidence', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mia-review-conflict-'));
+    try {
+      const ctx = context(dir, 'review-conflict');
+      const work = transitionWork(
+        transitionWork(createWork({ objective: 'Review checked work' }), 'specified'),
+        'planned'
+      );
+      await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+      const result = await review([work.id], ctx, async () =>
+        verification(ctx.run.id, 'failed', true)
+      );
+      expect(result.ok).toBe(false);
+      expect(result.error).toBe('Review verification failed');
+
+      const resumed = await loadWork(
+        createUnifiedStore(),
+        ctx.config.projectsDir,
+        ctx.slug,
+        work.id
+      );
+      expect(resumed?.state).toBe('in_progress');
+      expect(resumed?.verification?.passed).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
 });
