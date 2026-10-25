@@ -52,17 +52,21 @@ export async function execute(
     ? resolveVerificationChecks(ctx.skill.verification)
     : repositoryChecks.slice(0, 4);
   const verification = await verify(ctx, checks);
+  const passed =
+    verification.passed &&
+    verification.records.length > 0 &&
+    verification.records.every((record) => record.status === 'passed');
   work = recordVerification(work, {
     runId: ctx.run.id,
     records: verification.records,
-    passed: verification.passed,
+    passed,
   });
 
   for (const record of verification.records) {
     await ctx.unifiedStore.appendEvidence(ctx.config.projectsDir, ctx.slug, record);
   }
 
-  if (!verification.passed) {
+  if (!passed) {
     work = completeVerification(work, { passed: false });
     await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
