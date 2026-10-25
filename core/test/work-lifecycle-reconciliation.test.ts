@@ -193,5 +193,4 @@ describe('shipping lifecycle reconciliation', () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
-
 });
