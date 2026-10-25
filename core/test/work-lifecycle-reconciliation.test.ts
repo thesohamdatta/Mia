@@ -193,4 +193,31 @@ describe('shipping lifecycle reconciliation', () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
+
+  it('reopens Work when the shipping verification runner throws', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mia-ship-exception-'));
+    try {
+      const ctx = context(dir, 'ship-exception');
+      const work = readyWork();
+      await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+      const result = await ship([work.id], ctx, async () => {
+        throw new Error('verification tool unavailable');
+      });
+      expect(result.ok).toBe(false);
+      expect(result.status).toBe('blocked');
+      expect(result.error).toContain('verification tool unavailable');
+
+      const resumed = await loadWork(
+        createUnifiedStore(),
+        ctx.config.projectsDir,
+        ctx.slug,
+        work.id
+      );
+      expect(resumed?.state).toBe('in_progress');
+      expect(resumed?.verification?.passed).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });
