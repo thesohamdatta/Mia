@@ -1,9 +1,10 @@
 import { loadApprovalForWork } from '../../approval/persistence.js';
 import { runVerification } from '../../verification/run-checks.js';
 import { repositoryChecks, resolveVerificationChecks } from '../../verification/suite.js';
-import { recordApproval, recordVerification } from '../../work/lifecycle.js';
+import { completeReview, recordApproval, recordVerification } from '../../work/lifecycle.js';
 import { loadWork, saveWork } from '../../work/persistence.js';
 import { shipWork } from '../../work/ship.js';
+import { transitionWork } from '../../work/types.js';
 import type { ExecutionContext, SkillResult } from '../types.js';
 
 export async function execute(
@@ -30,12 +31,24 @@ export async function execute(
     };
   }
 
+  if (work.state !== 'ready_to_ship') {
+    return {
+      ok: false,
+      status: 'blocked',
+      error: `Work is not ready to ship: ${work.state}`,
+    };
+  }
+
   const checks = ctx.skill ? resolveVerificationChecks(ctx.skill.verification) : repositoryChecks;
   const verification = await verify(ctx, checks);
+  const passed =
+    verification.passed &&
+    verification.records.length > 0 &&
+    verification.records.every((record) => record.status === 'passed');
   work = recordVerification(work, {
     runId: ctx.run.id,
     records: verification.records,
-    passed: verification.passed,
+    passed,
   });
 
   for (const record of verification.records) {
@@ -47,6 +60,10 @@ export async function execute(
       `${record.status === 'passed' ? 'PASS' : 'FAIL'} ${record.name} (${record.durationMs}ms)`
   );
 
+  if (!passed) {
+    work = completeReview(transitionWork(work, 'review'), { passed: false });
+  }
+
   const approval = work.requiresHumanApproval
     ? await loadApprovalForWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work.id, 'ship')
     : undefined;
@@ -57,7 +74,7 @@ export async function execute(
 
   await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
 
-  if (!verification.passed) {
+  if (!passed) {
     return {
       ok: false,
       status: 'blocked',
