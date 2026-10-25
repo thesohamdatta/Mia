@@ -4,7 +4,7 @@ scope: project
 status: active
 owner: architecture
 canonical: false
-audience: agent
+audience: human
 load: on-demand
 ---
 
