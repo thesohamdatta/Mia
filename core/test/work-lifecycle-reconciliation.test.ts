@@ -220,4 +220,34 @@ describe('shipping lifecycle reconciliation', () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
+
+  it('persists a resumable Work state when review verification throws', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mia-review-exception-'));
+    try {
+      const ctx = context(dir, 'review-exception');
+      const work = transitionWork(
+        transitionWork(createWork({ objective: 'Review interrupted work' }), 'specified'),
+        'planned'
+      );
+      await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+
+      const result = await review([work.id], ctx, async () => {
+        throw new Error('verification command not found');
+      });
+      expect(result.ok).toBe(false);
+      expect(result.status).toBe('blocked');
+      expect(result.error).toContain('verification command not found');
+
+      const resumed = await loadWork(
+        createUnifiedStore(),
+        ctx.config.projectsDir,
+        ctx.slug,
+        work.id
+      );
+      expect(resumed?.state).toBe('in_progress');
+      expect(resumed?.verification?.passed).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });
