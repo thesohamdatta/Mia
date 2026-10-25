@@ -51,7 +51,19 @@ export async function execute(
   const checks = ctx.skill
     ? resolveVerificationChecks(ctx.skill.verification)
     : repositoryChecks.slice(0, 4);
-  const verification = await verify(ctx, checks);
+  let verification: Awaited<ReturnType<typeof runVerification>>;
+  try {
+    verification = await verify(ctx, checks);
+  } catch (error) {
+    work = recordVerification(work, { runId: ctx.run.id, records: [], passed: false });
+    work = completeVerification(work, { passed: false });
+    await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
+    return {
+      ok: false,
+      status: 'blocked',
+      error: `Review verification failed: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
   const passed =
     verification.passed &&
     verification.records.length > 0 &&
