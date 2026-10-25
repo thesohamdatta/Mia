@@ -33,14 +33,16 @@ function context(dir: string, runId: string) {
 function verification(runId: string, status: 'passed' | 'failed', passed = status === 'passed') {
   return {
     passed,
-    records: [{
-      runId,
-      name: 'tests',
-      status,
-      command: 'bun test',
-      durationMs: 1,
-      detail: status,
-    }],
+    records: [
+      {
+        runId,
+        name: 'tests',
+        status,
+        command: 'bun test',
+        durationMs: 1,
+        detail: status,
+      },
+    ],
   };
 }
 
@@ -61,8 +63,9 @@ describe('shipping lifecycle reconciliation', () => {
       expect(result.status).toBe('blocked');
       expect(result.error).toContain('not ready to ship: specified');
       expect(calls).toBe(0);
-      expect(await loadWork(createUnifiedStore(), ctx.config.projectsDir, ctx.slug, work.id))
-        .toEqual(work);
+      expect(
+        await loadWork(createUnifiedStore(), ctx.config.projectsDir, ctx.slug, work.id)
+      ).toEqual(work);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -92,8 +95,9 @@ describe('shipping lifecycle reconciliation', () => {
       expect(result.ok).toBe(false);
       expect(result.error).toContain('not ready to ship: shipped');
       expect(calls).toBe(0);
-      expect(await loadWork(createUnifiedStore(), ctx.config.projectsDir, ctx.slug, work.id))
-        .toEqual(work);
+      expect(
+        await loadWork(createUnifiedStore(), ctx.config.projectsDir, ctx.slug, work.id)
+      ).toEqual(work);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -105,13 +109,16 @@ describe('shipping lifecycle reconciliation', () => {
       const ctx = context(dir, 'ship-failed');
       const work = readyWork();
       await saveWork(ctx.unifiedStore, ctx.config.projectsDir, ctx.slug, work);
-      const result = await ship([work.id], ctx, async () =>
-        verification(ctx.run.id, 'failed')
-      );
+      const result = await ship([work.id], ctx, async () => verification(ctx.run.id, 'failed'));
       expect(result.ok).toBe(false);
       expect(result.error).toBe('Ship verification failed');
 
-      const resumed = await loadWork(createUnifiedStore(), ctx.config.projectsDir, ctx.slug, work.id);
+      const resumed = await loadWork(
+        createUnifiedStore(),
+        ctx.config.projectsDir,
+        ctx.slug,
+        work.id
+      );
       expect(resumed?.state).toBe('in_progress');
       expect(resumed?.verification).toEqual({
         runId: 'ship-failed',
@@ -145,7 +152,12 @@ describe('shipping lifecycle reconciliation', () => {
 
       expect(result.ok).toBe(false);
       expect(result.error).toBe('Ship verification failed');
-      const resumed = await loadWork(createUnifiedStore(), ctx.config.projectsDir, ctx.slug, work.id);
+      const resumed = await loadWork(
+        createUnifiedStore(),
+        ctx.config.projectsDir,
+        ctx.slug,
+        work.id
+      );
       expect(resumed?.state).toBe('in_progress');
       expect(resumed?.verification?.passed).toBe(false);
     } finally {
